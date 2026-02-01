@@ -1040,7 +1040,7 @@ async function handleGoogleLogin() {
         });
 
         // Check if user already exists in our system
-        let existingUser = getUserByEmail(googleEmail);
+        let existingUser = findUserByEmail(googleEmail);
 
         if (existingUser) {
             // User exists - log them in
@@ -1049,37 +1049,37 @@ async function handleGoogleLogin() {
 
             // Update profile photo from Google if available
             if (googlePhotoURL && !existingUser.profilePhoto) {
-                existingUser.profilePhoto = googlePhotoURL;
-                updateUserProfile(existingUser.id, { profilePhoto: googlePhotoURL });
+                const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+                if (allUsers[existingUser.userId]) {
+                    allUsers[existingUser.userId].profilePhoto = googlePhotoURL;
+                    localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+                    console.log('✅ Profile photo updated from Google');
+                }
             }
         } else {
             // New user - create account
             console.log('✨ New user, creating account...');
 
-            const newUser = {
-                id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                email: googleEmail,
-                name: googleName || googleEmail.split('@')[0],
-                password: null, // No password for Google users
-                verified: true, // Google accounts are pre-verified
-                createdAt: new Date().toISOString(),
-                loginMethod: 'google',
-                googleUID: googleUID,
-                profilePhoto: googlePhotoURL || null
-            };
+            const userId = generateUserId();
+            const userName = googleName || googleEmail.split('@')[0];
 
-            // Save to localStorage
-            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '[]');
-            users.push(newUser);
-            localStorage.setItem('VIVIANA_USERS', JSON.stringify(users));
+            // Save user to database using existing function
+            saveUserToDatabase(userId, userName, googleEmail, null, true);
+
+            // Add Google-specific fields
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            allUsers[userId].loginMethod = 'google';
+            allUsers[userId].googleUID = googleUID;
+            allUsers[userId].profilePhoto = googlePhotoURL || null;
+            localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
 
             // Give welcome credits
-            creditsPurchase(newUser.id, 10, 'Free', 'google_signup_bonus');
+            creditsPurchase(userId, 10, 'Free', 'google_signup_bonus');
 
-            currentUser = newUser;
+            currentUser = { userId, ...allUsers[userId] };
 
             logSecurityEvent('user_registered', {
-                userId: newUser.id,
+                userId: userId,
                 email: googleEmail,
                 method: 'google',
                 verified: true
@@ -1087,10 +1087,10 @@ async function handleGoogleLogin() {
         }
 
         // Save current session
-        localStorage.setItem('VIVIANA_CURRENT_USER', JSON.stringify(currentUser));
+        localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
 
         logSecurityEvent('user_login', {
-            userId: currentUser.id,
+            userId: currentUser.userId,
             email: googleEmail,
             method: 'google'
         });
@@ -1100,7 +1100,7 @@ async function handleGoogleLogin() {
         // Navigate to chat
         setTimeout(() => {
             showChat();
-            loadUserProfile();
+            loadProfile();
         }, 800);
 
     } catch (error) {
@@ -1134,10 +1134,9 @@ async function handleGoogleLogin() {
     }
 }
 
-// Helper function to get user by email
+// Helper function to get user by email (uses existing findUserByEmail)
 function getUserByEmail(email) {
-    const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '[]');
-    return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    return findUserByEmail(email);
 }
 
 // ========================================
