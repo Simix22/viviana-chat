@@ -628,14 +628,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if user is logged in
     const savedUserId = localStorage.getItem('VIVIANA_CURRENT_USER_ID');
+    console.log('🔍 Checking for saved user ID:', savedUserId);
 
     if (savedUserId) {
         const userData = getUserFromDatabase(savedUserId);
+        console.log('🔍 User data from database:', userData);
 
         if (userData) {
             // Check if email is verified
+            console.log('🔍 Email verified status:', userData.emailVerified);
             if (!userData.emailVerified) {
                 console.log('⚠️ Email not verified, redirecting to verification');
+                console.log('⚠️ User data:', JSON.stringify(userData));
                 localStorage.removeItem('VIVIANA_CURRENT_USER_ID');
                 showWelcome();
                 return;
@@ -643,7 +647,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUser = { userId: savedUserId, ...userData };
             console.log('✅ User logged in:', currentUser.email);
+            console.log('✅ Calling showChat() from DOMContentLoaded...');
             showChat();
+            console.log('✅ Calling loadProfile() from DOMContentLoaded...');
             loadProfile();
         } else {
             console.log('⚠️ Saved user ID not found, showing welcome');
@@ -1160,6 +1166,12 @@ async function handleGoogleLogin() {
 
         console.log('🔄 Navigating to chat NOW...');
 
+        // Restore Google button state (in case of success)
+        const googleButtons = document.querySelectorAll('.btn-google');
+        googleButtons.forEach(btn => {
+            btn.disabled = false;
+        });
+
         // Navigate to chat IMMEDIATELY (don't use setTimeout - it can fail)
         try {
             console.log('📱 Calling showChat()...');
@@ -1175,8 +1187,15 @@ async function handleGoogleLogin() {
             console.error('Error details:', error.message, error.stack);
             // Try fallback navigation
             setTimeout(() => {
-                showChat();
-                loadProfile();
+                try {
+                    showChat();
+                    loadProfile();
+                } catch (e) {
+                    console.error('❌ Fallback navigation also failed:', e);
+                    // Last resort - reload the page to trigger DOMContentLoaded
+                    console.log('🔄 Reloading page as last resort...');
+                    window.location.reload();
+                }
             }, 500);
         }
 
