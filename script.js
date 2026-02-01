@@ -1047,14 +1047,25 @@ async function handleGoogleLogin() {
             console.log('👤 Existing user found, logging in...');
             currentUser = existingUser;
 
-            // Update profile photo from Google if available
-            if (googlePhotoURL && !existingUser.profilePhoto) {
-                const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-                if (allUsers[existingUser.userId]) {
+            // Ensure Google users have emailVerified flag
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            if (allUsers[existingUser.userId]) {
+                // Set emailVerified for Google users (if missing)
+                if (allUsers[existingUser.userId].loginMethod === 'google' && !allUsers[existingUser.userId].emailVerified) {
+                    allUsers[existingUser.userId].emailVerified = true;
+                    localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+                    console.log('✅ emailVerified flag added for Google user');
+                }
+
+                // Update profile photo from Google if available
+                if (googlePhotoURL && !allUsers[existingUser.userId].profilePhoto) {
                     allUsers[existingUser.userId].profilePhoto = googlePhotoURL;
                     localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
                     console.log('✅ Profile photo updated from Google');
                 }
+
+                // Update currentUser with latest data
+                currentUser = { userId: existingUser.userId, ...allUsers[existingUser.userId] };
             }
         } else {
             // New user - create account
