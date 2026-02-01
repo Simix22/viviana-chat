@@ -4,8 +4,6 @@
 
 let currentUser = null;
 let pendingVerificationEmail = null;
-let verificationCode = null;
-let verificationCodeExpiry = null;
 let resendCooldownUntil = null;
 
 // Password Reset
@@ -52,11 +50,23 @@ try {
         console.log('✅ Firebase initialized successfully');
 
         // Set up auth state observer
-        firebaseAuth.onAuthStateChanged((user) => {
+        firebaseAuth.onAuthStateChanged(async (user) => {
             if (user) {
                 console.log('🔐 Firebase user detected:', user.email);
-                // User is signed in with Firebase
-                // The handleGoogleLogin function will handle the rest
+                console.log('📧 Email verified in Firebase:', user.emailVerified);
+
+                // Update local database if email was verified
+                if (user.emailVerified) {
+                    const userId = 'user_' + user.uid;
+                    const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+
+                    if (allUsers[userId]) {
+                        console.log('✅ Updating emailVerified status in local database');
+                        allUsers[userId].emailVerified = true;
+                        localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+                        localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
+                    }
+                }
             } else {
                 console.log('🔓 No Firebase user signed in');
             }
@@ -842,8 +852,15 @@ function switchToLogin() {
 // AUTHENTICATION
 // ========================================
 
-function handleLogin(e) {
+async function handleLogin(e) {
     e.preventDefault();
+
+    // Check if Firebase is initialized
+    if (!firebaseAuth) {
+        showToast('Firebase Authentication is not configured. Please contact support.', 'error');
+        console.error('Firebase Auth not initialized');
+        return;
+    }
 
     // Rate limiting
     const rateCheck = checkRateLimit('login');
@@ -856,65 +873,171 @@ function handleLogin(e) {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
 
+    console.log('🔐 Firebase Login attempt:', { email });
+
     if (!email || !password) {
         showToast('Please fill in all fields', 'error');
         return;
     }
 
-    const user = findUserByEmail(email);
+    try {
+        // Sign in with Firebase
+        console.log('🔥 Signing in with Firebase...');
+        const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
+        const firebaseUser = userCredential.user;
 
-    if (!user || user.password !== password) {
-        showToast('Invalid email or password', 'error');
-        logSecurityEvent('failed_login', { email });
-        return;
-    }
+        console.log('✅ Firebase sign-in successful:', firebaseUser.uid);
+        console.log('📧 Email verified:', firebaseUser.emailVerified);
 
-    // CHECK EMAIL VERIFICATION
-    if (!user.emailVerified) {
-        console.log('⚠️ Email not verified for user:', user.email);
-        showToast('Please verify your email before logging in', 'error');
+        // Check if email is verified
+        if (!firebaseUser.emailVerified) {
+            console.log('⚠️ Email not verified');
+            showToast('Please verify your email before logging in', 'error');
 
-        // Set pending verification
-        pendingVerificationEmail = user.email;
-        currentUser = user;
+            // Set pending verification
+            pendingVerificationEmail = email;
 
-        // Generate new code
-        generateVerificationCode();
+            // Check if user exists in local database
+            const userId = 'user_' + firebaseUser.uid;
+            const userData = getUserFromDatabase(userId);
+
+            if (userData) {
+                currentUser = { userId, ...userData };
+            } else {
+                // Create local user data if not exists
+                currentUser = {
+                    userId: userId,
+                    name: firebaseUser.displayName || email.split('@')[0],
+                    email: email,
+                    firebaseUID: firebaseUser.uid,
+                    emailVerified: false
+                };
+            }
+
+            // Clear form
+            document.getElementById('loginEmail').value = '';
+            document.getElementById('loginPassword').value = '';
+
+            // Sign out from Firebase (don't allow access without verification)
+            await firebaseAuth.signOut();
+
+            // Show verification screen
+            setTimeout(() => {
+                showVerificationScreen();
+            }, 500);
+
+            return;
+        }
+
+        // Email is verified - proceed with login
+
+        // Create or get local user ID
+        const userId = 'user_' + firebaseUser.uid;
+        let userData = getUserFromDatabase(userId);
+
+        if (!userData) {
+            // First time logging in after verification - create local data
+            console.log('🆕 Creating local user data for verified user');
+            saveUserToDatabase(
+                userId,
+                firebaseUser.displayName || email.split('@')[0],
+                email,
+                null,
+                true
+            );
+
+            // Add Firebase UID
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            if (allUsers[userId]) {
+                allUsers[userId].firebaseUID = firebaseUser.uid;
+                allUsers[userId].loginMethod = 'email';
+                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+            }
+
+            // Initialize user data if not exists
+            if (!localStorage.getItem(`VIVIANA_${userId}_MESSAGES`)) {
+                localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+                localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
+                localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+                localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
+                localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+
+                // Initial credits for first login
+                const initialCredits = 3;
+                localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
+
+                addCreditsLedgerEntry(userId, {
+                    type: 'initial_grant',
+                    amount: initialCredits,
+                    balance_before: 0,
+                    balance_after: initialCredits,
+                    description: 'Welcome bonus - First login after verification',
+                    metadata: { first_login: new Date().toISOString() }
+                });
+            }
+
+            userData = getUserFromDatabase(userId);
+        } else {
+            // Update email verified status in local database
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            if (allUsers[userId]) {
+                allUsers[userId].emailVerified = true;
+                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+            }
+            localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
+        }
+
+        // Login successful
+        currentUser = { userId, ...userData };
+        localStorage.setItem('VIVIANA_CURRENT_USER_ID', userId);
+        localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+
+        console.log('✅ Login successful:', email);
+        logSecurityEvent('login_success', { email: email, userId: userId, method: 'firebase_email' });
+        showToast('Welcome back!', 'success');
 
         // Clear form
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginPassword').value = '';
 
-        // Show verification screen
+        // Navigate to chat
         setTimeout(() => {
-            showVerificationScreen();
-        }, 1000);
+            console.log('🔄 Navigating to chat...');
+            showChat();
+            loadProfile();
+        }, 500);
 
-        return;
+    } catch (error) {
+        console.error('❌ Firebase Login error:', error);
+
+        // Handle specific Firebase errors
+        if (error.code === 'auth/user-not-found') {
+            showToast('No account found with this email', 'error');
+        } else if (error.code === 'auth/wrong-password') {
+            showToast('Incorrect password', 'error');
+        } else if (error.code === 'auth/invalid-email') {
+            showToast('Invalid email address', 'error');
+        } else if (error.code === 'auth/user-disabled') {
+            showToast('This account has been disabled', 'error');
+        } else if (error.code === 'auth/network-request-failed') {
+            showToast('Network error. Please check your connection.', 'error');
+        } else {
+            showToast('Failed to sign in. Please try again.', 'error');
+        }
+
+        logSecurityEvent('login_failed', { email, reason: error.code, message: error.message });
     }
-
-    // Login successful
-    currentUser = user;
-    localStorage.setItem('VIVIANA_CURRENT_USER_ID', user.userId);
-    localStorage.setItem(`VIVIANA_${user.userId}_LAST_LOGIN`, new Date().toISOString());
-
-    console.log('✅ Login successful:', user.email);
-    logSecurityEvent('login_success', { email: user.email, userId: user.userId });
-    showToast('Welcome back!', 'success');
-
-    // Clear form
-    document.getElementById('loginEmail').value = '';
-    document.getElementById('loginPassword').value = '';
-
-    // Navigate to chat after a brief delay
-    setTimeout(() => {
-        console.log('🔄 Navigating to chat...');
-        showChat();
-    }, 500);
 }
 
-function handleSignup(e) {
+async function handleSignup(e) {
     e.preventDefault();
+
+    // Check if Firebase is initialized
+    if (!firebaseAuth) {
+        showToast('Firebase Authentication is not configured. Please contact support.', 'error');
+        console.error('Firebase Auth not initialized');
+        return;
+    }
 
     // Rate limiting
     const rateCheck = checkRateLimit('signup');
@@ -928,7 +1051,7 @@ function handleSignup(e) {
     const email = document.getElementById('signupEmail').value.trim().toLowerCase();
     const password = document.getElementById('signupPassword').value;
 
-    console.log('📝 Signup attempt:', { name, email });
+    console.log('📝 Firebase Signup attempt:', { name, email });
 
     if (!name || !email || !password) {
         showToast('Please fill in all fields', 'error');
@@ -940,81 +1063,97 @@ function handleSignup(e) {
         return;
     }
 
-    // CRITICAL: Check for ANY existing references to this email
-    const searchResult = searchUserReferences(email);
-    if (searchResult.found) {
-        console.error('⚠️ CRITICAL: Email already exists in system!');
-        console.error('User ID:', searchResult.userId);
-        console.error('References:', searchResult.references.length);
+    try {
+        // Create user in Firebase
+        console.log('🔥 Creating Firebase user...');
+        const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
+        const firebaseUser = userCredential.user;
 
-        showToast('Account with this email already exists', 'error');
-        logSecurityEvent('signup_failed', { email, reason: 'email_exists', existingUserId: searchResult.userId });
+        console.log('✅ Firebase user created:', firebaseUser.uid);
 
-        // Alert admin that cleanup may be needed
-        console.error('⚠️ Run purgeUserByEmail("' + email + '") to clean up ghost account');
-        return;
+        // Update display name in Firebase
+        await firebaseUser.updateProfile({
+            displayName: name
+        });
+
+        // Send verification email via Firebase
+        console.log('📧 Sending verification email...');
+        await firebaseUser.sendEmailVerification();
+        console.log('✅ Verification email sent to:', email);
+
+        // Create local user data with Firebase UID
+        const userId = 'user_' + firebaseUser.uid;
+
+        // Save user to local database (emailVerified = false until they verify)
+        saveUserToDatabase(userId, name, email, null, false);
+
+        // Add Firebase UID to user data
+        const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+        if (allUsers[userId]) {
+            allUsers[userId].firebaseUID = firebaseUser.uid;
+            allUsers[userId].loginMethod = 'email';
+            localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+        }
+
+        logSecurityEvent('signup_success', { email, userId, method: 'firebase_email' });
+
+        // Initialize user data
+        localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+        localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
+        localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+        localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+        localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'false');
+        localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+
+        // Initialize credits with proper ledger entry (signup bonus)
+        const initialCredits = 3;
+        localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
+
+        addCreditsLedgerEntry(userId, {
+            type: 'initial_grant',
+            amount: initialCredits,
+            balance_before: 0,
+            balance_after: initialCredits,
+            description: 'Welcome bonus - New user signup',
+            metadata: { signup_date: new Date().toISOString() }
+        });
+
+        // Store pending user info
+        pendingVerificationEmail = email;
+        currentUser = { userId, name, email, firebaseUID: firebaseUser.uid, createdAt: new Date().toISOString(), emailVerified: false };
+
+        console.log('✅ Account created - verification email sent');
+
+        showToast('Account created! Please check your email to verify.', 'success');
+
+        // Clear form
+        document.getElementById('signupName').value = '';
+        document.getElementById('signupEmail').value = '';
+        document.getElementById('signupPassword').value = '';
+
+        // Navigate to verification screen (updated to show "check email" message)
+        setTimeout(() => {
+            showVerificationScreen();
+        }, 500);
+
+    } catch (error) {
+        console.error('❌ Firebase Signup error:', error);
+
+        // Handle specific Firebase errors
+        if (error.code === 'auth/email-already-in-use') {
+            showToast('An account with this email already exists', 'error');
+        } else if (error.code === 'auth/invalid-email') {
+            showToast('Invalid email address', 'error');
+        } else if (error.code === 'auth/weak-password') {
+            showToast('Password is too weak. Use at least 6 characters.', 'error');
+        } else if (error.code === 'auth/network-request-failed') {
+            showToast('Network error. Please check your connection.', 'error');
+        } else {
+            showToast('Failed to create account. Please try again.', 'error');
+        }
+
+        logSecurityEvent('signup_failed', { email, reason: error.code, message: error.message });
     }
-
-    // Double-check with legacy method
-    const existingUser = findUserByEmail(email);
-    if (existingUser) {
-        console.error('⚠️ CRITICAL: Legacy check found existing user!');
-        showToast('Account with this email already exists', 'error');
-        logSecurityEvent('signup_failed', { email, reason: 'email_exists_legacy' });
-        return;
-    }
-
-    // Create new user (NOT VERIFIED YET)
-    const userId = generateUserId();
-
-    console.log('🆕 Creating user with ID:', userId);
-
-    // Save user to VIVIANA_USERS with email_verified = false
-    saveUserToDatabase(userId, name, email, password, false);
-
-    logSecurityEvent('signup_success', { email, userId });
-
-    // Initialize user data
-    localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
-    localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
-    localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
-    localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
-    localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'false');
-    localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
-
-    // Initialize credits with proper ledger entry (signup bonus)
-    const initialCredits = 3;
-    localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
-
-    addCreditsLedgerEntry(userId, {
-        type: 'initial_grant',
-        amount: initialCredits,
-        balance_before: 0,
-        balance_after: initialCredits,
-        description: 'Welcome bonus - New user signup',
-        metadata: { signup_date: new Date().toISOString() }
-    });
-
-    // Store pending user info
-    pendingVerificationEmail = email;
-    currentUser = { userId, name, email, password, createdAt: new Date().toISOString(), emailVerified: false };
-
-    console.log('✅ Account created - verification required');
-
-    showToast('Account created! Please verify your email.', 'success');
-
-    // Clear form
-    document.getElementById('signupName').value = '';
-    document.getElementById('signupEmail').value = '';
-    document.getElementById('signupPassword').value = '';
-
-    // Generate and send verification code
-    generateVerificationCode();
-
-    // Navigate to verification screen
-    setTimeout(() => {
-        showVerificationScreen();
-    }, 500);
 }
 
 async function handleGoogleLogin() {
@@ -1244,34 +1383,8 @@ function getUserByEmail(email) {
 }
 
 // ========================================
-// EMAIL VERIFICATION
+// EMAIL VERIFICATION (Firebase)
 // ========================================
-
-function generateVerificationCode() {
-    // Generate 6-digit code
-    verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
-
-    // Set expiry to 15 minutes from now
-    verificationCodeExpiry = Date.now() + (15 * 60 * 1000);
-
-    console.log('📧 Verification code generated:', verificationCode);
-    console.log('⏰ Expires at:', new Date(verificationCodeExpiry).toLocaleTimeString());
-
-    // In a real app, send this via email API
-    // For demo, we'll log it to console
-    console.log('');
-    console.log('==============================================');
-    console.log('📬 EMAIL VERIFICATION CODE');
-    console.log('==============================================');
-    console.log('To:', pendingVerificationEmail);
-    console.log('Code:', verificationCode);
-    console.log('Expires in: 15 minutes');
-    console.log('==============================================');
-    console.log('');
-
-    // Show in alert for demo purposes
-    alert(`📧 DEMO MODE: Your verification code is:\n\n${verificationCode}\n\n(In production, this would be sent via email)`);
-}
 
 function showVerificationScreen() {
     console.log('📧 Showing verification screen');
@@ -1281,142 +1394,16 @@ function showVerificationScreen() {
     verificationScreen.style.display = 'flex';
     verificationScreen.classList.add('active');
 
-    // Set email in UI
-    document.getElementById('verificationEmail').textContent = pendingVerificationEmail;
-
-    // Setup code inputs
-    setupCodeInputs();
-
-    // Focus first input
-    document.getElementById('code1').focus();
-}
-
-function setupCodeInputs() {
-    const inputs = document.querySelectorAll('.code-input');
-
-    inputs.forEach((input, index) => {
-        // Auto-focus next input
-        input.addEventListener('input', (e) => {
-            if (e.target.value.length === 1) {
-                input.classList.add('filled');
-                if (index < inputs.length - 1) {
-                    inputs[index + 1].focus();
-                }
-            } else {
-                input.classList.remove('filled');
-            }
-
-            // Clear error state
-            inputs.forEach(inp => inp.classList.remove('error'));
-            document.getElementById('verificationError').style.display = 'none';
-        });
-
-        // Handle backspace
-        input.addEventListener('keydown', (e) => {
-            if (e.key === 'Backspace' && !input.value && index > 0) {
-                inputs[index - 1].focus();
-            }
-        });
-
-        // Only allow numbers
-        input.addEventListener('keypress', (e) => {
-            if (!/[0-9]/.test(e.key)) {
-                e.preventDefault();
-            }
-        });
-    });
-
-    // Setup form submission
-    const form = document.getElementById('verificationForm');
-    form.addEventListener('submit', (e) => {
-        e.preventDefault();
-        verifyCode();
-    });
-}
-
-function verifyCode() {
-    // Rate limiting
-    const rateCheck = checkRateLimit('verification');
-    if (!rateCheck.allowed) {
-        showVerificationError(`Too many attempts. Try again in ${rateCheck.waitMinutes} minutes.`);
-        logSecurityEvent('rate_limit_exceeded', { type: 'verification', email: pendingVerificationEmail });
-        return;
-    }
-
-    const inputs = document.querySelectorAll('.code-input');
-    const enteredCode = Array.from(inputs).map(input => input.value).join('');
-
-    console.log('🔍 Verifying code:', enteredCode);
-
-    // Check if code is complete
-    if (enteredCode.length !== 6) {
-        showVerificationError('Please enter all 6 digits');
-        return;
-    }
-
-    // Check if code expired
-    if (Date.now() > verificationCodeExpiry) {
-        showVerificationError('Code has expired. Please request a new one.');
-        inputs.forEach(input => {
-            input.classList.add('error');
-            input.value = '';
-        });
-        inputs[0].focus();
-        return;
-    }
-
-    // Verify code
-    if (enteredCode === verificationCode) {
-        console.log('✅ Code verified successfully!');
-
-        // Mark user as verified
-        const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-        if (currentUser && users[currentUser.userId]) {
-            users[currentUser.userId].emailVerified = true;
-            localStorage.setItem('VIVIANA_USERS', JSON.stringify(users));
-            localStorage.setItem(`VIVIANA_${currentUser.userId}_EMAIL_VERIFIED`, 'true');
-        }
-
-        currentUser.emailVerified = true;
-        localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
-
-        logSecurityEvent('email_verified', { email: currentUser.email, userId: currentUser.userId });
-        showToast('Email verified successfully! 🎉', 'success');
-
-        // Clear verification data
-        verificationCode = null;
-        verificationCodeExpiry = null;
-        pendingVerificationEmail = null;
-
-        // Navigate to chat
-        setTimeout(() => {
-            showChat();
-        }, 1000);
-
-    } else {
-        console.log('❌ Invalid code');
-        logSecurityEvent('verification_failed', { email: pendingVerificationEmail, reason: 'invalid_code' });
-        showVerificationError('Invalid code. Please try again.');
-        inputs.forEach(input => {
-            input.classList.add('error');
-            input.value = '';
-        });
-        inputs[0].focus();
+    // Display email
+    const emailDisplay = document.getElementById('verificationEmail');
+    if (emailDisplay && pendingVerificationEmail) {
+        emailDisplay.textContent = pendingVerificationEmail;
     }
 }
 
-function showVerificationError(message) {
-    const errorDiv = document.getElementById('verificationError');
-    errorDiv.textContent = message;
-    errorDiv.style.display = 'block';
-}
-
-function resendVerificationCode() {
-    // Rate limiting
-    const rateCheck = checkRateLimit('verification');
-    if (!rateCheck.allowed) {
-        showToast(`Too many attempts. Try again in ${rateCheck.waitMinutes} minutes.`, 'error');
-        logSecurityEvent('rate_limit_exceeded', { type: 'resend_verification', email: pendingVerificationEmail });
+async function resendVerificationEmail() {
+    if (!firebaseAuth) {
+        showToast('Firebase is not initialized', 'error');
         return;
     }
 
@@ -1427,37 +1414,64 @@ function resendVerificationCode() {
         return;
     }
 
-    // Generate new code
-    generateVerificationCode();
+    try {
+        // Get current Firebase user
+        const firebaseUser = firebaseAuth.currentUser;
 
-    // Set cooldown (60 seconds)
-    resendCooldownUntil = Date.now() + (60 * 1000);
+        if (!firebaseUser) {
+            showToast('Please sign up or log in first', 'error');
+            showAuth();
+            return;
+        }
 
-    // Start cooldown timer
-    startResendCooldown();
+        console.log('📧 Resending verification email to:', firebaseUser.email);
 
-    showToast('New code sent!', 'success');
+        // Send verification email
+        await firebaseUser.sendEmailVerification();
+
+        console.log('✅ Verification email sent');
+        showToast('Verification email sent! Please check your inbox.', 'success');
+
+        // Set cooldown (60 seconds)
+        resendCooldownUntil = Date.now() + (60 * 1000);
+
+        // Start cooldown timer
+        startResendCooldown();
+
+    } catch (error) {
+        console.error('❌ Error resending verification email:', error);
+
+        if (error.code === 'auth/too-many-requests') {
+            showToast('Too many requests. Please try again later.', 'error');
+        } else if (error.code === 'auth/network-request-failed') {
+            showToast('Network error. Please check your connection.', 'error');
+        } else {
+            showToast('Failed to send verification email. Please try again.', 'error');
+        }
+    }
 }
 
 function startResendCooldown() {
-    const resendBtn = document.getElementById('resendBtn');
+    const resendBtn = document.getElementById('resendVerificationBtn');
     const timerDiv = document.getElementById('resendTimer');
     const timerSeconds = document.getElementById('timerSeconds');
 
-    resendBtn.disabled = true;
+    if (!resendBtn || !timerDiv || !timerSeconds) return;
+
     resendBtn.style.display = 'none';
     timerDiv.style.display = 'block';
 
+    let remaining = 60;
+    timerSeconds.textContent = remaining;
+
     const interval = setInterval(() => {
-        const remaining = Math.ceil((resendCooldownUntil - Date.now()) / 1000);
+        remaining--;
+        timerSeconds.textContent = remaining;
 
         if (remaining <= 0) {
             clearInterval(interval);
-            resendBtn.disabled = false;
-            resendBtn.style.display = 'inline-block';
+            resendBtn.style.display = 'block';
             timerDiv.style.display = 'none';
-        } else {
-            timerSeconds.textContent = remaining;
         }
     }, 1000);
 }
