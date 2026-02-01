@@ -1306,8 +1306,7 @@ async function handleGoogleLogin() {
         console.log('🔄 Navigating to chat NOW...');
 
         // Restore Google button state (in case of success)
-        const googleButtons = document.querySelectorAll('.btn-google');
-        googleButtons.forEach(btn => {
+        document.querySelectorAll('.btn-google').forEach(btn => {
             btn.disabled = false;
         });
 
@@ -1342,8 +1341,7 @@ async function handleGoogleLogin() {
         console.error('❌ Google Sign-In error:', error);
 
         // Restore button state
-        const googleButtons = document.querySelectorAll('.btn-google');
-        googleButtons.forEach(btn => {
+        document.querySelectorAll('.btn-google').forEach(btn => {
             btn.disabled = false;
             btn.innerHTML = `
                 <svg width="18" height="18" viewBox="0 0 18 18">
