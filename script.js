@@ -2478,3 +2478,368 @@ function escapeHtml(text) {
     div.textContent = text;
     return div.innerHTML;
 }
+
+// ========================================
+// QUIZ ONBOARDING FLOW
+// ========================================
+
+// Quiz State
+let quizState = {
+    currentQuestion: 0,
+    answers: [],
+    isUnlocked: false
+};
+
+// Quiz Questions
+const quizQuestions = [
+    {
+        question: "Was ist dir am wichtigsten?",
+        choices: [
+            { text: "🎵 Musik & Entertainment", match: "Viviana liebt Musik!" },
+            { text: "📚 Tiefgründige Gespräche", match: "Viviana liebt Deep Talks!" },
+            { text: "🎮 Gaming & Fun", match: "Viviana ist playful!" },
+            { text: "🌙 Late night vibes", match: "Viviana ist Nachteule!" }
+        ]
+    },
+    {
+        question: "Wie verbringst du am liebsten Zeit?",
+        choices: [
+            { text: "✈️ Reisen & Abenteuer", match: "Same! Viviana liebt Abenteuer" },
+            { text: "🏡 Gemütlich zuhause", match: "Viviana liebt cozy vibes" },
+            { text: "🌆 City Life & Events", match: "Viviana liebt die City!" },
+            { text: "🌲 Natur & Draußen", match: "Viviana liebt die Natur!" }
+        ]
+    },
+    {
+        question: "Was beschreibt deinen Stil?",
+        choices: [
+            { text: "✨ Glam & Elegant", match: "Viviana loves that vibe!" },
+            { text: "🖤 Minimalistisch & Clean", match: "Viviana appreciates minimalism!" },
+            { text: "🎨 Kreativ & Bunt", match: "Viviana ist kreativ!" },
+            { text: "😌 Comfortable & Chill", match: "Viviana loves comfort!" }
+        ]
+    },
+    {
+        question: "Bist du eher...?",
+        choices: [
+            { text: "🎲 Spontan & flexibel", match: "Viviana liebt Spontanität!" },
+            { text: "📅 Strukturiert & geplant", match: "Viviana schätzt das!" },
+            { text: "🌀 Chaotisch kreativ", match: "Viviana finds das cool!" },
+            { text: "⚖️ Ausbalanciert", match: "Perfect match!" }
+        ]
+    },
+    {
+        question: "Dein perfekter Abend?",
+        choices: [
+            { text: "💬 Lange Gespräche", match: "Viviana loves deep talks!" },
+            { text: "🍿 Netflix & Chill", match: "Viviana loves that!" },
+            { text: "🎉 Party & Socializing", match: "Viviana ist social!" },
+            { text: "📖 Lesen & Entspannen", match: "Viviana loves reading!" }
+        ]
+    },
+    {
+        question: "Was macht dich glücklich?",
+        choices: [
+            { text: "😂 Humor & Lachen", match: "Viviana loves to laugh!" },
+            { text: "💕 Romantik & Connection", match: "Perfect match!" },
+            { text: "🎯 Ziele erreichen", match: "Viviana ist driven!" },
+            { text: "🆕 Neue Erfahrungen", match: "Viviana loves that!" }
+        ]
+    }
+];
+
+// Initialize Chat State Machine
+function initChatStateMachine() {
+    console.log('🎮 Initializing Quiz Onboarding');
+    
+    // Check if already unlocked
+    checkUnlockStatus();
+}
+
+// Check Unlock Status (Firestore or localStorage)
+async function checkUnlockStatus() {
+    if (!currentUser) {
+        console.log('⚠️ No user logged in');
+        return;
+    }
+
+    try {
+        // Check Firestore first (if available)
+        if (firebase && firebase.firestore) {
+            const db = firebase.firestore();
+            const userDoc = await db.collection('users').doc(currentUser.userId).get();
+            
+            if (userDoc.exists && userDoc.data().vivianaUnlocked) {
+                console.log('✅ User already unlocked from Firestore');
+                quizState.isUnlocked = true;
+                showChatState('actualChat');
+                return;
+            }
+        }
+    } catch (error) {
+        console.log('📝 Firestore not available, using localStorage');
+    }
+
+    // Fallback: Check localStorage
+    const unlocked = localStorage.getItem(`VIVIANA_${currentUser.userId}_UNLOCKED`);
+    if (unlocked === 'true') {
+        console.log('✅ User already unlocked from localStorage');
+        quizState.isUnlocked = true;
+        showChatState('actualChat');
+    } else {
+        console.log('🔒 User not unlocked, showing profile selection');
+        showChatState('profileSelection');
+    }
+}
+
+// Show Chat State
+function showChatState(stateName) {
+    const states = ['profileSelection', 'quizFlow', 'unlockModal', 'actualChat'];
+    
+    states.forEach(state => {
+        const element = document.getElementById(state);
+        if (element) {
+            if (state === stateName) {
+                element.style.display = 'flex';
+                element.classList.add('fade-in');
+                element.classList.remove('fade-out');
+            } else {
+                element.classList.add('fade-out');
+                element.classList.remove('fade-in');
+                setTimeout(() => {
+                    element.style.display = 'none';
+                }, 300);
+            }
+        }
+    });
+}
+
+// Start Quiz
+function startQuiz() {
+    console.log('🎯 Starting quiz');
+    quizState.currentQuestion = 0;
+    quizState.answers = [];
+    
+    showChatState('quizFlow');
+    renderQuestion();
+}
+
+// Render Current Question
+function renderQuestion() {
+    const question = quizQuestions[quizState.currentQuestion];
+    
+    // Update progress
+    document.getElementById('quizCurrentStep').textContent = quizState.currentQuestion + 1;
+    const progress = ((quizState.currentQuestion + 1) / 6) * 100;
+    document.getElementById('quizProgressFill').style.width = progress + '%';
+    
+    // Update question
+    document.getElementById('quizQuestion').textContent = question.question;
+    
+    // Render choices
+    const choicesContainer = document.getElementById('quizChoices');
+    choicesContainer.innerHTML = '';
+    
+    question.choices.forEach((choice, index) => {
+        const button = document.createElement('button');
+        button.className = 'quiz-choice';
+        button.textContent = choice.text;
+        button.onclick = () => selectChoice(index);
+        choicesContainer.appendChild(button);
+    });
+}
+
+// Select Choice
+function selectChoice(choiceIndex) {
+    const question = quizQuestions[quizState.currentQuestion];
+    const choice = question.choices[choiceIndex];
+    
+    console.log('✅ Choice selected:', choice.text);
+    
+    // Store answer
+    quizState.answers.push({
+        question: question.question,
+        choice: choice.text,
+        match: choice.match
+    });
+    
+    // Show match feedback
+    showMatchFeedback(choice.match);
+    
+    // Move to next question or finish
+    setTimeout(() => {
+        hideMatchFeedback();
+        
+        if (quizState.currentQuestion < quizQuestions.length - 1) {
+            quizState.currentQuestion++;
+            renderQuestion();
+        } else {
+            // Quiz completed!
+            finishQuiz();
+        }
+    }, 1800);
+}
+
+// Show Match Feedback
+function showMatchFeedback(matchText) {
+    const feedback = document.getElementById('matchFeedback');
+    const subtext = document.getElementById('matchSubtext');
+    
+    subtext.textContent = matchText;
+    feedback.style.display = 'flex';
+}
+
+// Hide Match Feedback
+function hideMatchFeedback() {
+    const feedback = document.getElementById('matchFeedback');
+    feedback.style.display = 'none';
+}
+
+// Finish Quiz
+async function finishQuiz() {
+    console.log('🎉 Quiz completed! Unlocking chat...');
+    
+    // Mark as unlocked
+    quizState.isUnlocked = true;
+    
+    // Save to localStorage
+    localStorage.setItem(`VIVIANA_${currentUser.userId}_UNLOCKED`, 'true');
+    
+    // Save to Firestore (if available)
+    try {
+        if (firebase && firebase.firestore) {
+            const db = firebase.firestore();
+            await db.collection('users').doc(currentUser.userId).set({
+                vivianaUnlocked: true,
+                unlockedAt: new Date().toISOString(),
+                quizAnswers: quizState.answers
+            }, { merge: true });
+            
+            console.log('✅ Unlock status saved to Firestore');
+        }
+    } catch (error) {
+        console.log('📝 Firestore not available:', error.message);
+    }
+    
+    // Show unlock modal with confetti
+    showChatState('unlockModal');
+    startConfetti();
+    
+    // Stop confetti after 5 seconds
+    setTimeout(() => {
+        stopConfetti();
+    }, 5000);
+}
+
+// Start Chat with Viviana (after unlock)
+function startChatWithViviana() {
+    console.log('💬 Starting chat with Viviana');
+    stopConfetti();
+    showChatState('actualChat');
+    
+    // Focus input field
+    setTimeout(() => {
+        const input = document.getElementById('messageInput');
+        if (input) {
+            input.focus();
+        }
+    }, 500);
+}
+
+// Back to Profile Selection
+function backToProfileSelection() {
+    quizState.currentQuestion = 0;
+    quizState.answers = [];
+    showChatState('profileSelection');
+}
+
+// ========================================
+// CONFETTI ANIMATION
+// ========================================
+
+let confettiCanvas = null;
+let confettiCtx = null;
+let confettiParticles = [];
+let confettiAnimationId = null;
+
+function startConfetti() {
+    confettiCanvas = document.getElementById('confettiCanvas');
+    if (!confettiCanvas) return;
+    
+    confettiCtx = confettiCanvas.getContext('2d');
+    confettiCanvas.width = window.innerWidth;
+    confettiCanvas.height = window.innerHeight;
+    
+    // Create particles
+    confettiParticles = [];
+    const colors = ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6', '#e67e22'];
+    
+    for (let i = 0; i < 150; i++) {
+        confettiParticles.push({
+            x: Math.random() * confettiCanvas.width,
+            y: Math.random() * confettiCanvas.height - confettiCanvas.height,
+            r: Math.random() * 6 + 4,
+            d: Math.random() * 150 + 50,
+            color: colors[Math.floor(Math.random() * colors.length)],
+            tilt: Math.random() * 10 - 10,
+            tiltAngleIncrement: Math.random() * 0.07 + 0.05,
+            tiltAngle: 0
+        });
+    }
+    
+    animateConfetti();
+}
+
+function animateConfetti() {
+    if (!confettiCtx || !confettiCanvas) return;
+    
+    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    
+    confettiParticles.forEach((p, i) => {
+        confettiCtx.beginPath();
+        confettiCtx.lineWidth = p.r / 2;
+        confettiCtx.strokeStyle = p.color;
+        confettiCtx.moveTo(p.x + p.tilt + p.r, p.y);
+        confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
+        confettiCtx.stroke();
+        
+        p.tiltAngle += p.tiltAngleIncrement;
+        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+        p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
+        
+        if (p.y > confettiCanvas.height) {
+            confettiParticles[i] = {
+                ...p,
+                x: Math.random() * confettiCanvas.width,
+                y: -20,
+                tilt: Math.random() * 10 - 10
+            };
+        }
+    });
+    
+    confettiAnimationId = requestAnimationFrame(animateConfetti);
+}
+
+function stopConfetti() {
+    if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+    }
+    
+    if (confettiCtx && confettiCanvas) {
+        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
+    }
+    
+    confettiParticles = [];
+}
+
+// Initialize quiz when chat is shown
+const originalShowChat = showChat;
+showChat = function() {
+    originalShowChat();
+    
+    // Initialize quiz state machine
+    setTimeout(() => {
+        initChatStateMachine();
+    }, 100);
+};
