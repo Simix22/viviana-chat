@@ -234,48 +234,143 @@
 
     <!-- Chat Screen -->
     <div id="chatScreen" class="screen">
-        <!-- Chat Header -->
-        <div class="chat-header">
-            <div class="header-profile">
-                <div class="avatar-small">V</div>
-                <div class="header-info">
-                    <h3>Viviana</h3>
-                    <span class="status">Online</span>
-                </div>
-            </div>
-            <button class="credits-display" onclick="showCreditsStore()">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <path d="M12 6v6l4 2"/>
-                </svg>
-                <span id="creditsCount">3</span> credits
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <polyline points="9 18 15 12 9 6"></polyline>
-                </svg>
-            </button>
-        </div>
 
-        <!-- Chat Messages -->
-        <div class="chat-messages" id="chatMessages">
-            <div class="message received">
-                <div class="message-avatar">V</div>
-                <div class="message-bubble">
-                    <p>Hey! 👋 So happy you're here! How are you doing today?</p>
-                    <span class="message-time">Just now</span>
+        <!-- Profile Selection (Initial State) -->
+        <div id="profileSelection" class="chat-state" style="display: flex;">
+            <div class="profile-selection-container">
+                <h2 class="section-title">Start chatting with</h2>
+                <div class="profile-card" onclick="startQuiz()">
+                    <div class="profile-card-avatar">
+                        <div class="avatar-large">V</div>
+                        <div class="status-badge">Online</div>
+                    </div>
+                    <div class="profile-card-info">
+                        <h3>Viviana</h3>
+                        <p class="profile-tagline">Your AI companion 💕</p>
+                        <p class="profile-hint">Tap to unlock chat</p>
+                    </div>
+                    <div class="profile-card-arrow">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <!-- Chat Input -->
-        <div class="chat-input-container">
-            <div class="chat-input-wrapper">
-                <input type="text" id="messageInput" placeholder="Type a message..." />
-                <button class="send-btn" onclick="sendMessage()">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="22" y1="2" x2="11" y2="13"></line>
-                        <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        <!-- Quiz Flow -->
+        <div id="quizFlow" class="chat-state" style="display: none;">
+            <div class="quiz-container">
+                <div class="quiz-header">
+                    <button class="quiz-back-btn" onclick="backToProfileSelection()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M19 12H5M12 19l-7-7 7-7"/>
+                        </svg>
+                    </button>
+                    <div class="quiz-progress">
+                        <div class="quiz-progress-text">
+                            <span id="quizCurrentStep">1</span> / 6
+                        </div>
+                        <div class="quiz-progress-bar">
+                            <div id="quizProgressFill" class="quiz-progress-fill" style="width: 16.666%"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="quiz-content">
+                    <div class="quiz-question-card">
+                        <div class="quiz-avatar">
+                            <div class="avatar-medium">V</div>
+                        </div>
+                        <h3 id="quizQuestion" class="quiz-question"></h3>
+                        <div id="quizChoices" class="quiz-choices"></div>
+                    </div>
+                </div>
+
+                <!-- Match Feedback Overlay -->
+                <div id="matchFeedback" class="match-feedback" style="display: none;">
+                    <div class="match-content">
+                        <div class="match-icon">✨</div>
+                        <h3 class="match-text">Perfect Match!</h3>
+                        <p class="match-subtext" id="matchSubtext">Viviana loves that too</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Unlock Success Modal -->
+        <div id="unlockModal" class="chat-state unlock-modal" style="display: none;">
+            <div class="unlock-modal-content">
+                <canvas id="confettiCanvas" class="confetti-canvas"></canvas>
+                <div class="unlock-card">
+                    <div class="unlock-icon">🎉</div>
+                    <h2 class="unlock-title">Herzlichen Glückwunsch!</h2>
+                    <p class="unlock-subtitle">Du bist freigeschaltet</p>
+                    <div class="unlock-stats">
+                        <div class="unlock-stat">
+                            <div class="stat-number">6/6</div>
+                            <div class="stat-label">Perfect Matches</div>
+                        </div>
+                        <div class="unlock-stat">
+                            <div class="stat-number">100%</div>
+                            <div class="stat-label">Compatibility</div>
+                        </div>
+                    </div>
+                    <button class="unlock-cta" onclick="startChatWithViviana()">
+                        <span>Start Chat mit Viviana</span>
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Actual Chat (Initially Hidden) -->
+        <div id="actualChat" class="chat-state" style="display: none;">
+            <!-- Chat Header -->
+            <div class="chat-header">
+                <div class="header-profile">
+                    <div class="avatar-small">V</div>
+                    <div class="header-info">
+                        <h3>Viviana <span class="unlock-badge">✓</span></h3>
+                        <span class="status">Online</span>
+                    </div>
+                </div>
+                <button class="credits-display" onclick="showCreditsStore()">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="10"/>
+                        <path d="M12 6v6l4 2"/>
+                    </svg>
+                    <span id="creditsCount">3</span> credits
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="9 18 15 12 9 6"></polyline>
                     </svg>
                 </button>
+            </div>
+
+            <!-- Chat Messages -->
+            <div class="chat-messages" id="chatMessages">
+                <div class="message received">
+                    <div class="message-avatar">V</div>
+                    <div class="message-bubble">
+                        <p>Hey! 👋 So happy you're here! How are you doing today?</p>
+                        <span class="message-time">Just now</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Chat Input -->
+            <div class="chat-input-container">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="messageInput" placeholder="Type a message..." />
+                    <button class="send-btn" onclick="sendMessage()">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <line x1="22" y1="2" x2="11" y2="13"></line>
+                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                        </svg>
+                    </button>
+                </div>
             </div>
         </div>
 
