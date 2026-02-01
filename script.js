@@ -710,6 +710,15 @@ function showVerificationScreenNav() {
 
 function showChat() {
     console.log('💬 Showing Chat Screen');
+
+    if (!currentUser) {
+        console.error('❌ Cannot show chat: currentUser is not set');
+        showWelcome();
+        return;
+    }
+
+    console.log('✅ currentUser verified:', currentUser.email);
+
     hideAllScreens();
     const chatScreen = document.getElementById('chatScreen');
     chatScreen.style.display = 'flex';
@@ -717,6 +726,8 @@ function showChat() {
     updateCreditsDisplay();
     updateNavButtons('chat');
     loadAdminMessages();
+
+    console.log('✅ Chat screen displayed');
 
     // Start auto-refresh for new messages from Viviana
     startMessageRefresh();
@@ -1045,21 +1056,47 @@ async function handleGoogleLogin() {
         if (existingUser) {
             // User exists - log them in
             console.log('👤 Existing user found, logging in...');
-            currentUser = existingUser;
 
-            // Update profile photo from Google if available
-            if (googlePhotoURL && !existingUser.profilePhoto) {
-                const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-                if (allUsers[existingUser.userId]) {
+            // CRITICAL: Update user data in database
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            if (allUsers[existingUser.userId]) {
+                // Google login auto-verifies email
+                allUsers[existingUser.userId].emailVerified = true;
+
+                // Update profile photo from Google if available
+                if (googlePhotoURL && !allUsers[existingUser.userId].profilePhoto) {
                     allUsers[existingUser.userId].profilePhoto = googlePhotoURL;
-                    localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-                    existingUser.profilePhoto = googlePhotoURL;
                 }
-                localStorage.setItem(`VIVIANA_${existingUser.userId}_PROFILE_PIC`, googlePhotoURL);
+
+                // Mark as Google login method if not already set
+                if (!allUsers[existingUser.userId].loginMethod) {
+                    allUsers[existingUser.userId].loginMethod = 'google';
+                }
+
+                // Store Google UID if not already stored
+                if (!allUsers[existingUser.userId].googleUID) {
+                    allUsers[existingUser.userId].googleUID = googleUID;
+                }
+
+                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+
+                // Update profile pic in separate storage
+                if (googlePhotoURL) {
+                    localStorage.setItem(`VIVIANA_${existingUser.userId}_PROFILE_PIC`, googlePhotoURL);
+                }
             }
+
+            // Update email verified status in separate storage
+            localStorage.setItem(`VIVIANA_${existingUser.userId}_EMAIL_VERIFIED`, 'true');
 
             // Update last login
             localStorage.setItem(`VIVIANA_${existingUser.userId}_LAST_LOGIN`, new Date().toISOString());
+
+            // Get fresh user data with all updates
+            const userData = getUserFromDatabase(existingUser.userId);
+            currentUser = { userId: existingUser.userId, ...userData };
+
+            console.log('✅ Existing user logged in with Google:', currentUser);
         } else {
             // New user - create account
             console.log('✨ New user, creating account...');
@@ -1070,11 +1107,7 @@ async function handleGoogleLogin() {
             // Save user to database using standard method (ensures consistent structure)
             saveUserToDatabase(userId, googleName || googleEmail.split('@')[0], googleEmail, null, true);
 
-            // Get the user object we just created
-            const userData = getUserFromDatabase(userId);
-            currentUser = { userId, ...userData };
-
-            // Add Google-specific fields
+            // Add Google-specific fields to database
             const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
             if (allUsers[userId]) {
                 allUsers[userId].loginMethod = 'google';
@@ -1082,6 +1115,12 @@ async function handleGoogleLogin() {
                 allUsers[userId].profilePhoto = googlePhotoURL || null;
                 localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
             }
+
+            // Get the user object with all fields (including Google-specific ones)
+            const userData = getUserFromDatabase(userId);
+            currentUser = { userId, ...userData };
+
+            console.log('✅ New Google user created:', currentUser);
 
             // Initialize user data (like email signup does)
             localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
@@ -1103,8 +1142,11 @@ async function handleGoogleLogin() {
         }
 
         // Save current session - CRITICAL: Must set VIVIANA_CURRENT_USER_ID for app restart
+        console.log('💾 Saving session to localStorage...');
         localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
         localStorage.setItem('VIVIANA_CURRENT_USER', JSON.stringify(currentUser));
+        console.log('✅ Session saved. User ID:', currentUser.userId);
+        console.log('✅ Email verified:', currentUser.emailVerified);
 
         logSecurityEvent('user_login', {
             userId: currentUser.userId,
@@ -1114,10 +1156,15 @@ async function handleGoogleLogin() {
 
         showToast(`Welcome back, ${currentUser.name}!`, 'success');
 
+        console.log('🔄 Navigating to chat in 800ms...');
+
         // Navigate to chat
         setTimeout(() => {
+            console.log('📱 Calling showChat()...');
             showChat();
+            console.log('👤 Calling loadProfile()...');
             loadProfile();
+            console.log('✅ Navigation complete');
         }, 800);
 
     } catch (error) {
@@ -1580,6 +1627,11 @@ function addReceivedMessage(text) {
 }
 
 function updateCreditsDisplay() {
+    if (!currentUser || !currentUser.userId) {
+        console.error('❌ Cannot update credits: currentUser not set');
+        return;
+    }
+
     const credits = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_CREDITS`) || '0');
     document.getElementById('creditsCount').textContent = credits;
 }
