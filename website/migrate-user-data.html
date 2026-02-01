@@ -1,0 +1,707 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Data Migration Tool - Viviana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 6px;
+        }
+
+        .warning h3 {
+            color: #856404;
+            font-size: 16px;
+            margin-bottom: 8px;
+        }
+
+        .warning p {
+            color: #856404;
+            font-size: 14px;
+            line-height: 1.5;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 5px;
+            color: #333;
+        }
+
+        input, select {
+            width: 100%;
+            padding: 10px 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 6px;
+            font-size: 14px;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .btn {
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            font-size: 14px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-success {
+            background: #28a745;
+        }
+
+        .btn-success:hover {
+            background: #218838;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .result {
+            margin-top: 15px;
+            padding: 15px;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .result.success {
+            background: #d4edda;
+            border-left: 4px solid #28a745;
+            color: #155724;
+        }
+
+        .result.error {
+            background: #f8d7da;
+            border-left: 4px solid #dc3545;
+            color: #721c24;
+        }
+
+        .result.info {
+            background: #d1ecf1;
+            border-left: 4px solid #17a2b8;
+            color: #0c5460;
+        }
+
+        code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-size: 12px;
+        }
+
+        .checkbox-group {
+            margin-top: 10px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-weight: normal;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: auto;
+            margin-right: 8px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔧 User Data Migration Tool</h1>
+        <p class="subtitle">Fix orphaned or incomplete user data</p>
+
+        <div class="warning">
+            <h3>⚠️ Warning: Advanced Tool</h3>
+            <p>
+                This tool modifies localStorage data directly. Use only if you understand the implications.
+                Always backup your data first using the "Export Data" feature.
+            </p>
+        </div>
+
+        <!-- Section 1: Check User Completeness -->
+        <div class="section">
+            <h2>1️⃣ Check User Data Completeness</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                Scan all users in VIVIANA_USERS and check if they have all required metadata.
+            </p>
+            <button class="btn" onclick="checkAllUsers()">🔍 Scan All Users</button>
+            <div id="scanResult"></div>
+        </div>
+
+        <!-- Section 2: Fix Incomplete User -->
+        <div class="section">
+            <h2>2️⃣ Fix Incomplete User Data</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                Initialize missing metadata for a specific user.
+            </p>
+
+            <div class="form-group">
+                <label>Email Address:</label>
+                <input type="email" id="fixEmail" placeholder="user@example.com">
+            </div>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="fixCredits" checked> Initialize Credits (3)
+                </label>
+                <label>
+                    <input type="checkbox" id="fixLedger" checked> Create Credits Ledger
+                </label>
+                <label>
+                    <input type="checkbox" id="fixMessages" checked> Initialize Messages
+                </label>
+                <label>
+                    <input type="checkbox" id="fixSettings" checked> Initialize Settings
+                </label>
+                <label>
+                    <input type="checkbox" id="fixProfile" checked> Initialize Profile
+                </label>
+                <label>
+                    <input type="checkbox" id="fixStatus" checked> Set Status to Active
+                </label>
+            </div>
+
+            <button class="btn btn-success" onclick="fixUserData()">✅ Fix User Data</button>
+            <div id="fixResult"></div>
+        </div>
+
+        <!-- Section 3: Create User Manually -->
+        <div class="section">
+            <h2>3️⃣ Create User Manually (Emergency)</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                Manually create a user account. Use only if signup failed.
+            </p>
+
+            <div class="form-group">
+                <label>Name:</label>
+                <input type="text" id="createName" placeholder="John Doe">
+            </div>
+
+            <div class="form-group">
+                <label>Email:</label>
+                <input type="email" id="createEmail" placeholder="john@example.com">
+            </div>
+
+            <div class="form-group">
+                <label>Password:</label>
+                <input type="password" id="createPassword" placeholder="minimum 6 characters">
+            </div>
+
+            <div class="checkbox-group">
+                <label>
+                    <input type="checkbox" id="createVerified"> Mark as Email Verified
+                </label>
+            </div>
+
+            <button class="btn btn-success" onclick="createUserManually()">➕ Create User</button>
+            <div id="createResult"></div>
+        </div>
+
+        <!-- Section 4: Validate Data Integrity -->
+        <div class="section">
+            <h2>4️⃣ Validate Data Integrity</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                Check for orphaned keys, missing references, and data inconsistencies.
+            </p>
+            <button class="btn" onclick="validateDataIntegrity()">🔍 Run Integrity Check</button>
+            <div id="validateResult"></div>
+        </div>
+
+        <!-- Section 5: Export/Import -->
+        <div class="section">
+            <h2>5️⃣ Backup & Restore</h2>
+            <p style="margin-bottom: 15px; color: #666; font-size: 14px;">
+                Export all VIVIANA data or import from a backup.
+            </p>
+            <button class="btn" onclick="exportAllData()">📥 Export All Data</button>
+            <button class="btn btn-danger" onclick="showImportWarning()">📤 Import Data</button>
+            <div id="backupResult"></div>
+        </div>
+    </div>
+
+    <script>
+        // Utility: Generate User ID
+        function generateUserId() {
+            const timestamp = Date.now();
+            const random = Math.random().toString(36).substring(2, 11);
+            return `user_${timestamp}_${random}`;
+        }
+
+        // 1. Check All Users for Completeness
+        function checkAllUsers() {
+            const resultDiv = document.getElementById('scanResult');
+            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const userIds = Object.keys(users);
+
+            if (userIds.length === 0) {
+                resultDiv.innerHTML = '<div class="result error">No users found in VIVIANA_USERS</div>';
+                return;
+            }
+
+            let report = '📊 User Data Completeness Report\n\n';
+            let incompleteUsers = [];
+
+            userIds.forEach(userId => {
+                const user = users[userId];
+                const requiredKeys = [
+                    'CREDITS',
+                    'CREDITS_LEDGER',
+                    'MESSAGES',
+                    'STATUS',
+                    'EMAIL_VERIFIED'
+                ];
+
+                const missing = [];
+                requiredKeys.forEach(key => {
+                    if (!localStorage.getItem(`VIVIANA_${userId}_${key}`)) {
+                        missing.push(key);
+                    }
+                });
+
+                if (missing.length > 0) {
+                    incompleteUsers.push({ userId, email: user.email, missing });
+                    report += `❌ ${user.email} (${userId.substring(0, 16)}...)\n`;
+                    report += `   Missing: ${missing.join(', ')}\n\n`;
+                } else {
+                    report += `✅ ${user.email} (Complete)\n\n`;
+                }
+            });
+
+            if (incompleteUsers.length > 0) {
+                report += `\n🚨 Found ${incompleteUsers.length} incomplete user(s)!\n`;
+                report += `Use "Fix Incomplete User Data" to repair them.`;
+                resultDiv.innerHTML = `<div class="result error">${report}</div>`;
+            } else {
+                report += `\n✅ All ${userIds.length} user(s) have complete data!`;
+                resultDiv.innerHTML = `<div class="result success">${report}</div>`;
+            }
+        }
+
+        // 2. Fix Incomplete User Data
+        function fixUserData() {
+            const email = document.getElementById('fixEmail').value.trim().toLowerCase();
+            const resultDiv = document.getElementById('fixResult');
+
+            if (!email) {
+                resultDiv.innerHTML = '<div class="result error">Please enter an email address</div>';
+                return;
+            }
+
+            // Find user
+            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            let userId = null;
+            for (let id in users) {
+                if (users[id].email === email) {
+                    userId = id;
+                    break;
+                }
+            }
+
+            if (!userId) {
+                resultDiv.innerHTML = `<div class="result error">User not found: ${email}</div>`;
+                return;
+            }
+
+            let report = `🔧 Fixing user: ${email}\nUser ID: ${userId}\n\n`;
+            let fixed = [];
+
+            // Fix Credits
+            if (document.getElementById('fixCredits').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_CREDITS`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_CREDITS`, '3');
+                    fixed.push('CREDITS → Set to 3');
+                }
+            }
+
+            // Fix Credits Ledger
+            if (document.getElementById('fixLedger').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_CREDITS_LEDGER`)) {
+                    const ledger = [{
+                        id: `txn_${Date.now()}_migration`,
+                        timestamp: new Date().toISOString(),
+                        event_type: 'admin_adjust',
+                        amount: 3,
+                        balance_before: 0,
+                        balance_after: 3,
+                        description: 'Data migration - Initial credits',
+                        metadata: { migration: true }
+                    }];
+                    localStorage.setItem(`VIVIANA_${userId}_CREDITS_LEDGER`, JSON.stringify(ledger));
+                    fixed.push('CREDITS_LEDGER → Created');
+                }
+            }
+
+            // Fix Messages
+            if (document.getElementById('fixMessages').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_MESSAGES`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+                    fixed.push('MESSAGES → Initialized');
+                }
+            }
+
+            // Fix Settings
+            if (document.getElementById('fixSettings').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_NOTIFICATION_SETTINGS`)) {
+                    const notifSettings = {
+                        newMessages: true,
+                        credits: true,
+                        email: true,
+                        productUpdates: false
+                    };
+                    localStorage.setItem(`VIVIANA_${userId}_NOTIFICATION_SETTINGS`, JSON.stringify(notifSettings));
+                    fixed.push('NOTIFICATION_SETTINGS → Created');
+                }
+
+                if (!localStorage.getItem(`VIVIANA_${userId}_PRIVACY_SETTINGS`)) {
+                    const privacySettings = {
+                        profileVisibility: 'private',
+                        allowAnalytics: false,
+                        showVerifiedBadge: true
+                    };
+                    localStorage.setItem(`VIVIANA_${userId}_PRIVACY_SETTINGS`, JSON.stringify(privacySettings));
+                    fixed.push('PRIVACY_SETTINGS → Created');
+                }
+            }
+
+            // Fix Profile
+            if (document.getElementById('fixProfile').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_BIO`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+                    fixed.push('BIO → Initialized');
+                }
+                if (!localStorage.getItem(`VIVIANA_${userId}_PROFILE_PIC`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
+                    fixed.push('PROFILE_PIC → Initialized');
+                }
+            }
+
+            // Fix Status
+            if (document.getElementById('fixStatus').checked) {
+                if (!localStorage.getItem(`VIVIANA_${userId}_STATUS`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+                    fixed.push('STATUS → Set to active');
+                }
+                if (!localStorage.getItem(`VIVIANA_${userId}_EMAIL_VERIFIED`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'false');
+                    fixed.push('EMAIL_VERIFIED → Set to false');
+                }
+                if (!localStorage.getItem(`VIVIANA_${userId}_LAST_LOGIN`)) {
+                    localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+                    fixed.push('LAST_LOGIN → Set to now');
+                }
+            }
+
+            if (fixed.length > 0) {
+                report += 'Fixed:\n' + fixed.map(f => `✅ ${f}`).join('\n');
+                report += '\n\n✅ User data repaired successfully!';
+                resultDiv.innerHTML = `<div class="result success">${report}</div>`;
+            } else {
+                report += 'ℹ️ No missing data found. User is already complete.';
+                resultDiv.innerHTML = `<div class="result info">${report}</div>`;
+            }
+        }
+
+        // 3. Create User Manually
+        function createUserManually() {
+            const name = document.getElementById('createName').value.trim();
+            const email = document.getElementById('createEmail').value.trim().toLowerCase();
+            const password = document.getElementById('createPassword').value;
+            const verified = document.getElementById('createVerified').checked;
+            const resultDiv = document.getElementById('createResult');
+
+            if (!name || !email || !password) {
+                resultDiv.innerHTML = '<div class="result error">Please fill in all fields</div>';
+                return;
+            }
+
+            if (password.length < 6) {
+                resultDiv.innerHTML = '<div class="result error">Password must be at least 6 characters</div>';
+                return;
+            }
+
+            // Check if user exists
+            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const exists = Object.values(users).some(u => u.email === email);
+
+            if (exists) {
+                resultDiv.innerHTML = `<div class="result error">User already exists: ${email}</div>`;
+                return;
+            }
+
+            // Create user
+            const userId = generateUserId();
+
+            users[userId] = {
+                name: name,
+                email: email,
+                password: password,
+                emailVerified: verified,
+                createdAt: new Date().toISOString()
+            };
+
+            localStorage.setItem('VIVIANA_USERS', JSON.stringify(users));
+
+            // Initialize all metadata
+            localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+            localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
+            localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+            localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+            localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, verified.toString());
+            localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+            localStorage.setItem(`VIVIANA_${userId}_CREDITS`, '3');
+
+            const ledger = [{
+                id: `txn_${Date.now()}_manual_create`,
+                timestamp: new Date().toISOString(),
+                event_type: 'initial_grant',
+                amount: 3,
+                balance_before: 0,
+                balance_after: 3,
+                description: 'Manual account creation',
+                metadata: { manual: true }
+            }];
+            localStorage.setItem(`VIVIANA_${userId}_CREDITS_LEDGER`, JSON.stringify(ledger));
+
+            const notifSettings = {
+                newMessages: true,
+                credits: true,
+                email: true,
+                productUpdates: false
+            };
+            localStorage.setItem(`VIVIANA_${userId}_NOTIFICATION_SETTINGS`, JSON.stringify(notifSettings));
+
+            const privacySettings = {
+                profileVisibility: 'private',
+                allowAnalytics: false,
+                showVerifiedBadge: true
+            };
+            localStorage.setItem(`VIVIANA_${userId}_PRIVACY_SETTINGS`, JSON.stringify(privacySettings));
+
+            let report = `✅ User created successfully!\n\n`;
+            report += `User ID: ${userId}\n`;
+            report += `Email: ${email}\n`;
+            report += `Name: ${name}\n`;
+            report += `Verified: ${verified ? 'Yes' : 'No'}\n`;
+            report += `Credits: 3\n`;
+            report += `Status: active\n\n`;
+            report += `User is now visible in Admin Panel!`;
+
+            resultDiv.innerHTML = `<div class="result success">${report}</div>`;
+
+            // Clear form
+            document.getElementById('createName').value = '';
+            document.getElementById('createEmail').value = '';
+            document.getElementById('createPassword').value = '';
+            document.getElementById('createVerified').checked = false;
+        }
+
+        // 4. Validate Data Integrity
+        function validateDataIntegrity() {
+            const resultDiv = document.getElementById('validateResult');
+            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const userIds = Object.keys(users);
+
+            let report = '🔍 Data Integrity Report\n\n';
+            let issues = [];
+
+            // Check for orphaned keys
+            const orphanedKeys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('VIVIANA_') && key !== 'VIVIANA_USERS' && !key.startsWith('VIVIANA_SECURITY_') && !key.startsWith('VIVIANA_WEBHOOK_')) {
+                    const userId = key.split('_').slice(1, -1).join('_');
+                    if (!users[userId]) {
+                        orphanedKeys.push(key);
+                    }
+                }
+            }
+
+            if (orphanedKeys.length > 0) {
+                report += `⚠️ Orphaned Keys (${orphanedKeys.length}):\n`;
+                orphanedKeys.forEach(key => {
+                    report += `   ${key}\n`;
+                });
+                report += '\n';
+                issues.push('orphaned_keys');
+            }
+
+            // Check for users missing required keys
+            const incompleteUsers = [];
+            userIds.forEach(userId => {
+                const required = ['CREDITS', 'CREDITS_LEDGER', 'MESSAGES'];
+                const missing = required.filter(key => !localStorage.getItem(`VIVIANA_${userId}_${key}`));
+                if (missing.length > 0) {
+                    incompleteUsers.push({ userId, email: users[userId].email, missing });
+                }
+            });
+
+            if (incompleteUsers.length > 0) {
+                report += `⚠️ Incomplete Users (${incompleteUsers.length}):\n`;
+                incompleteUsers.forEach(u => {
+                    report += `   ${u.email}: Missing ${u.missing.join(', ')}\n`;
+                });
+                report += '\n';
+                issues.push('incomplete_users');
+            }
+
+            // Summary
+            if (issues.length === 0) {
+                report += '✅ No data integrity issues found!\n';
+                report += `Total users: ${userIds.length}\n`;
+                report += 'All data is consistent.';
+                resultDiv.innerHTML = `<div class="result success">${report}</div>`;
+            } else {
+                report += `🚨 Found ${issues.length} issue type(s)!\n`;
+                report += 'Use the migration tools above to fix them.';
+                resultDiv.innerHTML = `<div class="result error">${report}</div>`;
+            }
+        }
+
+        // 5. Export All Data
+        function exportAllData() {
+            const resultDiv = document.getElementById('backupResult');
+
+            const allData = {};
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('VIVIANA_')) {
+                    allData[key] = localStorage.getItem(key);
+                }
+            }
+
+            const dataStr = JSON.stringify(allData, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+            const filename = `viviana_backup_${new Date().toISOString().split('T')[0]}.json`;
+
+            const link = document.createElement('a');
+            link.setAttribute('href', dataUri);
+            link.setAttribute('download', filename);
+            link.click();
+
+            resultDiv.innerHTML = `<div class="result success">✅ Data exported: ${filename}\nTotal keys: ${Object.keys(allData).length}</div>`;
+        }
+
+        // Show Import Warning
+        function showImportWarning() {
+            if (confirm('⚠️ WARNING: Importing data will OVERWRITE all existing data!\n\nAre you sure you want to continue?')) {
+                const input = document.createElement('input');
+                input.type = 'file';
+                input.accept = 'application/json';
+                input.onchange = importData;
+                input.click();
+            }
+        }
+
+        // Import Data
+        function importData(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = JSON.parse(e.target.result);
+
+                    // Clear existing VIVIANA data
+                    const keysToRemove = [];
+                    for (let i = 0; i < localStorage.length; i++) {
+                        const key = localStorage.key(i);
+                        if (key && key.startsWith('VIVIANA_')) {
+                            keysToRemove.push(key);
+                        }
+                    }
+                    keysToRemove.forEach(key => localStorage.removeItem(key));
+
+                    // Import new data
+                    Object.keys(data).forEach(key => {
+                        localStorage.setItem(key, data[key]);
+                    });
+
+                    const resultDiv = document.getElementById('backupResult');
+                    resultDiv.innerHTML = `<div class="result success">✅ Data imported successfully!\nImported ${Object.keys(data).length} keys.</div>`;
+                } catch (err) {
+                    const resultDiv = document.getElementById('backupResult');
+                    resultDiv.innerHTML = `<div class="result error">❌ Import failed: ${err.message}</div>`;
+                }
+            };
+            reader.readAsText(file);
+        }
+    </script>
+</body>
+</html>

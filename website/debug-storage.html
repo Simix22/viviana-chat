@@ -1,0 +1,473 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Debug Storage - Viviana</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+        }
+
+        h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+        }
+
+        .search-box {
+            margin-bottom: 20px;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            background: #f9f9f9;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .section h2 {
+            color: #667eea;
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+
+        .stat {
+            display: inline-block;
+            margin-right: 20px;
+            padding: 8px 16px;
+            background: white;
+            border-radius: 6px;
+            font-weight: 600;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            color: #667eea;
+            font-size: 24px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th {
+            background: #667eea;
+            color: white;
+            padding: 12px;
+            text-align: left;
+            font-weight: 600;
+        }
+
+        td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #e0e0e0;
+        }
+
+        tr:hover {
+            background: #f5f5f5;
+        }
+
+        code {
+            background: #2d3748;
+            color: #68d391;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+        }
+
+        .found {
+            background: #d4edda;
+            border-left-color: #28a745;
+        }
+
+        .not-found {
+            background: #f8d7da;
+            border-left-color: #dc3545;
+        }
+
+        .btn {
+            padding: 10px 20px;
+            background: #667eea;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+
+        .btn:hover {
+            background: #5568d3;
+        }
+
+        .btn-danger {
+            background: #dc3545;
+        }
+
+        .btn-danger:hover {
+            background: #c82333;
+        }
+
+        .json-output {
+            background: #2d3748;
+            color: #68d391;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            overflow-x: auto;
+            white-space: pre-wrap;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+
+        .error {
+            color: #dc3545;
+            font-weight: 600;
+        }
+
+        .success {
+            color: #28a745;
+            font-weight: 600;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🔍 Debug Storage Inspector</h1>
+        <p class="subtitle">Viviana User Database Diagnostic Tool</p>
+
+        <div style="margin-bottom: 20px;">
+            <button class="btn" onclick="loadAllData()">🔄 Refresh Data</button>
+            <button class="btn" onclick="exportData()">📥 Export JSON</button>
+            <button class="btn btn-danger" onclick="clearHighlight()">Clear Highlights</button>
+        </div>
+
+        <!-- Search Box -->
+        <div class="search-box">
+            <input type="email" id="emailSearch" placeholder="Search for email (e.g., yana.annatar.schwarz@proton.me)" oninput="searchEmail()">
+        </div>
+
+        <!-- Target Emails Status -->
+        <div id="targetEmailsSection" class="section">
+            <h2>🎯 Target Emails Status</h2>
+            <div id="targetEmailsResult"></div>
+        </div>
+
+        <!-- Stats -->
+        <div class="section">
+            <h2>📊 Storage Statistics</h2>
+            <div class="stat">
+                <div class="stat-label">Total Users</div>
+                <div class="stat-value" id="totalUsers">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Active Users</div>
+                <div class="stat-value" id="activeUsers">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Deleted Users</div>
+                <div class="stat-value" id="deletedUsers">0</div>
+            </div>
+            <div class="stat">
+                <div class="stat-label">Total Keys</div>
+                <div class="stat-value" id="totalKeys">0</div>
+            </div>
+        </div>
+
+        <!-- All Users -->
+        <div class="section">
+            <h2>👥 All Users in VIVIANA_USERS</h2>
+            <table id="usersTable">
+                <thead>
+                    <tr>
+                        <th>User ID</th>
+                        <th>Email</th>
+                        <th>Name</th>
+                        <th>Status</th>
+                        <th>Email Verified</th>
+                        <th>Created At</th>
+                    </tr>
+                </thead>
+                <tbody id="usersTableBody">
+                    <tr><td colspan="6">Loading...</td></tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- Raw Data -->
+        <div class="section">
+            <h2>📦 Raw VIVIANA_USERS JSON</h2>
+            <div class="json-output" id="rawJson">Loading...</div>
+        </div>
+
+        <!-- All Keys -->
+        <div class="section">
+            <h2>🗄️ All localStorage Keys (VIVIANA_*)</h2>
+            <div class="json-output" id="allKeys">Loading...</div>
+        </div>
+    </div>
+
+    <script>
+        const TARGET_EMAILS = [
+            'yana.annatar.schwarz@proton.me',
+            'simon.brandhorst@icloud.com'
+        ];
+
+        function loadAllData() {
+            console.log('🔍 Loading all data...');
+
+            // Check target emails
+            checkTargetEmails();
+
+            // Load stats
+            loadStats();
+
+            // Load users table
+            loadUsersTable();
+
+            // Load raw JSON
+            loadRawJson();
+
+            // Load all keys
+            loadAllKeys();
+        }
+
+        function checkTargetEmails() {
+            const resultDiv = document.getElementById('targetEmailsResult');
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+
+            let html = '<table style="margin-top: 10px;">';
+            html += '<tr><th>Email</th><th>Status</th><th>User ID</th><th>Details</th></tr>';
+
+            TARGET_EMAILS.forEach(email => {
+                let found = false;
+                let userId = null;
+                let userData = null;
+
+                for (let uid in allUsers) {
+                    if (allUsers[uid].email === email) {
+                        found = true;
+                        userId = uid;
+                        userData = allUsers[uid];
+                        break;
+                    }
+                }
+
+                if (found) {
+                    html += `<tr style="background: #d4edda;">
+                        <td><strong>${email}</strong></td>
+                        <td><span class="success">✅ FOUND</span></td>
+                        <td><code>${userId.substring(0, 20)}...</code></td>
+                        <td>
+                            Status: ${userData.status || 'active'}<br>
+                            Verified: ${userData.emailVerified ? 'Yes' : 'No'}<br>
+                            Created: ${new Date(userData.createdAt).toLocaleString()}
+                        </td>
+                    </tr>`;
+                } else {
+                    html += `<tr style="background: #f8d7da;">
+                        <td><strong>${email}</strong></td>
+                        <td><span class="error">❌ NOT FOUND</span></td>
+                        <td colspan="2">Not present in VIVIANA_USERS</td>
+                    </tr>`;
+                }
+            });
+
+            html += '</table>';
+            resultDiv.innerHTML = html;
+        }
+
+        function loadStats() {
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const userIds = Object.keys(allUsers);
+
+            let activeCount = 0;
+            let deletedCount = 0;
+
+            userIds.forEach(userId => {
+                const status = allUsers[userId].status || 'active';
+                if (status === 'deleted') {
+                    deletedCount++;
+                } else if (status === 'active') {
+                    activeCount++;
+                }
+            });
+
+            // Count all VIVIANA_* keys
+            let totalKeys = 0;
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('VIVIANA_')) {
+                    totalKeys++;
+                }
+            }
+
+            document.getElementById('totalUsers').textContent = userIds.length;
+            document.getElementById('activeUsers').textContent = activeCount;
+            document.getElementById('deletedUsers').textContent = deletedCount;
+            document.getElementById('totalKeys').textContent = totalKeys;
+        }
+
+        function loadUsersTable() {
+            const tbody = document.getElementById('usersTableBody');
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const userIds = Object.keys(allUsers);
+
+            if (userIds.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6">No users found in VIVIANA_USERS</td></tr>';
+                return;
+            }
+
+            let html = '';
+            userIds.forEach(userId => {
+                const user = allUsers[userId];
+                const status = user.status || 'active';
+                const emailVerified = user.emailVerified ? 'Yes ✅' : 'No ❌';
+                const createdAt = new Date(user.createdAt).toLocaleString();
+
+                const isTarget = TARGET_EMAILS.includes(user.email);
+                const rowClass = isTarget ? 'style="background: #fff3cd; font-weight: bold;"' : '';
+
+                html += `<tr ${rowClass}>
+                    <td><code>${userId.substring(0, 16)}...</code></td>
+                    <td>${user.email} ${isTarget ? '🎯' : ''}</td>
+                    <td>${user.name || 'N/A'}</td>
+                    <td>${status}</td>
+                    <td>${emailVerified}</td>
+                    <td>${createdAt}</td>
+                </tr>`;
+            });
+
+            tbody.innerHTML = html;
+        }
+
+        function loadRawJson() {
+            const rawData = localStorage.getItem('VIVIANA_USERS') || '{}';
+            const formatted = JSON.stringify(JSON.parse(rawData), null, 2);
+            document.getElementById('rawJson').textContent = formatted;
+        }
+
+        function loadAllKeys() {
+            const keys = [];
+            for (let i = 0; i < localStorage.length; i++) {
+                const key = localStorage.key(i);
+                if (key && key.startsWith('VIVIANA_')) {
+                    keys.push(key);
+                }
+            }
+
+            keys.sort();
+            document.getElementById('allKeys').textContent = keys.join('\n');
+        }
+
+        function searchEmail() {
+            const searchTerm = document.getElementById('emailSearch').value.toLowerCase();
+            if (!searchTerm) {
+                loadUsersTable();
+                return;
+            }
+
+            const tbody = document.getElementById('usersTableBody');
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const userIds = Object.keys(allUsers);
+
+            let html = '';
+            let found = false;
+
+            userIds.forEach(userId => {
+                const user = allUsers[userId];
+                if (user.email.toLowerCase().includes(searchTerm)) {
+                    found = true;
+                    const status = user.status || 'active';
+                    const emailVerified = user.emailVerified ? 'Yes ✅' : 'No ❌';
+                    const createdAt = new Date(user.createdAt).toLocaleString();
+
+                    html += `<tr style="background: #d4edda;">
+                        <td><code>${userId.substring(0, 16)}...</code></td>
+                        <td><strong>${user.email}</strong></td>
+                        <td>${user.name || 'N/A'}</td>
+                        <td>${status}</td>
+                        <td>${emailVerified}</td>
+                        <td>${createdAt}</td>
+                    </tr>`;
+                }
+            });
+
+            if (!found) {
+                html = '<tr><td colspan="6" class="error">No users found matching: ' + searchTerm + '</td></tr>';
+            }
+
+            tbody.innerHTML = html;
+        }
+
+        function exportData() {
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            const dataStr = JSON.stringify(allUsers, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,' + encodeURIComponent(dataStr);
+
+            const exportName = 'viviana_users_export_' + new Date().toISOString().split('T')[0] + '.json';
+
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportName);
+            linkElement.click();
+        }
+
+        function clearHighlight() {
+            loadUsersTable();
+        }
+
+        // Auto-load on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            loadAllData();
+        });
+    </script>
+</body>
+</html>

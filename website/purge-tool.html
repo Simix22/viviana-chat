@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Viviana - User Purge Tool</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            padding: 40px;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            color: #856404;
+        }
+
+        .input-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #333;
+            font-weight: 500;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border 0.3s;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        button {
+            flex: 1;
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .btn-search {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-search:hover {
+            background: #1976D2;
+            transform: translateY(-2px);
+        }
+
+        .btn-purge {
+            background: #f44336;
+            color: white;
+        }
+
+        .btn-purge:hover {
+            background: #d32f2f;
+            transform: translateY(-2px);
+        }
+
+        .btn-auto {
+            background: #ff9800;
+            color: white;
+        }
+
+        .btn-auto:hover {
+            background: #f57c00;
+            transform: translateY(-2px);
+        }
+
+        #result {
+            min-height: 100px;
+            padding: 15px;
+            background: #f5f5f5;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            overflow-x: auto;
+        }
+
+        .success {
+            color: #28a745;
+        }
+
+        .error {
+            color: #f44336;
+        }
+
+        .info {
+            color: #2196F3;
+        }
+
+        .warning-text {
+            color: #ff9800;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗑️ User Purge Tool</h1>
+        <p class="subtitle">Complete hard delete of user accounts and all associated data</p>
+
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This tool performs a HARD DELETE. All user data will be permanently removed from the system. This action cannot be undone!
+        </div>
+
+        <div class="input-group">
+            <label for="emailInput">Email Address to Purge:</label>
+            <input type="email" id="emailInput" placeholder="user@example.com" value="simon.brandhorst@icloud.com">
+        </div>
+
+        <div class="button-group">
+            <button class="btn-search" onclick="searchUser()">🔍 Search</button>
+            <button class="btn-purge" onclick="purgeUser()">🗑️ Purge</button>
+            <button class="btn-auto" onclick="autoPurge()">⚡ Auto Purge</button>
+        </div>
+
+        <div id="result">Ready. Enter an email address and click Search to begin.</div>
+    </div>
+
+    <script src="script.js"></script>
+    <script>
+        function log(message, type = 'info') {
+            const result = document.getElementById('result');
+            const timestamp = new Date().toLocaleTimeString();
+            const line = `[${timestamp}] ${message}\n`;
+
+            result.innerHTML += `<span class="${type}">${line}</span>`;
+            result.scrollTop = result.scrollHeight;
+        }
+
+        function clearLog() {
+            document.getElementById('result').innerHTML = '';
+        }
+
+        function searchUser() {
+            const email = document.getElementById('emailInput').value.trim().toLowerCase();
+
+            if (!email) {
+                clearLog();
+                log('❌ Please enter an email address', 'error');
+                return;
+            }
+
+            clearLog();
+            log('🔍 Searching for user: ' + email, 'info');
+
+            if (typeof searchUserReferences !== 'function') {
+                log('❌ Search function not available. Make sure script.js is loaded.', 'error');
+                return;
+            }
+
+            const result = searchUserReferences(email);
+
+            if (!result.found) {
+                log('✅ No user found with email: ' + email, 'success');
+                log('System is clean. Email can be used for new signup.', 'success');
+            } else {
+                log('⚠️ USER FOUND!', 'warning-text');
+                log('User ID: ' + result.userId, 'warning-text');
+                log('Total References: ' + result.references.length, 'warning-text');
+                log('', 'info');
+                log('References:', 'info');
+                result.references.forEach((ref, index) => {
+                    log(`  ${index + 1}. ${ref.type}: ${ref.key}`, 'info');
+                });
+                log('', 'info');
+                log('Click "Purge" to permanently delete this user.', 'warning-text');
+            }
+        }
+
+        function purgeUser() {
+            const email = document.getElementById('emailInput').value.trim().toLowerCase();
+
+            if (!email) {
+                clearLog();
+                log('❌ Please enter an email address', 'error');
+                return;
+            }
+
+            if (!confirm(`⚠️ FINAL WARNING ⚠️\n\nYou are about to PERMANENTLY DELETE:\n\nEmail: ${email}\n\nThis will remove:\n- User account\n- All messages\n- All credits & transactions\n- All profile data\n- Payment history\n- All references in logs\n\nThis action CANNOT be undone!\n\nType "DELETE" in the next prompt to confirm.`)) {
+                log('❌ Purge cancelled by user', 'error');
+                return;
+            }
+
+            const confirmation = prompt('Type "DELETE" to confirm:');
+            if (confirmation !== 'DELETE') {
+                log('❌ Purge cancelled - confirmation failed', 'error');
+                return;
+            }
+
+            clearLog();
+            log('🗑️ Starting purge process...', 'warning-text');
+
+            if (typeof purgeUserByEmail !== 'function') {
+                log('❌ Purge function not available. Make sure script.js is loaded.', 'error');
+                return;
+            }
+
+            const result = purgeUserByEmail(email);
+
+            if (!result.found) {
+                log('ℹ️ No user found with email: ' + email, 'info');
+            } else {
+                log('✅ PURGE COMPLETE!', 'success');
+                log('', 'success');
+                log('Email: ' + email, 'success');
+                log('User ID: ' + result.userId, 'success');
+                log('Items Deleted: ' + result.itemsDeleted, 'success');
+                log('', 'success');
+                log('User has been completely removed from the system.', 'success');
+                log('This email can now be used for a new signup.', 'success');
+            }
+        }
+
+        function autoPurge() {
+            const email = 'simon.brandhorst@icloud.com';
+            document.getElementById('emailInput').value = email;
+
+            clearLog();
+            log('⚡ AUTO PURGE MODE ACTIVATED', 'warning-text');
+            log('Target: ' + email, 'warning-text');
+            log('', 'info');
+
+            // Search first
+            log('Step 1: Searching...', 'info');
+
+            if (typeof searchUserReferences !== 'function') {
+                log('❌ Functions not available. Reload the page.', 'error');
+                return;
+            }
+
+            const searchResult = searchUserReferences(email);
+
+            if (!searchResult.found) {
+                log('✅ No user found - system is already clean!', 'success');
+                return;
+            }
+
+            log('⚠️ User found - ' + searchResult.references.length + ' references', 'warning-text');
+            log('', 'info');
+            log('Step 2: Purging...', 'warning-text');
+
+            const purgeResult = purgeUserByEmail(email);
+
+            if (purgeResult.found) {
+                log('', 'success');
+                log('✅ AUTO PURGE COMPLETE!', 'success');
+                log('User ID: ' + purgeResult.userId, 'success');
+                log('Items Deleted: ' + purgeResult.itemsDeleted, 'success');
+                log('', 'success');
+                log('🎉 System is now clean!', 'success');
+                log('Email ' + email + ' is ready for new signup.', 'success');
+            }
+        }
+
+        // Auto-load and display system status on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            log('System ready. Functions loaded successfully.', 'success');
+            log('Email pre-filled: simon.brandhorst@icloud.com', 'info');
+            log('', 'info');
+            log('Quick Actions:', 'info');
+            log('  🔍 Search - Check if email exists in system', 'info');
+            log('  🗑️ Purge - Manual purge with confirmation', 'info');
+            log('  ⚡ Auto Purge - Instant purge (no confirmation)', 'info');
+        });
+    </script>
+</body>
+</html>
