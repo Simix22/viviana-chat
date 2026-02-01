@@ -1148,24 +1148,37 @@ async function handleGoogleLogin() {
         console.log('✅ Session saved. User ID:', currentUser.userId);
         console.log('✅ Email verified:', currentUser.emailVerified);
 
-        logSecurityEvent('user_login', {
-            userId: currentUser.userId,
-            email: googleEmail,
-            method: 'google'
-        });
+        try {
+            logSecurityEvent('user_login', {
+                userId: currentUser.userId,
+                email: googleEmail,
+                method: 'google'
+            });
+        } catch (error) {
+            console.error('❌ Error logging security event:', error);
+        }
 
-        showToast(`Welcome back, ${currentUser.name}!`, 'success');
+        console.log('🔄 Navigating to chat NOW...');
 
-        console.log('🔄 Navigating to chat in 800ms...');
-
-        // Navigate to chat
-        setTimeout(() => {
+        // Navigate to chat IMMEDIATELY (don't use setTimeout - it can fail)
+        try {
             console.log('📱 Calling showChat()...');
             showChat();
             console.log('👤 Calling loadProfile()...');
             loadProfile();
             console.log('✅ Navigation complete');
-        }, 800);
+
+            // Show welcome toast AFTER navigation
+            showToast(`Welcome back, ${currentUser.name}!`, 'success');
+        } catch (error) {
+            console.error('❌ Error during navigation:', error);
+            console.error('Error details:', error.message, error.stack);
+            // Try fallback navigation
+            setTimeout(() => {
+                showChat();
+                loadProfile();
+            }, 500);
+        }
 
     } catch (error) {
         console.error('❌ Google Sign-In error:', error);
