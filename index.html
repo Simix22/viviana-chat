@@ -105,7 +105,7 @@
     <!-- Email Verification Screen -->
     <div id="verificationScreen" class="screen">
         <div class="auth-container">
-            <button class="back-btn" onclick="logout()">
+            <button class="back-btn" onclick="showAuth()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M19 12H5M12 19l-7-7 7-7"/>
                 </svg>
@@ -118,33 +118,32 @@
                 </svg>
             </div>
 
-            <h2>Verify Your Email</h2>
-            <p class="auth-subtitle">We've sent a 6-digit code to <strong id="verificationEmail">your email</strong></p>
+            <h2>Check Your Email</h2>
+            <p class="auth-subtitle">We've sent a verification link to <strong id="verificationEmail">your email</strong></p>
 
-            <form id="verificationForm" class="verification-form">
-                <div class="code-inputs">
-                    <input type="text" maxlength="1" class="code-input" id="code1" autofocus />
-                    <input type="text" maxlength="1" class="code-input" id="code2" />
-                    <input type="text" maxlength="1" class="code-input" id="code3" />
-                    <input type="text" maxlength="1" class="code-input" id="code4" />
-                    <input type="text" maxlength="1" class="code-input" id="code5" />
-                    <input type="text" maxlength="1" class="code-input" id="code6" />
-                </div>
+            <div class="verification-instructions">
+                <p style="margin-top: 30px; margin-bottom: 20px; color: #666; line-height: 1.6;">
+                    Please check your inbox and click the verification link to activate your account.
+                    <br><br>
+                    After verifying, return here and log in.
+                </p>
+            </div>
 
-                <div class="verification-error" id="verificationError" style="display: none;"></div>
-
-                <button type="submit" class="btn-primary">Verify Email</button>
+            <div class="verification-actions" style="margin-top: 30px;">
+                <button type="button" class="btn-primary" onclick="showAuth()" style="margin-bottom: 15px;">
+                    Back to Login
+                </button>
 
                 <div class="resend-section">
-                    <p>Didn't receive the code?</p>
-                    <button type="button" class="btn-resend" id="resendBtn" onclick="resendVerificationCode()">
-                        Resend Code
+                    <p style="margin-bottom: 10px;">Didn't receive the email?</p>
+                    <button type="button" class="btn-resend" id="resendVerificationBtn" onclick="resendVerificationEmail()">
+                        Resend Verification Email
                     </button>
-                    <p class="resend-timer" id="resendTimer" style="display: none;">
+                    <p class="resend-timer" id="resendTimer" style="display: none; margin-top: 10px; color: #999;">
                         Resend available in <span id="timerSeconds">60</span>s
                     </p>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 
