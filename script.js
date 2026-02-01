@@ -1049,48 +1049,65 @@ async function handleGoogleLogin() {
 
             // Update profile photo from Google if available
             if (googlePhotoURL && !existingUser.profilePhoto) {
-                existingUser.profilePhoto = googlePhotoURL;
-                updateUserProfile(existingUser.id, { profilePhoto: googlePhotoURL });
+                const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+                if (allUsers[existingUser.userId]) {
+                    allUsers[existingUser.userId].profilePhoto = googlePhotoURL;
+                    localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+                    existingUser.profilePhoto = googlePhotoURL;
+                }
+                localStorage.setItem(`VIVIANA_${existingUser.userId}_PROFILE_PIC`, googlePhotoURL);
             }
+
+            // Update last login
+            localStorage.setItem(`VIVIANA_${existingUser.userId}_LAST_LOGIN`, new Date().toISOString());
         } else {
             // New user - create account
             console.log('✨ New user, creating account...');
 
-            const newUser = {
-                id: 'user_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9),
-                email: googleEmail,
-                name: googleName || googleEmail.split('@')[0],
-                password: null, // No password for Google users
-                verified: true, // Google accounts are pre-verified
-                createdAt: new Date().toISOString(),
-                loginMethod: 'google',
-                googleUID: googleUID,
-                profilePhoto: googlePhotoURL || null
-            };
+            // Generate userId using standard function
+            const userId = generateUserId();
 
-            // Save to localStorage
-            const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '[]');
-            users.push(newUser);
-            localStorage.setItem('VIVIANA_USERS', JSON.stringify(users));
+            // Save user to database using standard method (ensures consistent structure)
+            saveUserToDatabase(userId, googleName || googleEmail.split('@')[0], googleEmail, null, true);
 
-            // Give welcome credits
-            creditsPurchase(newUser.id, 10, 'Free', 'google_signup_bonus');
+            // Get the user object we just created
+            const userData = getUserFromDatabase(userId);
+            currentUser = { userId, ...userData };
 
-            currentUser = newUser;
+            // Add Google-specific fields
+            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+            if (allUsers[userId]) {
+                allUsers[userId].loginMethod = 'google';
+                allUsers[userId].googleUID = googleUID;
+                allUsers[userId].profilePhoto = googlePhotoURL || null;
+                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
+            }
+
+            // Initialize user data (like email signup does)
+            localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+            localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, googlePhotoURL || '');
+            localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+            localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+            localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
+            localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+
+            // Give welcome credits (10 for Google signup)
+            creditsPurchase(userId, 10, 'Free', 'google_signup_bonus');
 
             logSecurityEvent('user_registered', {
-                userId: newUser.id,
+                userId: userId,
                 email: googleEmail,
                 method: 'google',
                 verified: true
             });
         }
 
-        // Save current session
+        // Save current session - CRITICAL: Must set VIVIANA_CURRENT_USER_ID for app restart
+        localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
         localStorage.setItem('VIVIANA_CURRENT_USER', JSON.stringify(currentUser));
 
         logSecurityEvent('user_login', {
-            userId: currentUser.id,
+            userId: currentUser.userId,
             email: googleEmail,
             method: 'google'
         });
@@ -1100,7 +1117,7 @@ async function handleGoogleLogin() {
         // Navigate to chat
         setTimeout(() => {
             showChat();
-            loadUserProfile();
+            loadProfile();
         }, 800);
 
     } catch (error) {
@@ -1136,8 +1153,15 @@ async function handleGoogleLogin() {
 
 // Helper function to get user by email
 function getUserByEmail(email) {
-    const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '[]');
-    return users.find(u => u.email.toLowerCase() === email.toLowerCase());
+    const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+
+    for (let userId in allUsers) {
+        if (allUsers[userId].email.toLowerCase() === email.toLowerCase()) {
+            return { userId, ...allUsers[userId] };
+        }
+    }
+
+    return null;
 }
 
 // ========================================
