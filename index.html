@@ -7,6 +7,7 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>Chat with Viviana</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="quiz-polish.css">
 </head>
 <body>
     <!-- Welcome Screen -->
@@ -267,12 +268,31 @@
                             <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
                     </button>
+
+                    <!-- Viviana Branding -->
+                    <div class="quiz-branding">
+                        <div class="quiz-branding-avatar">V</div>
+                        <div class="quiz-branding-info">
+                            <h3>Viviana <span style="color: #27ae60;">💚</span></h3>
+                            <p>Compatibility Check</p>
+                        </div>
+                    </div>
+
                     <div class="quiz-progress">
                         <div class="quiz-progress-text">
-                            <span id="quizCurrentStep">1</span> / 6
+                            Question <span id="quizCurrentStep">1</span> / 6
                         </div>
                         <div class="quiz-progress-bar">
                             <div id="quizProgressFill" class="quiz-progress-fill" style="width: 16.666%"></div>
+                        </div>
+                        <!-- Progress Steps (Nodes) -->
+                        <div class="quiz-progress-steps">
+                            <div class="quiz-step current" data-step="1"></div>
+                            <div class="quiz-step" data-step="2"></div>
+                            <div class="quiz-step" data-step="3"></div>
+                            <div class="quiz-step" data-step="4"></div>
+                            <div class="quiz-step" data-step="5"></div>
+                            <div class="quiz-step" data-step="6"></div>
                         </div>
                     </div>
                 </div>
@@ -915,5 +935,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
 
     <script src="script.js"></script>
+    <script src="quiz-polish.js"></script>
 </body>
 </html>
