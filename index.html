@@ -13,6 +13,7 @@
     <link rel="stylesheet" href="chat-footer-redesign.css">
     <link rel="stylesheet" href="critical-layout-fixes.css">
     <link rel="stylesheet" href="profile-credits-layout.css">
+    <link rel="stylesheet" href="chat-layout-final-fix.css">
 </head>
 <body>
     <!-- Welcome Screen -->
@@ -244,23 +245,7 @@
         <!-- Profile Selection (Initial State) -->
         <div id="profileSelection" class="chat-state" style="display: flex;">
             <div class="profile-selection-container">
-                <h2 class="section-title">Start chatting with</h2>
-                <div class="profile-card" onclick="startQuiz()">
-                    <div class="profile-card-avatar">
-                        <div class="avatar-large">V</div>
-                        <div class="status-badge">Online</div>
-                    </div>
-                    <div class="profile-card-info">
-                        <h3>Viviana</h3>
-                        <p class="profile-tagline">Your AI companion 💕</p>
-                        <p class="profile-hint">Tap to unlock chat</p>
-                    </div>
-                    <div class="profile-card-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
-                </div>
+                <!-- Profile list dynamically rendered by profile-list-manager.js -->
             </div>
         </div>
 
@@ -981,5 +966,6 @@
     <script src="chat-photo-feature.js"></script>
     <script src="quiz-modal-fix.js"></script>
     <script src="profile-quiz-system.js"></script>
+    <script src="profile-list-manager.js"></script>
 </body>
 </html>
