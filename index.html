@@ -7,6 +7,10 @@
     <meta name="mobile-web-app-capable" content="yes">
     <title>Chat with Viviana</title>
     <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="quiz-polish.css">
+    <link rel="stylesheet" href="chat-scroll-fix.css">
+    <link rel="stylesheet" href="chat-photo-feature.css">
+    <link rel="stylesheet" href="chat-footer-redesign.css">
 </head>
 <body>
     <!-- Welcome Screen -->
@@ -267,12 +271,31 @@
                             <path d="M19 12H5M12 19l-7-7 7-7"/>
                         </svg>
                     </button>
+
+                    <!-- Viviana Branding -->
+                    <div class="quiz-branding">
+                        <div class="quiz-branding-avatar">V</div>
+                        <div class="quiz-branding-info">
+                            <h3>Viviana <span style="color: #27ae60;">💚</span></h3>
+                            <p>Compatibility Check</p>
+                        </div>
+                    </div>
+
                     <div class="quiz-progress">
                         <div class="quiz-progress-text">
-                            <span id="quizCurrentStep">1</span> / 6
+                            Question <span id="quizCurrentStep">1</span> / 6
                         </div>
                         <div class="quiz-progress-bar">
                             <div id="quizProgressFill" class="quiz-progress-fill" style="width: 16.666%"></div>
+                        </div>
+                        <!-- Progress Steps (Nodes) -->
+                        <div class="quiz-progress-steps">
+                            <div class="quiz-step current" data-step="1"></div>
+                            <div class="quiz-step" data-step="2"></div>
+                            <div class="quiz-step" data-step="3"></div>
+                            <div class="quiz-step" data-step="4"></div>
+                            <div class="quiz-step" data-step="5"></div>
+                            <div class="quiz-step" data-step="6"></div>
                         </div>
                     </div>
                 </div>
@@ -337,16 +360,7 @@
                         <span class="status">Online</span>
                     </div>
                 </div>
-                <button class="credits-display" onclick="showCreditsStore()">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="10"/>
-                        <path d="M12 6v6l4 2"/>
-                    </svg>
-                    <span id="creditsCount">3</span> credits
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
+                <!-- Credits display removed - now only in Settings menu -->
             </div>
 
             <!-- Chat Messages -->
@@ -360,16 +374,45 @@
                 </div>
             </div>
 
-            <!-- Chat Input -->
+            <!-- Chat Input (3-Column Layout: Left Placeholder / Center Input / Right Actions) -->
             <div class="chat-input-container">
                 <div class="chat-input-wrapper">
-                    <input type="text" id="messageInput" placeholder="Type a message..." />
-                    <button class="send-btn" onclick="sendMessage()">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <line x1="22" y1="2" x2="11" y2="13"></line>
-                            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                        </svg>
-                    </button>
+                    <!-- Left: Placeholder (reserved for future features) -->
+                    <div class="chat-input-left">
+                        <button class="menu-placeholder-btn" disabled title="More options (coming soon)">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="12" r="1"></circle>
+                                <circle cx="12" cy="5" r="1"></circle>
+                                <circle cx="12" cy="19" r="1"></circle>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Center: Input Field (main focus, centered) -->
+                    <div class="chat-input-center">
+                        <button class="photo-btn" onclick="triggerPhotoUpload()" title="Send photo">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                        </button>
+
+                        <input type="text" id="messageInput" placeholder="Type a message..." />
+                    </div>
+
+                    <!-- Right: Send Button -->
+                    <div class="chat-input-right">
+                        <button class="send-btn" onclick="sendMessage()">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
+
+                    <!-- Hidden File Input -->
+                    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="handlePhotoSelect(event)" />
                 </div>
             </div>
         </div>
@@ -910,10 +953,27 @@
     <!-- Error/Info Toast -->
     <div id="toast" class="toast"></div>
 
+    <!-- Image Lightbox Modal -->
+    <div id="imageLightbox" class="lightbox-overlay" onclick="closeLightbox()" style="display: none;">
+        <div class="lightbox-content" onclick="event.stopPropagation()">
+            <button class="lightbox-close" onclick="closeLightbox()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+            <img id="lightboxImage" src="" alt="Full size image" />
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-storage-compat.js"></script>
 
     <script src="script.js"></script>
+    <script src="quiz-polish.js"></script>
+    <script src="chat-scroll-fix.js"></script>
+    <script src="chat-photo-feature.js"></script>
 </body>
 </html>

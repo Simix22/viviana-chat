@@ -1,0 +1,342 @@
+/* ============================================
+   CHAT FOOTER REDESIGN - CLEAN 3-COLUMN LAYOUT
+   Modern, centered input, stable structure
+   ============================================ */
+
+/* ========================================
+   CHAT HEADER - SIMPLIFIED (NO CREDITS)
+   ======================================== */
+
+/* Remove credits-display button styling if exists */
+.chat-header .credits-display {
+    display: none !important; /* Force hide if not removed from HTML */
+}
+
+/* Header now only contains profile */
+.chat-header {
+    padding: 16px 20px;
+    background: white;
+    border-bottom: 1px solid #E0E0E0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-start; /* No need for space-between anymore */
+    min-height: 70px;
+}
+
+.header-profile {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+}
+
+/* ========================================
+   CHAT INPUT - 3-COLUMN LAYOUT
+   ======================================== */
+
+.chat-input-container {
+    position: fixed;
+    bottom: 60px; /* Above bottom nav */
+    left: 0;
+    right: 0;
+    background: white;
+    border-top: 1px solid #E0E0E0;
+    padding: 12px 16px;
+    z-index: 100;
+}
+
+.chat-input-wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr auto; /* Left / Center (flex) / Right */
+    gap: 12px;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* ========================================
+   LEFT COLUMN - PLACEHOLDER
+   ======================================== */
+
+.chat-input-left {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.menu-placeholder-btn {
+    background: transparent;
+    border: none;
+    color: #BDBDBD; /* Greyed out - disabled state */
+    padding: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    cursor: not-allowed;
+    opacity: 0.5;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.menu-placeholder-btn:disabled {
+    pointer-events: none;
+}
+
+/* Subtle hint that it's coming soon */
+.menu-placeholder-btn:hover {
+    background: rgba(189, 189, 189, 0.1);
+}
+
+/* ========================================
+   CENTER COLUMN - INPUT (MAIN FOCUS)
+   ======================================== */
+
+.chat-input-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #F5F5F5;
+    border-radius: 24px;
+    padding: 8px 16px;
+    flex: 1;
+    max-width: 600px; /* Prevent extreme widths on desktop */
+    margin: 0 auto; /* Center the input area */
+    transition: all 0.2s ease;
+}
+
+.chat-input-center:focus-within {
+    background: #EEEEEE;
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.1);
+}
+
+/* Photo button inside center */
+.chat-input-center .photo-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #757575;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+    flex-shrink: 0;
+}
+
+.chat-input-center .photo-btn:hover {
+    background: rgba(233, 30, 99, 0.1);
+    color: #E91E63;
+}
+
+.chat-input-center .photo-btn:active {
+    transform: scale(0.95);
+}
+
+/* Input field */
+#messageInput {
+    flex: 1;
+    border: none;
+    background: transparent;
+    font-size: 15px;
+    padding: 8px 4px;
+    outline: none;
+    color: #212121;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+#messageInput::placeholder {
+    color: #9E9E9E;
+}
+
+/* ========================================
+   RIGHT COLUMN - SEND BUTTON
+   ======================================== */
+
+.chat-input-right {
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.send-btn {
+    background: linear-gradient(135deg, #E91E63 0%, #FF4081 100%);
+    border: none;
+    color: white;
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+    flex-shrink: 0;
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 2px 6px rgba(233, 30, 99, 0.3);
+}
+
+/* Disabled state (no text in input) */
+.send-btn:disabled {
+    background: #BDBDBD;
+    cursor: not-allowed;
+    box-shadow: none;
+}
+
+.send-btn:disabled:hover {
+    transform: none;
+}
+
+/* ========================================
+   STABILITY - NO LAYOUT SHIFTS
+   ======================================== */
+
+/* Prevent container from resizing when typing */
+.chat-input-container {
+    min-height: 70px; /* Reserve stable height */
+}
+
+/* Prevent input from growing vertically */
+#messageInput {
+    min-height: 20px;
+    max-height: 20px;
+    overflow: hidden;
+    resize: none;
+}
+
+/* Grid columns are fixed (no flex-grow issues) */
+.chat-input-wrapper {
+    will-change: auto; /* Don't trigger will-change */
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 768px) {
+    .chat-input-container {
+        padding: 10px 12px;
+        bottom: 60px;
+    }
+
+    .chat-input-wrapper {
+        gap: 8px;
+    }
+
+    .chat-input-center {
+        max-width: 100%; /* Use full available space */
+        padding: 6px 12px;
+    }
+
+    #messageInput {
+        font-size: 16px; /* Prevent iOS zoom on focus */
+    }
+
+    .send-btn {
+        width: 40px;
+        height: 40px;
+    }
+
+    .menu-placeholder-btn {
+        padding: 6px;
+    }
+}
+
+@media (max-width: 480px) {
+    .chat-input-wrapper {
+        gap: 6px;
+    }
+
+    .chat-input-center {
+        padding: 6px 10px;
+    }
+
+    .send-btn {
+        width: 38px;
+        height: 38px;
+    }
+}
+
+/* ========================================
+   KEYBOARD OPEN (MOBILE) - PREVENT SHIFT
+   ======================================== */
+
+/* When keyboard opens, container stays stable */
+@supports (-webkit-touch-callout: none) {
+    /* iOS Safari */
+    .chat-input-container {
+        position: fixed;
+        bottom: env(safe-area-inset-bottom, 60px);
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.photo-btn:focus-visible,
+.send-btn:focus-visible,
+.menu-placeholder-btn:focus-visible {
+    outline: 2px solid #E91E63;
+    outline-offset: 2px;
+}
+
+#messageInput:focus {
+    /* No outline needed - container has focus-within style */
+}
+
+/* ========================================
+   DESKTOP LARGE SCREENS
+   ======================================== */
+
+@media (min-width: 1200px) {
+    .chat-input-wrapper {
+        max-width: 900px; /* Limit width on very large screens */
+    }
+
+    .chat-input-center {
+        max-width: 600px;
+    }
+}
+
+/* ========================================
+   RTL SUPPORT (IF NEEDED LATER)
+   ======================================== */
+
+[dir="rtl"] .chat-input-wrapper {
+    grid-template-columns: auto 1fr auto; /* Same, grid auto-adjusts */
+}
+
+/* ========================================
+   PREVENT FLASH / JANK
+   ======================================== */
+
+.chat-input-container,
+.chat-input-wrapper,
+.chat-input-center {
+    contain: layout style; /* CSS containment for stability */
+}
+
+/* No transitions on structure changes */
+.chat-input-wrapper > * {
+    will-change: auto;
+}
+
+/* ========================================
+   DARK MODE SUPPORT (FUTURE)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    /* Reserved for future dark mode implementation */
+    /* .chat-input-container { background: #1a1a1a; } */
+}
