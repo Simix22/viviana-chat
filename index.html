@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="critical-layout-fixes.css">
     <link rel="stylesheet" href="profile-credits-layout.css">
     <link rel="stylesheet" href="chat-layout-final-fix.css">
+    <link rel="stylesheet" href="chat-rebuild.css">
 </head>
 <body>
     <!-- Welcome Screen -->
@@ -587,6 +588,23 @@
                 <button type="submit" class="btn-primary">Save Changes</button>
             </form>
 
+            <!-- Credits Section - Prominent -->
+            <div class="profile-credits-section">
+                <div class="credits-balance">
+                    <div class="credits-amount">
+                        <div class="credits-icon">💎</div>
+                        <div>
+                            <span class="credits-number" id="profileCreditsCount">3</span>
+                            <span class="credits-label">Credits</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="credits-buy-btn" onclick="showCreditsStore()">
+                    <span class="credits-buy-icon">✨</span>
+                    <span>Get More Credits</span>
+                </button>
+            </div>
+
             <!-- Additional Options -->
             <div class="profile-options">
                 <h3>Account Settings</h3>
@@ -611,19 +629,6 @@
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                         <span>Privacy Settings</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-
-                <button class="option-btn option-btn-primary" onclick="showCreditsStore()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        <span>Buy Credits</span>
                     </div>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
@@ -967,5 +972,6 @@
     <script src="quiz-modal-fix.js"></script>
     <script src="profile-quiz-system.js"></script>
     <script src="profile-list-manager.js"></script>
+    <script src="credits-display.js"></script>
 </body>
 </html>
