@@ -1,0 +1,300 @@
+/* ============================================
+   VIVIANA CHAT - THEME PLUGIN SYSTEM
+   Design Capabilities Enhancement
+   ============================================ */
+
+/* Base Theme Variables (Default - Light Romantic) */
+:root {
+    /* Primary Colors */
+    --primary-color: #E91E63;
+    --primary-dark: #C2185B;
+    --primary-light: #F8BBD0;
+    --secondary-color: #9C27B0;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F5F5;
+    --bg-tertiary: #FAFAFA;
+
+    /* Text Colors */
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-tertiary: #9E9E9E;
+
+    /* UI Elements */
+    --border-color: #E0E0E0;
+    --success-color: #4CAF50;
+    --error-color: #F44336;
+    --warning-color: #FF9800;
+    --info-color: #2196F3;
+
+    /* Shadows */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.15);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.2);
+
+    /* Borders & Radius */
+    --border-radius-sm: 8px;
+    --border-radius-md: 12px;
+    --border-radius-lg: 20px;
+    --border-radius-xl: 30px;
+
+    /* Spacing */
+    --spacing-xs: 4px;
+    --spacing-sm: 8px;
+    --spacing-md: 16px;
+    --spacing-lg: 24px;
+    --spacing-xl: 32px;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* Transitions */
+    --transition-fast: 0.2s ease;
+    --transition-normal: 0.3s ease;
+    --transition-slow: 0.5s ease;
+}
+
+/* ============================================
+   THEME 1: DARK MODE
+   ============================================ */
+[data-theme="dark"] {
+    /* Primary Colors */
+    --primary-color: #FF4081;
+    --primary-dark: #F50057;
+    --primary-light: #FF80AB;
+    --secondary-color: #7C4DFF;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+    --bg-primary: #1a1a2e;
+    --bg-secondary: #0f0f1e;
+    --bg-tertiary: #16213e;
+
+    /* Text Colors */
+    --text-primary: #FFFFFF;
+    --text-secondary: #B0B0B0;
+    --text-tertiary: #808080;
+
+    /* UI Elements */
+    --border-color: #2a2a3e;
+    --success-color: #66BB6A;
+    --error-color: #EF5350;
+    --warning-color: #FFA726;
+    --info-color: #42A5F5;
+
+    /* Shadows */
+    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.6);
+    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.8);
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+/* ============================================
+   THEME 2: ROMANTIC PINK
+   ============================================ */
+[data-theme="romantic"] {
+    /* Primary Colors */
+    --primary-color: #FF1744;
+    --primary-dark: #D50000;
+    --primary-light: #FFD1DC;
+    --secondary-color: #FF4081;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #ffeef8 0%, #ffcce5 100%);
+    --bg-primary: #FFFCFE;
+    --bg-secondary: #FFF0F5;
+    --bg-tertiary: #FFE4F0;
+
+    /* Text Colors */
+    --text-primary: #2D1B2E;
+    --text-secondary: #7D5A7F;
+    --text-tertiary: #A584A7;
+
+    /* UI Elements */
+    --border-color: #FFD1E3;
+    --success-color: #FF6B9D;
+    --error-color: #D81B60;
+    --warning-color: #FF80AB;
+    --info-color: #F48FB1;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #ff6b9d 0%, #c44569 100%);
+}
+
+/* ============================================
+   THEME 3: MODERN BLUE
+   ============================================ */
+[data-theme="modern"] {
+    /* Primary Colors */
+    --primary-color: #2196F3;
+    --primary-dark: #1976D2;
+    --primary-light: #BBDEFB;
+    --secondary-color: #00BCD4;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #F5F9FC;
+    --bg-tertiary: #E8F4F8;
+
+    /* Text Colors */
+    --text-primary: #0D47A1;
+    --text-secondary: #546E7A;
+    --text-tertiary: #90A4AE;
+
+    /* UI Elements */
+    --border-color: #B3E5FC;
+    --success-color: #26A69A;
+    --error-color: #EF5350;
+    --warning-color: #FFA726;
+    --info-color: #29B6F6;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #42a5f5 0%, #1e88e5 100%);
+}
+
+/* ============================================
+   THEME 4: MINIMALIST GREY
+   ============================================ */
+[data-theme="minimalist"] {
+    /* Primary Colors */
+    --primary-color: #424242;
+    --primary-dark: #212121;
+    --primary-light: #BDBDBD;
+    --secondary-color: #616161;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #fafafa 0%, #f5f5f5 100%);
+    --bg-primary: #FFFFFF;
+    --bg-secondary: #FAFAFA;
+    --bg-tertiary: #F5F5F5;
+
+    /* Text Colors */
+    --text-primary: #212121;
+    --text-secondary: #757575;
+    --text-tertiary: #9E9E9E;
+
+    /* UI Elements */
+    --border-color: #E0E0E0;
+    --success-color: #66BB6A;
+    --error-color: #EF5350;
+    --warning-color: #FFA726;
+    --info-color: #42A5F5;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #757575 0%, #424242 100%);
+}
+
+/* ============================================
+   THEME 5: SUNSET ORANGE
+   ============================================ */
+[data-theme="sunset"] {
+    /* Primary Colors */
+    --primary-color: #FF5722;
+    --primary-dark: #E64A19;
+    --primary-light: #FFCCBC;
+    --secondary-color: #FF9800;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+    --bg-primary: #FFFAF5;
+    --bg-secondary: #FFF8E1;
+    --bg-tertiary: #FFECB3;
+
+    /* Text Colors */
+    --text-primary: #3E2723;
+    --text-secondary: #6D4C41;
+    --text-tertiary: #8D6E63;
+
+    /* UI Elements */
+    --border-color: #FFE0B2;
+    --success-color: #66BB6A;
+    --error-color: #EF5350;
+    --warning-color: #FFA726;
+    --info-color: #42A5F5;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #ff7043 0%, #ff5722 100%);
+}
+
+/* ============================================
+   THEME 6: OCEAN TEAL
+   ============================================ */
+[data-theme="ocean"] {
+    /* Primary Colors */
+    --primary-color: #00897B;
+    --primary-dark: #00695C;
+    --primary-light: #B2DFDB;
+    --secondary-color: #00ACC1;
+
+    /* Background Colors */
+    --bg-gradient: linear-gradient(135deg, #e0f2f1 0%, #b2dfdb 100%);
+    --bg-primary: #F0FFFE;
+    --bg-secondary: #E0F7F5;
+    --bg-tertiary: #B2EBF2;
+
+    /* Text Colors */
+    --text-primary: #004D40;
+    --text-secondary: #00695C;
+    --text-tertiary: #00897B;
+
+    /* UI Elements */
+    --border-color: #B2DFDB;
+    --success-color: #26A69A;
+    --error-color: #EF5350;
+    --warning-color: #FFA726;
+    --info-color: #00ACC1;
+
+    /* Avatar Gradient */
+    --avatar-gradient: linear-gradient(135deg, #26a69a 0%, #00897b 100%);
+}
+
+/* ============================================
+   THEME TRANSITIONS
+   ============================================ */
+body {
+    transition:
+        background-color var(--transition-normal),
+        color var(--transition-normal);
+}
+
+* {
+    transition:
+        border-color var(--transition-fast),
+        background-color var(--transition-fast),
+        color var(--transition-fast);
+}
+
+/* Preserve specific transitions */
+.btn-primary,
+.btn-secondary,
+.btn-google,
+.nav-item,
+.message,
+.quiz-choice {
+    transition: all var(--transition-normal) !important;
+}
+
+/* ============================================
+   THEME-AWARE COMPONENTS
+   ============================================ */
+
+/* Update scrollbar for dark themes */
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: var(--text-secondary);
+}
+
+/* Update shadows for dark theme */
+[data-theme="dark"] .shadow,
+[data-theme="dark"] .card,
+[data-theme="dark"] .message-bubble {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+}
