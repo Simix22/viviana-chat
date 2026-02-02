@@ -6,6 +6,8 @@
 // Track rendered messages to prevent duplicates
 let renderedMessageIds = new Set();
 let isScrollingProgrammatically = false;
+let isChatInitialized = false; // Track if chat has been initialized
+let lastUserId = null; // Track last user to detect user switches
 
 // Centralized scroll manager - smooth and stable
 function scrollChatToBottom(force = false) {
@@ -90,46 +92,91 @@ function loadMessagesStable() {
     if (!currentUser) return;
 
     const messagesData = localStorage.getItem(`VIVIANA_${currentUser.userId}_MESSAGES`);
-    if (!messagesData) return;
-
-    const messages = JSON.parse(messagesData);
-    console.log(`📨 Loading ${messages.length} messages (stable mode)`);
-
-    // Clear rendered tracking on fresh load
-    renderedMessageIds.clear();
-
     const container = document.getElementById('chatMessages');
     if (!container) return;
 
-    // Add loading class to disable animations during batch load
-    container.classList.add('loading');
-
-    // Keep initial greeting if exists
-    const initialGreeting = container.querySelector('.message.received');
-    const hasGreeting = !!initialGreeting;
-
-    // Clear DOM ONLY on initial load
-    container.innerHTML = '';
-
-    // Re-add greeting
-    if (hasGreeting && initialGreeting) {
-        container.appendChild(initialGreeting);
-        // Track greeting to prevent duplication
-        renderedMessageIds.add('initial-greeting');
+    // DETECT USER SWITCH - Reset chat state if user changed
+    if (lastUserId !== null && lastUserId !== currentUser.userId) {
+        console.log('🔄 User switched, resetting chat state');
+        resetChatState();
     }
 
-    // Append all messages (no animation during batch load)
-    messages.forEach(message => {
-        appendMessageToChat(message, false); // isNewMessage = false for batch
-    });
+    // Update last user ID
+    lastUserId = currentUser.userId;
 
-    // Remove loading class after batch is done
-    setTimeout(() => {
-        container.classList.remove('loading');
-    }, 100);
+    // FIRST TIME INITIALIZATION
+    if (!isChatInitialized) {
+        console.log('🎬 First-time chat initialization');
 
-    // Scroll to bottom (force on initial load)
-    scrollChatToBottom(true);
+        // Clear rendered tracking
+        renderedMessageIds.clear();
+
+        // Add loading class to disable animations during batch load
+        container.classList.add('loading');
+
+        // Keep initial greeting if exists
+        const initialGreeting = container.querySelector('.message.received:first-child');
+        const hasGreeting = !!initialGreeting;
+
+        // Clear DOM ONLY on FIRST initialization
+        container.innerHTML = '';
+
+        // Re-add greeting
+        if (hasGreeting && initialGreeting) {
+            container.appendChild(initialGreeting);
+            // Track greeting to prevent duplication
+            renderedMessageIds.add('initial-greeting');
+        }
+
+        // Load all messages if available
+        if (messagesData) {
+            const messages = JSON.parse(messagesData);
+            console.log(`📨 Loading ${messages.length} messages (initial load)`);
+
+            // Append all messages (no animation during batch load)
+            messages.forEach(message => {
+                appendMessageToChat(message, false); // isNewMessage = false for batch
+            });
+        }
+
+        // Remove loading class after batch is done
+        setTimeout(() => {
+            container.classList.remove('loading');
+        }, 100);
+
+        // Mark as initialized
+        isChatInitialized = true;
+
+        // Scroll to bottom (force on initial load)
+        scrollChatToBottom(true);
+
+        console.log('✅ Chat initialized successfully');
+    }
+    // SUBSEQUENT CALLS - APPEND ONLY NEW MESSAGES
+    else {
+        console.log('🔄 Syncing messages (append-only mode)');
+
+        if (!messagesData) return;
+
+        const messages = JSON.parse(messagesData);
+        let newMessagesAdded = 0;
+
+        // Only append messages that aren't rendered yet
+        messages.forEach(message => {
+            if (!renderedMessageIds.has(message.id)) {
+                appendMessageToChat(message, false); // No animation for sync
+                newMessagesAdded++;
+            }
+        });
+
+        if (newMessagesAdded > 0) {
+            console.log(`📥 Appended ${newMessagesAdded} new message(s)`);
+            // Auto-scroll if user is near bottom
+            scrollChatToBottom(false);
+        } else {
+            console.log('✓ No new messages to append');
+        }
+    }
 }
 
 // Sync new messages from storage - APPEND ONLY!
@@ -266,6 +313,18 @@ function stopMessageSyncStable() {
     }
     console.log('🛑 Message sync stopped');
 }
+
+// Reset chat state (call on logout, user switch, or screen change)
+function resetChatState() {
+    console.log('🔄 Resetting chat state');
+    isChatInitialized = false;
+    renderedMessageIds.clear();
+    isScrollingProgrammatically = false;
+    stopMessageSyncStable();
+}
+
+// Expose resetChatState globally for logout/login flows
+window.resetChatState = resetChatState;
 
 // Override original functions
 console.log('🔧 Applying chat scroll jitter fix...');

@@ -9,6 +9,11 @@
     -webkit-overflow-scrolling: touch; /* Smooth momentum scrolling on iOS */
 }
 
+/* CRITICAL FIX: Disable global message animation (prevents re-mount flash) */
+.message {
+    animation: none !important; /* Override style.css global animation */
+}
+
 /* Disable slideIn animation during batch loads (prevents jitter) */
 .chat-messages.loading .message {
     animation: none !important;
