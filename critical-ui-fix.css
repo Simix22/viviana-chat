@@ -1,0 +1,649 @@
+/* ============================================
+   CRITICAL UI FIX
+   Fixes layout issues in Chat-List & Discover
+   ============================================ */
+
+/* ========================================
+   FORCE DARK MODE AS DEFAULT
+   ======================================== */
+
+html {
+    background: #0a0a0a;
+}
+
+body {
+    background: #0a0a0a !important;
+    color: #ffffff;
+}
+
+/* Ensure all screens have dark background */
+.screen {
+    background: #0a0a0a !important;
+}
+
+/* ========================================
+   FIX: CHAT SCREEN LAYOUT
+   ======================================== */
+
+#chatScreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    flex-direction: column;
+    background: #0a0a0a !important;
+    overflow: hidden;
+}
+
+#chatScreen.active,
+#chatScreen[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* ========================================
+   FIX: PROFILE SELECTION (Messages List)
+   ======================================== */
+
+#profileSelection {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 65px; /* Leave space for nav */
+    display: flex;
+    flex-direction: column;
+    background: #0a0a0a !important;
+    overflow: hidden;
+    z-index: 1;
+}
+
+#profileSelection .profile-selection-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+    background: #0a0a0a;
+}
+
+/* Messages Header - Fixed at top */
+#profileSelection .messages-header {
+    position: relative !important;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 12px 16px;
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a;
+    min-height: 56px;
+    z-index: 5;
+}
+
+#profileSelection .messages-header h1 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff !important;
+    margin: 0;
+}
+
+#profileSelection .messages-header-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+}
+
+#profileSelection .messages-header-btn svg {
+    stroke: #ffffff;
+}
+
+/* Search Bar - Below header */
+#profileSelection .messages-search {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    background: #0a0a0a !important;
+}
+
+#profileSelection .messages-search-input {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #1a1a1a !important;
+    border: 1px solid #2a2a2a;
+    border-radius: 12px;
+    padding: 10px 14px;
+}
+
+#profileSelection .messages-search-input svg {
+    stroke: #666666;
+    flex-shrink: 0;
+    width: 18px;
+    height: 18px;
+}
+
+#profileSelection .messages-search-input input {
+    flex: 1;
+    border: none;
+    background: transparent !important;
+    outline: none;
+    font-size: 15px;
+    color: #ffffff !important;
+}
+
+#profileSelection .messages-search-input input::placeholder {
+    color: #666666;
+}
+
+/* Filter Row */
+#profileSelection .messages-filter {
+    flex-shrink: 0;
+    padding: 8px 16px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    color: #a0a0a0;
+    font-size: 13px;
+    background: #0a0a0a !important;
+}
+
+#profileSelection .messages-filter svg {
+    width: 14px;
+    height: 14px;
+    stroke: #a0a0a0;
+}
+
+/* Contact List - Scrollable */
+#profileSelection .contact-list {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    background: #0a0a0a !important;
+    padding-bottom: 20px;
+}
+
+/* Contact Item */
+#profileSelection .contact-item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    background: transparent;
+    border-bottom: 1px solid #1a1a1a;
+    cursor: pointer;
+    transition: background 0.15s ease;
+}
+
+#profileSelection .contact-item:hover,
+#profileSelection .contact-item:active {
+    background: #141414;
+}
+
+/* Contact Avatar */
+#profileSelection .contact-avatar {
+    position: relative;
+    flex-shrink: 0;
+}
+
+#profileSelection .contact-avatar-img {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+    font-weight: 600;
+    color: white;
+}
+
+#profileSelection .contact-unread-dot {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 14px;
+    height: 14px;
+    background: #7C4DFF;
+    border-radius: 50%;
+    border: 2px solid #0a0a0a;
+}
+
+/* Contact Info */
+#profileSelection .contact-info {
+    flex: 1;
+    min-width: 0;
+}
+
+#profileSelection .contact-name {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 2px;
+}
+
+#profileSelection .contact-name h3 {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff !important;
+    margin: 0;
+}
+
+#profileSelection .contact-verified {
+    color: #4CAF50;
+    font-size: 14px;
+}
+
+#profileSelection .contact-preview {
+    font-size: 14px;
+    color: #888888 !important;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+/* Contact Meta */
+#profileSelection .contact-meta {
+    flex-shrink: 0;
+    text-align: right;
+}
+
+#profileSelection .contact-time {
+    font-size: 12px;
+    color: #666666;
+}
+
+/* ========================================
+   FIX: DISCOVER SCREEN LAYOUT
+   ======================================== */
+
+#discoverScreen {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    flex-direction: column;
+    background: #0a0a0a !important;
+    overflow: hidden;
+}
+
+#discoverScreen.active,
+#discoverScreen[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* Discover Header */
+#discoverScreen .discover-header {
+    position: relative;
+    flex-shrink: 0;
+    height: 56px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    background: #0a0a0a !important;
+    border-bottom: 1px solid #1a1a1a;
+    z-index: 10;
+}
+
+#discoverScreen .discover-header h2 {
+    font-size: 20px;
+    font-weight: 600;
+    color: #ffffff !important;
+    margin: 0;
+}
+
+/* Cards Area - Takes remaining space */
+#discoverScreen .discover-cards-area {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px 16px 0;
+    overflow: hidden;
+    position: relative;
+}
+
+/* Card Stack */
+#discoverScreen .discover-card-stack {
+    position: relative;
+    width: 100%;
+    max-width: 360px;
+    height: calc(100% - 100px);
+    max-height: 480px;
+}
+
+/* Fix Card Stacking - Hide cards behind properly */
+#discoverScreen .discover-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: #1a1a1a !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+}
+
+#discoverScreen .discover-card.card-top {
+    z-index: 3;
+    transform: scale(1) translateY(0);
+    opacity: 1;
+}
+
+/* Behind cards: only show top portion, hide details */
+#discoverScreen .discover-card.card-behind-1 {
+    z-index: 2;
+    transform: scale(0.95) translateY(12px);
+    pointer-events: none;
+}
+
+#discoverScreen .discover-card.card-behind-1 .discover-card-details,
+#discoverScreen .discover-card.card-behind-1 .discover-card-info {
+    visibility: hidden;
+}
+
+#discoverScreen .discover-card.card-behind-2 {
+    z-index: 1;
+    transform: scale(0.90) translateY(24px);
+    pointer-events: none;
+}
+
+#discoverScreen .discover-card.card-behind-2 .discover-card-details,
+#discoverScreen .discover-card.card-behind-2 .discover-card-info,
+#discoverScreen .discover-card.card-behind-2 .discover-card-image {
+    visibility: hidden;
+}
+
+/* Card Image */
+#discoverScreen .discover-card-image {
+    width: 100%;
+    height: 65%;
+    background-size: cover;
+    background-position: center;
+    position: relative;
+}
+
+#discoverScreen .discover-card-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    pointer-events: none;
+}
+
+/* Card Info Overlay */
+#discoverScreen .discover-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 16px;
+    z-index: 2;
+    color: white;
+}
+
+#discoverScreen .discover-card-name {
+    font-size: 24px;
+    font-weight: 700;
+    margin: 0;
+    color: #ffffff;
+}
+
+#discoverScreen .discover-card-age {
+    font-size: 18px;
+    font-weight: 500;
+    color: rgba(255, 255, 255, 0.9);
+}
+
+/* Card Details */
+#discoverScreen .discover-card-details {
+    padding: 14px 16px;
+    background: #1a1a1a !important;
+}
+
+#discoverScreen .discover-card-tagline {
+    font-size: 14px;
+    color: #a0a0a0 !important;
+    margin: 0 0 10px 0;
+}
+
+#discoverScreen .discover-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+#discoverScreen .discover-tag {
+    background: #252525 !important;
+    border: 1px solid #333333;
+    border-radius: 16px;
+    padding: 5px 12px;
+    font-size: 12px;
+    color: #cccccc !important;
+}
+
+/* Action Buttons */
+#discoverScreen .discover-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+    padding: 16px 0;
+    margin-top: auto;
+}
+
+#discoverScreen .discover-action-btn {
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: transform 0.2s ease;
+}
+
+#discoverScreen .discover-skip-btn {
+    width: 56px;
+    height: 56px;
+    background: #1a1a1a;
+    border: 2px solid #333333;
+}
+
+#discoverScreen .discover-skip-btn svg {
+    stroke: #888888;
+}
+
+#discoverScreen .discover-like-btn {
+    width: 68px;
+    height: 68px;
+    background: linear-gradient(135deg, #E91E63, #FF4081);
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.4);
+}
+
+#discoverScreen .discover-action-btn:active {
+    transform: scale(0.92);
+}
+
+/* Empty State */
+#discoverScreen .discover-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 20px;
+    gap: 12px;
+}
+
+#discoverScreen .discover-empty.visible {
+    display: flex;
+}
+
+#discoverScreen .discover-empty h3 {
+    color: #ffffff !important;
+    font-size: 20px;
+    margin: 0;
+}
+
+#discoverScreen .discover-empty p {
+    color: #888888 !important;
+    font-size: 14px;
+    margin: 0;
+}
+
+/* ========================================
+   FIX: APP NAVIGATION
+   ======================================== */
+
+.app-nav {
+    position: fixed !important;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 65px;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    background: #0a0a0a !important;
+    border-top: 1px solid #1a1a1a;
+    z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom, 0);
+}
+
+.nav-item {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 8px 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    color: #666666;
+    transition: color 0.2s ease;
+}
+
+.nav-item svg {
+    stroke: currentColor;
+}
+
+.nav-item span {
+    font-size: 11px;
+    font-weight: 500;
+}
+
+.nav-item.active {
+    color: #E91E63 !important;
+}
+
+.nav-item.active svg {
+    stroke: #E91E63;
+}
+
+.nav-item.active span {
+    color: #E91E63;
+}
+
+/* ========================================
+   FIX: SCREEN ISOLATION
+   ======================================== */
+
+/* Hide all screens by default */
+.screen {
+    display: none !important;
+}
+
+/* Only show active screen */
+.screen.active,
+.screen[style*="display: flex"],
+.screen[style*="display: block"] {
+    display: flex !important;
+}
+
+/* Ensure proper stacking */
+#authScreen { z-index: 10; }
+#chatScreen { z-index: 20; }
+#discoverScreen { z-index: 20; }
+#profileScreen { z-index: 20; }
+#creditsScreen { z-index: 25; }
+
+/* ========================================
+   FIX: ACTUAL CHAT VIEW
+   ======================================== */
+
+#actualChat {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 65px;
+    display: none;
+    flex-direction: column;
+    background: #0a0a0a !important;
+    z-index: 2;
+}
+
+#actualChat[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* ========================================
+   FIX: QUIZ FLOW
+   ======================================== */
+
+#quizFlow {
+    position: absolute !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none;
+    background: rgba(0, 0, 0, 0.95) !important;
+    z-index: 50;
+}
+
+#quizFlow.active,
+#quizFlow[style*="display: flex"] {
+    display: flex !important;
+}
+
+/* ========================================
+   SCROLLBAR STYLING (Dark Theme)
+   ======================================== */
+
+::-webkit-scrollbar {
+    width: 4px;
+}
+
+::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #333333;
+    border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #444444;
+}
