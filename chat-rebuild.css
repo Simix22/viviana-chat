@@ -506,3 +506,47 @@ body.quiz-open .app-nav {
         scroll-behavior: auto;
     }
 }
+
+/* ========================================
+   SEND BUTTON - GUARANTEED VISIBILITY
+   ======================================== */
+
+/* Ensure send button and container are always visible */
+.chat-input-right {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}
+
+.send-btn {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+    min-height: 44px !important;
+    background: linear-gradient(135deg, #E91E63, #F06292) !important;
+    border: none !important;
+    border-radius: 50% !important;
+    color: white !important;
+    cursor: pointer !important;
+    align-items: center !important;
+    justify-content: center !important;
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3) !important;
+}
+
+.send-btn svg {
+    display: block !important;
+    visibility: visible !important;
+    width: 20px !important;
+    height: 20px !important;
+}
+
+/* Ensure chat-input-container is visible when actualChat is shown */
+#actualChat .chat-input-container,
+#chatScreen .chat-input-container {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+}

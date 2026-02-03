@@ -810,23 +810,23 @@ function updateNavButtons(active) {
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(btn => btn.classList.remove('active'));
 
-    // Add active to the current section
+    // Add active to ALL buttons with the matching onclick (each screen has its own nav)
     try {
         if (active === 'chat') {
-            const chatBtn = document.querySelector('[onclick="showChat()"]');
-            if (chatBtn) chatBtn.classList.add('active');
+            const chatBtns = document.querySelectorAll('[onclick="showChat()"]');
+            chatBtns.forEach(btn => btn.classList.add('active'));
         }
         if (active === 'credits') {
-            const creditsBtn = document.querySelector('[onclick="showCreditsStore()"]');
-            if (creditsBtn) creditsBtn.classList.add('active');
+            const creditsBtns = document.querySelectorAll('[onclick="showCreditsStore()"]');
+            creditsBtns.forEach(btn => btn.classList.add('active'));
         }
         if (active === 'discover') {
-            const discoverBtn = document.querySelector('[onclick="showDiscover()"]');
-            if (discoverBtn) discoverBtn.classList.add('active');
+            const discoverBtns = document.querySelectorAll('[onclick="showDiscover()"]');
+            discoverBtns.forEach(btn => btn.classList.add('active'));
         }
         if (active === 'profile') {
-            const profileBtn = document.querySelector('[onclick="showProfile()"]');
-            if (profileBtn) profileBtn.classList.add('active');
+            const profileBtns = document.querySelectorAll('[onclick="showProfile()"]');
+            profileBtns.forEach(btn => btn.classList.add('active'));
         }
     } catch (error) {
         console.error('Error updating nav buttons:', error);
