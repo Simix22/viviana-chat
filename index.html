@@ -17,6 +17,7 @@
     <link rel="stylesheet" href="chat-rebuild.css">
     <link rel="stylesheet" href="audio-messaging.css">
     <link rel="stylesheet" href="discover.css">
+    <link rel="stylesheet" href="soulmate-rank.css">
 </head>
 <body>
     <!-- Welcome Screen (hidden, redirects to auth) -->
@@ -335,7 +336,16 @@
                         <span class="status">Online</span>
                     </div>
                 </div>
-                <!-- Credits display removed - now only in Settings menu -->
+            </div>
+
+            <!-- Soulmate Rank Progress Bar -->
+            <div class="soulmate-rank-bar">
+                <span class="rank-level-label" id="rankLevelLabel">🌱 Curious</span>
+                <div class="rank-progress-track">
+                    <div class="rank-progress-fill" id="rankProgressFill" style="width: 0%;"></div>
+                </div>
+                <span class="rank-next-label" id="rankNextLabel">Connected</span>
+                <button class="joker-open-btn" onclick="openJokerModal()" title="Joker Shop">🃏</button>
             </div>
 
             <!-- Open Quizzes List -->
@@ -1050,6 +1060,22 @@
         </div>
     </div>
 
+    <!-- Joker Modal -->
+    <div id="jokerModal" class="">
+        <div class="joker-modal-panel">
+            <div class="joker-modal-header">
+                <div>
+                    <h3>🃏 Joker Shop</h3>
+                    <span class="header-sub">Use jokers to deepen your connection</span>
+                </div>
+                <button class="joker-modal-close" onclick="closeJokerModal()">✕</button>
+            </div>
+            <div class="joker-cards-grid" id="jokerCardsGrid">
+                <!-- Rendered dynamically by soulmate-rank.js -->
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -1065,5 +1091,6 @@
     <script src="credits-display.js"></script>
     <script src="audio-messaging.js"></script>
     <script src="discover.js"></script>
+    <script src="soulmate-rank.js"></script>
 </body>
 </html>
