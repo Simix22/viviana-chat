@@ -16,31 +16,17 @@
     <link rel="stylesheet" href="chat-layout-final-fix.css">
     <link rel="stylesheet" href="chat-rebuild.css">
     <link rel="stylesheet" href="audio-messaging.css">
+    <link rel="stylesheet" href="discover.css">
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div id="welcomeScreen" class="screen">
-        <div class="welcome-container">
-            <div class="profile-image">
-                <div class="avatar-placeholder">V</div>
-            </div>
-            <h1>Hey, you were invited by Viviana to chat with her.</h1>
-            <p class="subtitle">Start a private conversation now</p>
-            <button class="btn-primary" onclick="showAuth()">Get Started</button>
-        </div>
-    </div>
+    <!-- Welcome Screen (hidden, redirects to auth) -->
+    <div id="welcomeScreen" class="screen" style="display: none;"></div>
 
-    <!-- Auth Screen -->
+    <!-- Auth Screen (start screen) -->
     <div id="authScreen" class="screen">
         <div class="auth-container">
-            <button class="back-btn" onclick="showWelcome()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
-
             <h2>Welcome Back</h2>
-            <p class="auth-subtitle">Sign in to continue chatting with Viviana</p>
+            <p class="auth-subtitle">Sign in to continue</p>
 
             <!-- Toggle between Login/Signup -->
             <div class="auth-toggle">
@@ -457,6 +443,65 @@
                 </svg>
                 <span>Chat</span>
             </button>
+            <button class="nav-item" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
+            </button>
+            <button class="nav-item" onclick="showProfile()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profile</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Discover Screen (Tinder-Style) -->
+    <div id="discoverScreen" class="screen">
+        <div class="discover-header">
+            <h2>Discover</h2>
+        </div>
+        <div class="discover-cards-area">
+            <div class="discover-card-stack" id="discoverCardStack"></div>
+            <!-- Empty state (shown when all cards swiped) -->
+            <div class="discover-empty" id="discoverEmpty">
+                <div class="discover-empty-icon">🎉</div>
+                <h3>You've seen everyone!</h3>
+                <p>Check back later for new people</p>
+                <button class="discover-refresh-btn" onclick="discoverRefresh()">Refresh</button>
+            </div>
+            <div class="discover-actions">
+                <button class="discover-action-btn discover-skip-btn" onclick="discoverSkip()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <button class="discover-action-btn discover-like-btn" onclick="discoverLike()">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#E91E63">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- App Navigation -->
+        <div class="app-nav">
+            <button class="nav-item" onclick="showChat()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Chat</span>
+            </button>
+            <button class="nav-item active" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
+            </button>
             <button class="nav-item" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
@@ -560,13 +605,12 @@
                 </svg>
                 <span>Chat</span>
             </button>
-            <button class="nav-item active">
+            <button class="nav-item" onclick="showDiscover()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
                 </svg>
-                <span>Credits</span>
+                <span>Discover</span>
             </button>
             <button class="nav-item" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -713,7 +757,14 @@
                 </svg>
                 <span>Chat</span>
             </button>
-            <button class="nav-item active">
+            <button class="nav-item" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
+            </button>
+            <button class="nav-item active" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -1013,5 +1064,6 @@
     <script src="profile-list-manager.js"></script>
     <script src="credits-display.js"></script>
     <script src="audio-messaging.js"></script>
+    <script src="discover.js"></script>
 </body>
 </html>

@@ -1,0 +1,455 @@
+/* ============================================
+   DISCOVER PAGE - TINDER-STYLE
+   Fake profiles, swipe/like UI, no backend
+   ============================================ */
+
+/* ========================================
+   DISCOVER SCREEN LAYOUT
+   ======================================== */
+
+#discoverScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: #f0f0f3;
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+#discoverScreen.active {
+    display: flex;
+}
+
+/* Discover Header */
+.discover-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e8e8e8;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+}
+
+.discover-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.discover-header-icon {
+    font-size: 20px;
+}
+
+/* ========================================
+   CARD STACK AREA
+   ======================================== */
+
+.discover-cards-area {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 80px; /* Above app-nav */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 16px;
+    padding-top: 12px;
+    overflow: hidden;
+}
+
+/* Card Stack (relative container) */
+.discover-card-stack {
+    position: relative;
+    width: 100%;
+    max-width: 400px;
+    height: calc(100% - 110px); /* Leave room for action buttons */
+    max-height: 480px;
+}
+
+/* ========================================
+   PROFILE CARD
+   ======================================== */
+
+.discover-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    border-radius: 20px;
+    overflow: hidden;
+    background: white;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.12);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.3s ease, opacity 0.3s ease;
+    will-change: transform;
+}
+
+.discover-card:active {
+    cursor: grabbing;
+}
+
+/* Card that's being swiped away */
+.discover-card.swipe-left {
+    transform: translateX(-150%) rotate(-30deg) !important;
+    opacity: 0 !important;
+    transition: transform 0.4s ease, opacity 0.3s ease !important;
+}
+
+.discover-card.swipe-right {
+    transform: translateX(150%) rotate(30deg) !important;
+    opacity: 0 !important;
+    transition: transform 0.4s ease, opacity 0.3s ease !important;
+}
+
+/* Stacked cards behind (depth effect) */
+.discover-card.card-behind-1 {
+    transform: scale(0.96) translateY(12px);
+    z-index: 1;
+    pointer-events: none;
+}
+
+.discover-card.card-behind-2 {
+    transform: scale(0.92) translateY(24px);
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.7;
+}
+
+/* Top card (interactive) */
+.discover-card.card-top {
+    z-index: 2;
+    pointer-events: all;
+}
+
+/* Card Image */
+.discover-card-image {
+    width: 100%;
+    height: 320px;
+    background-size: cover;
+    background-position: center top;
+    position: relative;
+}
+
+/* Gradient overlay on image */
+.discover-card-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 60%;
+    background: linear-gradient(to top, rgba(0,0,0,0.7) 0%, transparent 100%);
+}
+
+/* Card Info (over image) */
+.discover-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 20px;
+    z-index: 1;
+    color: white;
+}
+
+.discover-card-name {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+}
+
+.discover-card-age {
+    font-size: 18px;
+    font-weight: 400;
+    opacity: 0.9;
+}
+
+/* Card Details (below image) */
+.discover-card-details {
+    padding: 16px 20px;
+    background: white;
+}
+
+.discover-card-tagline {
+    font-size: 15px;
+    color: #666;
+    margin: 0 0 8px 0;
+}
+
+.discover-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.discover-tag {
+    background: #f5f5f5;
+    border: 1px solid #e8e8e8;
+    border-radius: 20px;
+    padding: 4px 12px;
+    font-size: 13px;
+    color: #555;
+}
+
+/* ========================================
+   LIKE / NOPE OVERLAY LABELS
+   ======================================== */
+
+.card-like-label,
+.card-nope-label {
+    position: absolute;
+    top: 40px;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-size: 32px;
+    font-weight: 800;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.15s ease;
+    pointer-events: none;
+    border: 3px solid;
+    transform: rotate(-15deg);
+}
+
+.card-like-label {
+    left: 20px;
+    color: #4CAF50;
+    border-color: #4CAF50;
+    transform: rotate(-15deg);
+}
+
+.card-nope-label {
+    right: 20px;
+    color: #F44336;
+    border-color: #F44336;
+    transform: rotate(15deg);
+}
+
+/* ========================================
+   ACTION BUTTONS (Like / Skip)
+   ======================================== */
+
+.discover-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 32px;
+    padding: 16px 0;
+    margin-top: auto;
+}
+
+.discover-action-btn {
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+/* Skip button (smaller, grey) */
+.discover-skip-btn {
+    width: 56px;
+    height: 56px;
+    background: white;
+    color: #F44336;
+}
+
+.discover-skip-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(244, 67, 54, 0.25);
+}
+
+/* Like button (bigger, pink) */
+.discover-like-btn {
+    width: 68px;
+    height: 68px;
+    background: white;
+    color: #E91E63;
+}
+
+.discover-like-btn:hover {
+    transform: scale(1.08);
+    box-shadow: 0 6px 16px rgba(233, 30, 99, 0.3);
+}
+
+.discover-action-btn:active {
+    transform: scale(0.92) !important;
+}
+
+/* ========================================
+   EMPTY STATE (no more cards)
+   ======================================== */
+
+.discover-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    gap: 16px;
+}
+
+.discover-empty.visible {
+    display: flex;
+}
+
+.discover-empty-icon {
+    font-size: 60px;
+}
+
+.discover-empty h3 {
+    font-size: 22px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0;
+}
+
+.discover-empty p {
+    font-size: 15px;
+    color: #888;
+    margin: 0;
+    line-height: 1.5;
+}
+
+.discover-refresh-btn {
+    margin-top: 8px;
+    background: linear-gradient(135deg, #E91E63, #F06292);
+    color: white;
+    border: none;
+    padding: 12px 32px;
+    border-radius: 28px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.3);
+    transition: all 0.2s ease;
+}
+
+.discover-refresh-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(233, 30, 99, 0.4);
+}
+
+/* ========================================
+   LIKE ANIMATION (heart burst)
+   ======================================== */
+
+.heart-burst {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 80px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: heartBurst 0.6s ease-out forwards;
+}
+
+@keyframes heartBurst {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        transform: translate(-50%, -50%) scale(1.3);
+        opacity: 1;
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(1.8);
+        opacity: 0;
+    }
+}
+
+/* ========================================
+   LOGIN SCREEN SIMPLIFIED
+   ======================================== */
+
+/* Remove welcome screen elements */
+#welcomeScreen {
+    display: none !important;
+}
+
+/* Auth screen: full viewport, no back button */
+#authScreen .back-btn {
+    display: none !important;
+}
+
+#authScreen .auth-container {
+    padding-top: 80px;
+}
+
+/* ========================================
+   MOBILE
+   ======================================== */
+
+@media (max-width: 600px) {
+    .discover-card-stack {
+        max-height: 420px;
+    }
+
+    .discover-card-image {
+        height: 280px;
+    }
+
+    .discover-card-name {
+        font-size: 24px;
+    }
+
+    .discover-card-age {
+        font-size: 16px;
+    }
+
+    .discover-actions {
+        gap: 24px;
+        padding: 16px 0;
+    }
+
+    .discover-skip-btn {
+        width: 50px;
+        height: 50px;
+    }
+
+    .discover-like-btn {
+        width: 60px;
+        height: 60px;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.discover-action-btn:focus {
+    outline: 2px solid #E91E63;
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .discover-card,
+    .heart-burst,
+    .card-like-label,
+    .card-nope-label {
+        animation: none !important;
+        transition: none !important;
+    }
+}
