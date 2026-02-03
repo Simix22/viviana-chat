@@ -2747,11 +2747,21 @@ function startChatWithViviana() {
     }, 500);
 }
 
-// Back to Profile Selection
+// Back to Profile Selection (from Quiz)
 function backToProfileSelection() {
     quizState.currentQuestion = 0;
     quizState.answers = [];
     showChatState('profileSelection');
+}
+
+// Back to Contact List (from Chat)
+function backToContactList() {
+    console.log('⬅️ Back to contact list');
+    showChatState('profileSelection');
+    // Update contact list to reflect any changes
+    if (typeof renderProfileList === 'function') {
+        renderProfileList();
+    }
 }
 
 // ========================================

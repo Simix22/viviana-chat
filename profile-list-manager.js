@@ -61,7 +61,7 @@ function getProfileStatus(profileId) {
 // ========================================
 
 /**
- * Render the profile list in profile selection screen
+ * Render the contact list (WhatsApp-Style)
  */
 function renderProfileList() {
     const container = document.querySelector('#profileSelection .profile-selection-container');
@@ -70,41 +70,48 @@ function renderProfileList() {
         return;
     }
 
-    // Build HTML
+    // Build HTML - WhatsApp Style Contact List
     let html = `
-        <div class="profile-list-header">
-            <h2>Your Chats</h2>
-            <p class="profile-list-subtitle">Choose a profile to start or continue chatting</p>
+        <div class="contact-list-header">
+            <h1>Chats</h1>
+            <p>Your conversations</p>
         </div>
-        <div class="profile-list">
+        <div class="contact-list">
     `;
 
-    // Render each profile
+    // Render each profile as a contact
     for (const [profileId, profile] of Object.entries(PROFILES)) {
         const status = getProfileStatus(profileId);
 
+        // Get last message preview
+        const lastMessage = status.status === 'unlocked'
+            ? 'Tap to continue chatting...'
+            : status.statusText;
+
+        // Status dot class
+        const dotClass = status.status === 'unlocked' ? 'online'
+            : status.status === 'quiz-open' ? 'quiz'
+            : 'locked';
+
         html += `
-            <div class="profile-list-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0"
-                 onkeypress="if(event.key==='Enter') handleProfileClick('${profileId}')">
-                <div class="profile-list-avatar">
-                    <div class="profile-list-avatar-circle" style="background: ${profile.color};">
+            <div class="contact-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0">
+                <div class="contact-avatar">
+                    <div class="contact-avatar-img" style="background: ${profile.color};">
                         ${profile.avatar}
                     </div>
-                    <div class="profile-list-status-badge ${status.badgeClass}"></div>
+                    <div class="contact-status-dot ${dotClass}"></div>
                 </div>
-                <div class="profile-list-info">
-                    <h3 class="profile-list-name">
-                        ${profile.name}
-                        ${status.status === 'unlocked' ? '<span class="profile-list-verified">✓</span>' : ''}
-                    </h3>
-                    <p class="profile-list-tagline">${profile.tagline}</p>
-                    <p class="profile-list-status ${status.statusClass || ''}">
-                        ${status.statusText}
-                    </p>
+                <div class="contact-info">
+                    <div class="contact-name">
+                        <h3>${profile.name}</h3>
+                        ${status.status === 'unlocked' ? '<span class="contact-verified">✓</span>' : ''}
+                    </div>
+                    <p class="contact-preview ${status.statusClass || ''}">${lastMessage}</p>
                 </div>
-                <div class="profile-list-action">
-                    <div class="profile-list-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <div class="contact-meta">
+                    <span class="contact-time">${status.status === 'unlocked' ? 'Online' : ''}</span>
+                    <div class="contact-arrow">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
                     </div>
@@ -118,7 +125,7 @@ function renderProfileList() {
     `;
 
     container.innerHTML = html;
-    console.log('✅ Profile list rendered');
+    console.log('✅ Contact list rendered');
 }
 
 /**
