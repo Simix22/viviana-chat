@@ -1900,18 +1900,88 @@ function createConfetti() {
 function loadProfile() {
     if (!currentUser) return;
 
+    // Form fields
     document.getElementById('profileName').value = currentUser.name;
     document.getElementById('profileEmail').value = currentUser.email;
 
     const bio = localStorage.getItem(`VIVIANA_${currentUser.userId}_BIO`) || '';
     document.getElementById('profileBio').value = bio;
 
+    // Profile display elements (new design)
+    const displayName = document.getElementById('profileDisplayName');
+    const displayEmail = document.getElementById('profileDisplayEmail');
+    if (displayName) displayName.textContent = currentUser.name || 'User';
+    if (displayEmail) displayEmail.textContent = '@' + (currentUser.email ? currentUser.email.split('@')[0] : 'user');
+
+    // Profile picture
     const pic = localStorage.getItem(`VIVIANA_${currentUser.userId}_PROFILE_PIC`);
-    if (pic) {
-        document.getElementById('profilePicture').src = pic;
-    } else {
-        const initial = currentUser.name.charAt(0).toUpperCase();
-        document.getElementById('profilePicture').src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-size="60" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E${initial}%3C/text%3E%3C/svg%3E`;
+    const profilePicEl = document.getElementById('profilePicture');
+    const profileInitialEl = document.getElementById('profileInitial');
+
+    if (pic && profilePicEl) {
+        // If there's a picture, show it
+        if (!profilePicEl.querySelector('img')) {
+            const img = document.createElement('img');
+            img.src = pic;
+            img.alt = 'Profile';
+            profilePicEl.innerHTML = '';
+            profilePicEl.appendChild(img);
+        } else {
+            profilePicEl.querySelector('img').src = pic;
+        }
+    } else if (profileInitialEl) {
+        // Show initial
+        const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+        profileInitialEl.textContent = initial;
+    }
+
+    // Credits count
+    const credits = getCreditsBalance(currentUser.userId);
+    const creditsEl = document.getElementById('profileCreditsCount');
+    if (creditsEl) creditsEl.textContent = credits || 0;
+
+    // Message count (from localStorage)
+    const messageCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_MESSAGE_COUNT`) || '0');
+    const messagesEl = document.getElementById('profileMessagesCount');
+    if (messagesEl) messagesEl.textContent = messageCount;
+
+    // Streak count
+    const streakCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_STREAK`) || '0');
+    const streakEl = document.getElementById('profileStreakCount');
+    if (streakEl) streakEl.textContent = streakCount;
+
+    // Soulmate Level (from soulmate-rank.js)
+    updateProfileLevel();
+
+    // Dark mode toggle state
+    const savedTheme = localStorage.getItem('VIVIANA_THEME');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.checked = savedTheme === 'dark';
+    }
+}
+
+function updateProfileLevel() {
+    // Get rank info if the function exists
+    if (typeof getRankInfo === 'function') {
+        const info = getRankInfo();
+
+        const levelIcon = document.getElementById('profileLevelIcon');
+        const levelName = document.getElementById('profileLevelName');
+        const levelProgress = document.getElementById('profileLevelProgress');
+        const levelXP = document.getElementById('profileLevelXP');
+
+        if (levelIcon) levelIcon.textContent = info.levelObj.emoji;
+        if (levelName) levelName.textContent = info.levelObj.name;
+        if (levelProgress) levelProgress.style.width = info.percentToNext + '%';
+
+        if (levelXP) {
+            if (info.level >= 5) {
+                levelXP.textContent = 'Max Level!';
+            } else {
+                levelXP.textContent = `${info.progressInLevel} / ${info.thresholdForLevel} XP`;
+            }
+        }
     }
 }
 

@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="chat-redesign.css">
     <link rel="stylesheet" href="chat-ui-fanfix.css">
     <link rel="stylesheet" href="discover-premium.css">
+    <link rel="stylesheet" href="profile-premium.css">
 </head>
 <body>
     <!-- Welcome Screen (hidden, redirects to auth) -->
@@ -642,144 +643,243 @@
         </div>
     </div>
 
-    <!-- Profile Screen -->
+    <!-- Profile Screen - Premium Redesign -->
     <div id="profileScreen" class="screen">
-        <div class="profile-header">
-            <button class="back-btn" onclick="showChat()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
-            <h2>My Profile</h2>
+        <!-- Profile Hero Section -->
+        <div class="profile-hero">
+            <div class="profile-hero-bg"></div>
+            <div class="profile-hero-content">
+                <!-- Profile Avatar -->
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-ring">
+                        <div class="profile-avatar" id="profilePicture">
+                            <span id="profileInitial">U</span>
+                        </div>
+                        <button class="profile-avatar-edit" onclick="uploadProfilePicture()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Identity -->
+                <div class="profile-identity">
+                    <h1 class="profile-name" id="profileDisplayName">User</h1>
+                    <p class="profile-handle" id="profileDisplayEmail">@user</p>
+                </div>
+
+                <!-- Soulmate Level Badge -->
+                <div class="profile-level-card">
+                    <div class="level-card-icon" id="profileLevelIcon">🌱</div>
+                    <div class="level-card-info">
+                        <span class="level-card-title" id="profileLevelName">Curious</span>
+                        <div class="level-card-progress">
+                            <div class="level-card-progress-fill" id="profileLevelProgress" style="width: 0%;"></div>
+                        </div>
+                        <span class="level-card-xp" id="profileLevelXP">0 / 50 XP</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="profile-container">
-            <!-- Profile Picture Section -->
-            <div class="profile-picture-section">
-                <div class="profile-picture-wrapper">
-                    <div class="profile-picture" id="profilePicture">
-                        <span id="profileInitial">U</span>
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Stats Cards -->
+            <div class="profile-stats">
+                <div class="stat-card stat-card-primary" onclick="showCreditsStore()">
+                    <div class="stat-card-icon">💎</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileCreditsCount">0</span>
+                        <span class="stat-card-label">Credits</span>
                     </div>
-                    <button class="edit-picture-btn" onclick="uploadProfilePicture()">
+                    <div class="stat-card-action">
+                        <span>Get More</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
-                    </button>
+                    </div>
                 </div>
-                <p class="profile-hint">Tap the camera icon to upload a photo</p>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">💬</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileMessagesCount">0</span>
+                        <span class="stat-card-label">Messages</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">🔥</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileStreakCount">0</span>
+                        <span class="stat-card-label">Day Streak</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Profile Info Form -->
-            <form id="profileForm" class="profile-form">
-                <div class="input-group">
-                    <label>Name</label>
-                    <input type="text" id="profileName" placeholder="Your name" required>
-                </div>
-
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="profileEmail" placeholder="Your email" disabled>
-                    <span class="input-hint">Email cannot be changed</span>
-                </div>
-
-                <div class="input-group">
-                    <label>Bio</label>
-                    <textarea id="profileBio" placeholder="Tell Viviana about yourself..." rows="3"></textarea>
-                </div>
-
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </form>
-
-            <!-- Credits Section - Prominent -->
-            <div class="profile-credits-section">
-                <div class="credits-balance">
-                    <div class="credits-amount">
-                        <div class="credits-icon">💎</div>
-                        <div>
-                            <span class="credits-number" id="profileCreditsCount">3</span>
-                            <span class="credits-label">Credits</span>
+            <!-- Edit Profile Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Edit Profile
+                </h3>
+                <div class="profile-form-card">
+                    <form id="profileForm" class="profile-form-modern">
+                        <div class="form-field">
+                            <label>Name</label>
+                            <input type="text" id="profileName" placeholder="Your name" required>
                         </div>
-                    </div>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <input type="email" id="profileEmail" placeholder="Your email" disabled>
+                            <span class="field-hint">Email cannot be changed</span>
+                        </div>
+                        <div class="form-field">
+                            <label>Bio</label>
+                            <textarea id="profileBio" placeholder="Tell us about yourself..." rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </form>
                 </div>
-                <button class="credits-buy-btn" onclick="showCreditsStore()">
-                    <span class="credits-buy-icon">✨</span>
-                    <span>Get More Credits</span>
-                </button>
             </div>
 
-            <!-- Additional Options -->
-            <div class="profile-options">
-                <h3>Account Settings</h3>
-
-                <!-- Dark Mode Toggle -->
-                <div class="option-btn dark-mode-toggle-row">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
-                        </svg>
-                        <span>Dark Mode</span>
+            <!-- Preferences Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+                    </svg>
+                    Preferences
+                </h3>
+                <div class="settings-card">
+                    <!-- Dark Mode -->
+                    <div class="setting-row">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Dark Mode</span>
+                                <span class="setting-desc">Switch between light and dark theme</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
-                    <label class="toggle-switch">
-                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
-                        <span class="toggle-slider"></span>
-                    </label>
+
+                    <!-- Notifications -->
+                    <div class="setting-row" onclick="showNotificationSettings()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Notifications</span>
+                                <span class="setting-desc">Manage push notifications</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Privacy -->
+                    <div class="setting-row" onclick="showPrivacySettings()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Privacy</span>
+                                <span class="setting-desc">Control your data and visibility</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
                 </div>
+            </div>
 
-                <button class="option-btn" onclick="showNotificationSettings()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                        <span>Notification Settings</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
+            <!-- Account Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
-                </button>
+                    Account
+                </h3>
+                <div class="settings-card">
+                    <!-- Logout -->
+                    <div class="setting-row" onclick="logout()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap setting-icon-neutral">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Log Out</span>
+                                <span class="setting-desc">Sign out of your account</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
 
-                <button class="option-btn" onclick="showPrivacySettings()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                    <!-- Delete Account -->
+                    <div class="setting-row setting-row-danger" onclick="deleteAccount()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap setting-icon-danger">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Delete Account</span>
+                                <span class="setting-desc">Permanently remove your account</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
-                        <span>Privacy Settings</span>
                     </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
+                </div>
+            </div>
 
-                <button class="option-btn" onclick="deleteAccount()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F44336" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
-                        </svg>
-                        <span style="color: #F44336;">Delete Account</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F44336" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-
-                <button class="option-btn" onclick="logout()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
-                        </svg>
-                        <span>Logout</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
+            <!-- App Info -->
+            <div class="profile-footer">
+                <p class="app-version">Soulmate v1.0.0</p>
+                <p class="app-tagline">Made with 💕 for connection</p>
             </div>
         </div>
 
