@@ -678,13 +678,36 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('passwordResetRequestForm').addEventListener('submit', handlePasswordResetRequest);
     document.getElementById('passwordResetVerifyForm').addEventListener('submit', handlePasswordResetVerify);
 
-    // Enter key for messages
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
+    // Enter key for messages + Character counter
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Character counter
+        messageInput.addEventListener('input', (e) => {
+            const charCount = document.getElementById('charCount');
+            if (charCount) {
+                charCount.textContent = e.target.value.length;
+            }
+        });
+    }
+
+    // Update free messages count
+    updateFreeMessagesDisplay();
 
     console.log('✅ App initialization complete');
 });
+
+// Update free messages display
+function updateFreeMessagesDisplay() {
+    const freeMessagesEl = document.getElementById('freeMessagesCount');
+    if (freeMessagesEl && currentUser) {
+        const credits = getCreditsBalance(currentUser.userId);
+        freeMessagesEl.textContent = credits || 0;
+    }
+}
 
 // ========================================
 // NAVIGATION

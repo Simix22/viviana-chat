@@ -61,7 +61,7 @@ function getProfileStatus(profileId) {
 // ========================================
 
 /**
- * Render the contact list (WhatsApp-Style)
+ * Render the contact list (Fanfix-Style)
  */
 function renderProfileList() {
     const container = document.querySelector('#profileSelection .profile-selection-container');
@@ -70,12 +70,56 @@ function renderProfileList() {
         return;
     }
 
-    // Build HTML - WhatsApp Style Contact List
+    // Build HTML - Fanfix Style Messages List
     let html = `
-        <div class="contact-list-header">
-            <h1>Chats</h1>
-            <p>Your conversations</p>
+        <!-- Messages Header -->
+        <div class="messages-header">
+            <div class="messages-header-left">
+                <button class="messages-header-btn" title="Search">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+            <h1>Messages</h1>
+            <div class="messages-header-right">
+                <button class="messages-header-btn notification-badge" title="Notifications">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </button>
+                <button class="messages-header-btn" title="Menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
+
+        <!-- Search Bar -->
+        <div class="messages-search">
+            <div class="messages-search-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Search messages..." />
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="messages-filter">
+            <span>All messages</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+
+        <!-- Contact List -->
         <div class="contact-list">
     `;
 
@@ -85,13 +129,14 @@ function renderProfileList() {
 
         // Get last message preview
         const lastMessage = status.status === 'unlocked'
-            ? 'Tap to continue chatting...'
+            ? 'Hey! 👋 So happy you\'re here...'
             : status.statusText;
 
-        // Status dot class
-        const dotClass = status.status === 'unlocked' ? 'online'
-            : status.status === 'quiz-open' ? 'quiz'
-            : 'locked';
+        // Time display
+        const timeDisplay = status.status === 'unlocked' ? 'Now' : '';
+
+        // Show unread dot for new/quiz profiles
+        const showUnread = status.status === 'quiz-open' || status.status === 'locked';
 
         html += `
             <div class="contact-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0">
@@ -99,22 +144,17 @@ function renderProfileList() {
                     <div class="contact-avatar-img" style="background: ${profile.color};">
                         ${profile.avatar}
                     </div>
-                    <div class="contact-status-dot ${dotClass}"></div>
+                    ${showUnread ? '<div class="contact-unread-dot"></div>' : ''}
                 </div>
                 <div class="contact-info">
                     <div class="contact-name">
                         <h3>${profile.name}</h3>
                         ${status.status === 'unlocked' ? '<span class="contact-verified">✓</span>' : ''}
                     </div>
-                    <p class="contact-preview ${status.statusClass || ''}">${lastMessage}</p>
+                    <p class="contact-preview">${lastMessage}</p>
                 </div>
                 <div class="contact-meta">
-                    <span class="contact-time">${status.status === 'unlocked' ? 'Online' : ''}</span>
-                    <div class="contact-arrow">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
+                    <span class="contact-time">${timeDisplay}</span>
                 </div>
             </div>
         `;
@@ -125,7 +165,7 @@ function renderProfileList() {
     `;
 
     container.innerHTML = html;
-    console.log('✅ Contact list rendered');
+    console.log('✅ Messages list rendered (Fanfix-style)');
 }
 
 /**
