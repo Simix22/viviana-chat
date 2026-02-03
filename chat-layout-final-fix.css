@@ -1,0 +1,415 @@
+/* ============================================
+   CHAT LAYOUT FINAL FIX
+   Strukturell sauberes Layout ohne fixed-Overlays
+   ============================================ */
+
+/* ========================================
+   CRITICAL: CHAT SCREEN STRUCTURE
+   ======================================== */
+
+/* Chat Screen: Flexbox Container (Full Height) */
+#chatScreen {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh; /* Dynamic viewport height for mobile */
+    overflow: hidden;
+}
+
+/* ========================================
+   PROFILE SELECTION STATE
+   ======================================== */
+
+#profileSelection {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+.profile-selection-container {
+    flex: 1;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding: 20px 16px;
+    padding-bottom: 100px; /* Space for bottom nav */
+}
+
+/* ========================================
+   ACTUAL CHAT STATE - PROPER STRUCTURE
+   ======================================== */
+
+#actualChat {
+    display: flex !important;
+    flex-direction: column;
+    height: 100%;
+    overflow: hidden;
+}
+
+/* Chat Header: Fixed at top of chat */
+.chat-header {
+    flex-shrink: 0; /* Don't shrink */
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Open Quizzes List: Below header, before messages */
+.open-quizzes-list {
+    flex-shrink: 0; /* Don't shrink */
+    /* Existing styles from profile-credits-layout.css apply */
+}
+
+/* Chat Messages: GROWS to fill available space, SCROLLS */
+.chat-messages {
+    flex: 1 1 auto; /* Grow to fill, shrink if needed, auto basis */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    padding-bottom: 20px !important; /* Remove excess padding */
+
+    /* Scroll behavior */
+    scroll-behavior: smooth;
+
+    /* Performance */
+    contain: layout style;
+    will-change: scroll-position;
+}
+
+/* CRITICAL FIX: Chat Input Container - PART OF FLOW (NOT FIXED) */
+.chat-input-container {
+    flex-shrink: 0; /* Don't shrink */
+
+    /* REMOVED: position: fixed */
+    /* Now part of normal document flow */
+
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    padding: 12px 16px;
+    z-index: 1; /* Just above messages, but not fixed */
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.05);
+
+    /* Ensure it stays at bottom of flex container */
+    order: 999;
+}
+
+/* ========================================
+   BOTTOM NAVIGATION - STAYS FIXED
+   ======================================== */
+
+/* App Nav: Fixed at bottom (THIS IS OK - it's the main nav) */
+.app-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    height: 80px;
+    /* Other styles from style.css apply */
+}
+
+/* CRITICAL: Account for bottom nav in chat screen */
+#chatScreen {
+    padding-bottom: 80px; /* Height of app-nav */
+}
+
+/* ========================================
+   PROFILE LIST (NOT SINGLE CARD)
+   ======================================== */
+
+/* Profile List Header */
+.profile-list-header {
+    margin-bottom: 16px;
+}
+
+.profile-list-header h2 {
+    font-size: 24px;
+    font-weight: 700;
+    color: #1a1a1a;
+    margin: 0 0 8px 0;
+}
+
+.profile-list-subtitle {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+}
+
+/* Profile List Container - SCALABLE LIST */
+.profile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+/* Profile List Item - NOT A CARD, A LIST ITEM */
+.profile-list-item {
+    display: grid;
+    grid-template-columns: 56px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 12px 16px;
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+.profile-list-item:hover {
+    background: #fafafa;
+    border-color: #E91E63;
+    transform: translateX(4px);
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.15);
+}
+
+.profile-list-item:active {
+    transform: translateX(2px);
+}
+
+/* Profile Avatar Section */
+.profile-list-avatar {
+    width: 56px;
+    height: 56px;
+    position: relative;
+    flex-shrink: 0;
+}
+
+.profile-list-avatar-circle {
+    width: 56px;
+    height: 56px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    font-weight: 700;
+    color: white;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.profile-list-status-badge {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 2px solid white;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+}
+
+.profile-list-status-badge.online {
+    background: #4CAF50;
+}
+
+.profile-list-status-badge.offline {
+    background: #9E9E9E;
+}
+
+.profile-list-status-badge.quiz-open {
+    background: #FF9800;
+}
+
+/* Profile Info Section */
+.profile-list-info {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    min-width: 0;
+}
+
+.profile-list-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #1a1a1a;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.profile-list-verified {
+    color: #27ae60;
+    font-size: 14px;
+}
+
+.profile-list-tagline {
+    font-size: 14px;
+    color: #666;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.profile-list-status {
+    font-size: 13px;
+    color: #999;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.profile-list-status.quiz-open {
+    color: #FF9800;
+    font-weight: 500;
+}
+
+.profile-list-status.unlocked {
+    color: #4CAF50;
+    font-weight: 500;
+}
+
+/* Profile Action Section */
+.profile-list-action {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+}
+
+.profile-list-arrow {
+    color: #999;
+    transition: all 0.2s ease;
+}
+
+.profile-list-item:hover .profile-list-arrow {
+    color: #E91E63;
+    transform: translateX(4px);
+}
+
+/* ========================================
+   QUIZ OVERLAY - COVERS EVERYTHING
+   ======================================== */
+
+/* Quiz Flow: Fullscreen overlay (unchanged) */
+#quizFlow.active {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: white;
+    display: flex !important;
+}
+
+/* Hide chat input and nav when quiz active */
+body.quiz-open .chat-input-container,
+body.quiz-open .app-nav {
+    display: none !important;
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 600px) {
+    .profile-list-item {
+        grid-template-columns: 48px 1fr auto;
+        gap: 10px;
+        padding: 10px 12px;
+    }
+
+    .profile-list-avatar,
+    .profile-list-avatar-circle {
+        width: 48px;
+        height: 48px;
+        font-size: 20px;
+    }
+
+    .profile-list-name {
+        font-size: 15px;
+    }
+
+    .profile-list-tagline {
+        font-size: 13px;
+    }
+
+    .profile-list-status {
+        font-size: 12px;
+    }
+
+    .chat-messages {
+        padding: 12px;
+    }
+}
+
+/* ========================================
+   PREVENT LAYOUT SHIFTS
+   ======================================== */
+
+/* Ensure smooth transitions */
+.chat-messages,
+.chat-input-container,
+.profile-list-item {
+    will-change: transform;
+}
+
+/* Prevent input focus zoom on mobile */
+@media (max-width: 600px) {
+    input,
+    textarea {
+        font-size: 16px !important; /* Prevents iOS zoom */
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.profile-list-item:focus {
+    outline: 2px solid #E91E63;
+    outline-offset: 2px;
+}
+
+.profile-list-item:focus:not(:focus-visible) {
+    outline: none;
+}
+
+/* Screen reader only content */
+.sr-only {
+    position: absolute;
+    left: -9999px;
+    top: auto;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+}
+
+/* ========================================
+   OVERRIDE PROBLEMATIC STYLES
+   ======================================== */
+
+/* Remove old fixed positioning from previous CSS */
+.chat-input-container {
+    position: relative !important; /* Override fixed */
+    bottom: auto !important;
+}
+
+/* Ensure messages don't have excessive padding */
+.chat-messages {
+    padding-bottom: 20px !important; /* Override 160px */
+}
+
+/* ========================================
+   DARK MODE SUPPORT (Future)
+   ======================================== */
+
+@media (prefers-color-scheme: dark) {
+    #chatScreen,
+    #actualChat,
+    .chat-input-container,
+    .app-nav {
+        /* Dark mode styles can be added here */
+    }
+}

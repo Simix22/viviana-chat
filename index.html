@@ -13,31 +13,21 @@
     <link rel="stylesheet" href="chat-footer-redesign.css">
     <link rel="stylesheet" href="critical-layout-fixes.css">
     <link rel="stylesheet" href="profile-credits-layout.css">
+    <link rel="stylesheet" href="chat-layout-final-fix.css">
+    <link rel="stylesheet" href="chat-rebuild.css">
+    <link rel="stylesheet" href="audio-messaging.css">
+    <link rel="stylesheet" href="discover.css">
+    <link rel="stylesheet" href="soulmate-rank.css">
 </head>
 <body>
-    <!-- Welcome Screen -->
-    <div id="welcomeScreen" class="screen">
-        <div class="welcome-container">
-            <div class="profile-image">
-                <div class="avatar-placeholder">V</div>
-            </div>
-            <h1>Hey, you were invited by Viviana to chat with her.</h1>
-            <p class="subtitle">Start a private conversation now</p>
-            <button class="btn-primary" onclick="showAuth()">Get Started</button>
-        </div>
-    </div>
+    <!-- Welcome Screen (hidden, redirects to auth) -->
+    <div id="welcomeScreen" class="screen" style="display: none;"></div>
 
-    <!-- Auth Screen -->
+    <!-- Auth Screen (start screen) -->
     <div id="authScreen" class="screen">
         <div class="auth-container">
-            <button class="back-btn" onclick="showWelcome()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
-
             <h2>Welcome Back</h2>
-            <p class="auth-subtitle">Sign in to continue chatting with Viviana</p>
+            <p class="auth-subtitle">Sign in to continue</p>
 
             <!-- Toggle between Login/Signup -->
             <div class="auth-toggle">
@@ -244,23 +234,7 @@
         <!-- Profile Selection (Initial State) -->
         <div id="profileSelection" class="chat-state" style="display: flex;">
             <div class="profile-selection-container">
-                <h2 class="section-title">Start chatting with</h2>
-                <div class="profile-card" onclick="startQuiz()">
-                    <div class="profile-card-avatar">
-                        <div class="avatar-large">V</div>
-                        <div class="status-badge">Online</div>
-                    </div>
-                    <div class="profile-card-info">
-                        <h3>Viviana</h3>
-                        <p class="profile-tagline">Your AI companion 💕</p>
-                        <p class="profile-hint">Tap to unlock chat</p>
-                    </div>
-                    <div class="profile-card-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                    </div>
-                </div>
+                <!-- Profile list dynamically rendered by profile-list-manager.js -->
             </div>
         </div>
 
@@ -362,7 +336,16 @@
                         <span class="status">Online</span>
                     </div>
                 </div>
-                <!-- Credits display removed - now only in Settings menu -->
+            </div>
+
+            <!-- Soulmate Rank Progress Bar -->
+            <div class="soulmate-rank-bar">
+                <span class="rank-level-label" id="rankLevelLabel">🌱 Curious</span>
+                <div class="rank-progress-track">
+                    <div class="rank-progress-fill" id="rankProgressFill" style="width: 0%;"></div>
+                </div>
+                <span class="rank-next-label" id="rankNextLabel">Connected</span>
+                <button class="joker-open-btn" onclick="openJokerModal()" title="Joker Shop">🃏</button>
             </div>
 
             <!-- Open Quizzes List -->
@@ -405,7 +388,45 @@
                             </svg>
                         </button>
 
+                        <button class="audio-btn" onclick="startAudioRecording()" title="Record voice message">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
+                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
+                                <line x1="12" y1="19" x2="12" y2="23"></line>
+                                <line x1="8" y1="23" x2="16" y2="23"></line>
+                            </svg>
+                        </button>
+
                         <input type="text" id="messageInput" placeholder="Type a message..." />
+                    </div>
+
+                    <!-- Recording UI (replaces input during recording) -->
+                    <div id="audioRecordingUI" class="audio-recording-ui">
+                        <div class="recording-indicator">
+                            <div class="recording-pulse"></div>
+                            <span id="recordingTimer" class="recording-timer">0:00</span>
+                        </div>
+                        <div class="recording-waveform">
+                            <div class="recording-bar"></div>
+                            <div class="recording-bar"></div>
+                            <div class="recording-bar"></div>
+                            <div class="recording-bar"></div>
+                            <div class="recording-bar"></div>
+                        </div>
+                        <div class="recording-actions">
+                            <button class="recording-cancel-btn" onclick="cancelAudioRecording()" title="Cancel">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                                </svg>
+                            </button>
+                            <button class="recording-send-btn" onclick="stopAudioRecording()" title="Send">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                                </svg>
+                            </button>
+                        </div>
                     </div>
 
                     <!-- Right: Send Button -->
@@ -431,6 +452,65 @@
                     <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
                 </svg>
                 <span>Chat</span>
+            </button>
+            <button class="nav-item" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
+            </button>
+            <button class="nav-item" onclick="showProfile()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                    <circle cx="12" cy="7" r="4"></circle>
+                </svg>
+                <span>Profile</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- Discover Screen (Tinder-Style) -->
+    <div id="discoverScreen" class="screen">
+        <div class="discover-header">
+            <h2>Discover</h2>
+        </div>
+        <div class="discover-cards-area">
+            <div class="discover-card-stack" id="discoverCardStack"></div>
+            <!-- Empty state (shown when all cards swiped) -->
+            <div class="discover-empty" id="discoverEmpty">
+                <div class="discover-empty-icon">🎉</div>
+                <h3>You've seen everyone!</h3>
+                <p>Check back later for new people</p>
+                <button class="discover-refresh-btn" onclick="discoverRefresh()">Refresh</button>
+            </div>
+            <div class="discover-actions">
+                <button class="discover-action-btn discover-skip-btn" onclick="discoverSkip()">
+                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#999" stroke-width="2.5">
+                        <path d="M18 6L6 18M6 6l12 12"></path>
+                    </svg>
+                </button>
+                <button class="discover-action-btn discover-like-btn" onclick="discoverLike()">
+                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#E91E63">
+                        <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <!-- App Navigation -->
+        <div class="app-nav">
+            <button class="nav-item" onclick="showChat()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                </svg>
+                <span>Chat</span>
+            </button>
+            <button class="nav-item active" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
             </button>
             <button class="nav-item" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -535,13 +615,12 @@
                 </svg>
                 <span>Chat</span>
             </button>
-            <button class="nav-item active">
+            <button class="nav-item" onclick="showDiscover()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="12" cy="12" r="10"/>
-                    <line x1="12" y1="8" x2="12" y2="12"></line>
-                    <line x1="12" y1="16" x2="12.01" y2="16"></line>
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
                 </svg>
-                <span>Credits</span>
+                <span>Discover</span>
             </button>
             <button class="nav-item" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -602,6 +681,23 @@
                 <button type="submit" class="btn-primary">Save Changes</button>
             </form>
 
+            <!-- Credits Section - Prominent -->
+            <div class="profile-credits-section">
+                <div class="credits-balance">
+                    <div class="credits-amount">
+                        <div class="credits-icon">💎</div>
+                        <div>
+                            <span class="credits-number" id="profileCreditsCount">3</span>
+                            <span class="credits-label">Credits</span>
+                        </div>
+                    </div>
+                </div>
+                <button class="credits-buy-btn" onclick="showCreditsStore()">
+                    <span class="credits-buy-icon">✨</span>
+                    <span>Get More Credits</span>
+                </button>
+            </div>
+
             <!-- Additional Options -->
             <div class="profile-options">
                 <h3>Account Settings</h3>
@@ -626,19 +722,6 @@
                             <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
                         </svg>
                         <span>Privacy Settings</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
-
-                <button class="option-btn option-btn-primary" onclick="showCreditsStore()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <circle cx="12" cy="12" r="10"/>
-                            <path d="M12 6v6l4 2"/>
-                        </svg>
-                        <span>Buy Credits</span>
                     </div>
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <polyline points="9 18 15 12 9 6"></polyline>
@@ -684,7 +767,14 @@
                 </svg>
                 <span>Chat</span>
             </button>
-            <button class="nav-item active">
+            <button class="nav-item" onclick="showDiscover()">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <span>Discover</span>
+            </button>
+            <button class="nav-item active" onclick="showProfile()">
                 <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                     <circle cx="12" cy="7" r="4"></circle>
@@ -970,6 +1060,22 @@
         </div>
     </div>
 
+    <!-- Joker Modal -->
+    <div id="jokerModal" class="">
+        <div class="joker-modal-panel">
+            <div class="joker-modal-header">
+                <div>
+                    <h3>🃏 Joker Shop</h3>
+                    <span class="header-sub">Use jokers to deepen your connection</span>
+                </div>
+                <button class="joker-modal-close" onclick="closeJokerModal()">✕</button>
+            </div>
+            <div class="joker-cards-grid" id="jokerCardsGrid">
+                <!-- Rendered dynamically by soulmate-rank.js -->
+            </div>
+        </div>
+    </div>
+
     <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.8.0/firebase-auth-compat.js"></script>
@@ -981,5 +1087,10 @@
     <script src="chat-photo-feature.js"></script>
     <script src="quiz-modal-fix.js"></script>
     <script src="profile-quiz-system.js"></script>
+    <script src="profile-list-manager.js"></script>
+    <script src="credits-display.js"></script>
+    <script src="audio-messaging.js"></script>
+    <script src="discover.js"></script>
+    <script src="soulmate-rank.js"></script>
 </body>
 </html>

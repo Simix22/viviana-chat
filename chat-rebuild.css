@@ -1,0 +1,508 @@
+/* ============================================
+   CHAT REBUILD - COMPLETE RESTRUCTURE
+   Fixed input bar above footer, clean layout
+   ============================================ */
+
+/* ========================================
+   CRITICAL: RESET PROBLEMATIC STYLES
+   ======================================== */
+
+/* Override all previous chat layout attempts */
+#chatScreen {
+    display: block !important;
+    flex-direction: initial !important;
+    height: auto !important;
+    padding-bottom: 0 !important;
+}
+
+#actualChat {
+    display: block !important;
+    flex-direction: initial !important;
+    height: auto !important;
+}
+
+/* ========================================
+   SCREEN STRUCTURE - ABSOLUTE POSITIONING
+   ======================================== */
+
+/* All screens fill viewport */
+.screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: white;
+    overflow: hidden;
+}
+
+/* Chat Screen: Full viewport with proper spacing */
+#chatScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: block;
+    background: #f5f5f5;
+}
+
+/* ========================================
+   ACTUAL CHAT - LAYERED STRUCTURE
+   ======================================== */
+
+#actualChat {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    display: none; /* Hidden by default */
+}
+
+#actualChat[style*="display: flex"],
+#actualChat[style*="display: block"] {
+    display: block !important;
+}
+
+/* Chat Header: Fixed at top */
+.chat-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    padding: 0 16px;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+}
+
+/* Open Quizzes List: Below header */
+.open-quizzes-list {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    z-index: 45;
+    max-height: 200px;
+    overflow-y: auto;
+    background: white;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Chat Messages: Scrollable area between header and input */
+.chat-messages {
+    position: fixed;
+    top: 60px; /* Below header */
+    left: 0;
+    right: 0;
+    bottom: 150px; /* Above input (70px) + footer (80px) */
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    background: #f5f5f5;
+}
+
+/* Adjust when open quizzes list is visible */
+body.has-open-quizzes .chat-messages {
+    top: 260px; /* header (60px) + quizzes list (~200px) */
+}
+
+/* ========================================
+   CHAT INPUT - FIXED ABOVE FOOTER
+   ======================================== */
+
+/* CRITICAL: Input Container - FIXED above app-nav */
+.chat-input-container {
+    position: fixed !important;
+    left: 0;
+    right: 0;
+    bottom: 80px !important; /* Exactly above app-nav (80px height) */
+    height: 70px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    padding: 12px 16px;
+    z-index: 90 !important;
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.08);
+}
+
+/* Input Wrapper: 3-column grid */
+.chat-input-wrapper {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 12px;
+    height: 100%;
+    align-items: center;
+}
+
+/* Left placeholder */
+.chat-input-left {
+    display: flex;
+    align-items: center;
+}
+
+/* Center input */
+.chat-input-center {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: #f5f5f5;
+    border-radius: 24px;
+    padding: 8px 16px;
+    max-width: 600px;
+    margin: 0 auto;
+    width: 100%;
+}
+
+.chat-input-center input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15px;
+    color: #1a1a1a;
+}
+
+.chat-input-center input::placeholder {
+    color: #999;
+}
+
+/* Photo button */
+.photo-btn {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #666;
+    transition: color 0.2s ease;
+}
+
+.photo-btn:hover {
+    color: #E91E63;
+}
+
+/* Right send button */
+.chat-input-right {
+    display: flex;
+    align-items: center;
+}
+
+.send-btn {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #E91E63, #F06292);
+    border: none;
+    color: white;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.3);
+}
+
+.send-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 4px 12px rgba(233, 30, 99, 0.4);
+}
+
+.send-btn:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   APP NAVIGATION - FIXED AT BOTTOM
+   ======================================== */
+
+.app-nav {
+    position: fixed !important;
+    bottom: 0 !important;
+    left: 0;
+    right: 0;
+    height: 80px;
+    background: white;
+    border-top: 1px solid #e0e0e0;
+    z-index: 100 !important;
+    display: flex;
+    align-items: center;
+    justify-content: space-around;
+    padding: 0 16px;
+}
+
+/* ========================================
+   PROFILE SELECTION STATE
+   ======================================== */
+
+#profileSelection {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 80px; /* Above app-nav */
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    background: white;
+    display: none;
+}
+
+#profileSelection[style*="display: flex"] {
+    display: block !important;
+}
+
+.profile-selection-container {
+    padding: 20px 16px;
+    padding-bottom: 40px;
+}
+
+/* ========================================
+   QUIZ OVERLAY - FULLSCREEN
+   ======================================== */
+
+#quizFlow {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    z-index: 9999;
+    background: white;
+    display: none;
+    overflow-y: auto;
+}
+
+#quizFlow.active {
+    display: block !important;
+}
+
+/* Hide input and nav when quiz is active */
+body.quiz-open .chat-input-container,
+body.quiz-open .app-nav {
+    display: none !important;
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 600px) {
+    /* Adjust spacing for mobile */
+    .chat-messages {
+        padding: 12px;
+        bottom: 150px; /* Same as desktop */
+    }
+
+    .chat-input-container {
+        height: 70px;
+        padding: 10px 12px;
+    }
+
+    .chat-input-center {
+        padding: 6px 12px;
+    }
+
+    .chat-input-center input {
+        font-size: 16px; /* Prevent zoom on iOS */
+    }
+
+    /* Prevent mobile keyboard issues */
+    .chat-input-container {
+        position: fixed !important;
+        bottom: 80px !important;
+    }
+}
+
+/* iOS Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+    /* Use safe area insets if available */
+    .app-nav {
+        padding-bottom: env(safe-area-inset-bottom, 0);
+        height: calc(80px + env(safe-area-inset-bottom, 0));
+    }
+
+    .chat-input-container {
+        bottom: calc(80px + env(safe-area-inset-bottom, 0)) !important;
+    }
+
+    .chat-messages {
+        bottom: calc(150px + env(safe-area-inset-bottom, 0));
+    }
+}
+
+/* ========================================
+   PERFORMANCE OPTIMIZATIONS
+   ======================================== */
+
+.chat-messages {
+    contain: layout style;
+    will-change: scroll-position;
+}
+
+.chat-input-container,
+.app-nav {
+    contain: layout style paint;
+    will-change: transform;
+}
+
+/* Smooth scrolling */
+.chat-messages,
+#profileSelection {
+    scroll-behavior: smooth;
+}
+
+/* ========================================
+   CREDITS BUTTON - PROMINENT PLACEMENT
+   ======================================== */
+
+/* Credits Section in Profile - Highlighted */
+.profile-credits-section {
+    margin: 24px 0;
+    padding: 20px;
+    background: linear-gradient(135deg, #E91E63 0%, #F06292 100%);
+    border-radius: 16px;
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.25);
+    position: relative;
+    overflow: hidden;
+}
+
+.profile-credits-section::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -20%;
+    width: 200px;
+    height: 200px;
+    background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+    border-radius: 50%;
+}
+
+.credits-balance {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+}
+
+.credits-amount {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.credits-icon {
+    width: 32px;
+    height: 32px;
+    background: rgba(255,255,255,0.2);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 18px;
+}
+
+.credits-number {
+    font-size: 32px;
+    font-weight: 700;
+    color: white;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.credits-label {
+    font-size: 14px;
+    color: rgba(255,255,255,0.9);
+    margin-left: 8px;
+}
+
+.credits-buy-btn {
+    background: white;
+    color: #E91E63;
+    border: none;
+    padding: 12px 24px;
+    border-radius: 24px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    justify-content: center;
+}
+
+.credits-buy-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.credits-buy-btn:active {
+    transform: translateY(0);
+}
+
+.credits-buy-icon {
+    font-size: 18px;
+}
+
+/* Remove old option-btn-primary styling */
+.option-btn-primary {
+    background: transparent !important;
+    border: 1px solid #e0e0e0 !important;
+    color: inherit !important;
+    box-shadow: none !important;
+}
+
+/* ========================================
+   LAYOUT STABILITY
+   ======================================== */
+
+/* Prevent content shift */
+* {
+    box-sizing: border-box;
+}
+
+/* Ensure all fixed elements are properly layered */
+.chat-header { z-index: 50; }
+.open-quizzes-list { z-index: 45; }
+.chat-messages { z-index: 10; }
+.chat-input-container { z-index: 90; }
+.app-nav { z-index: 100; }
+#quizFlow { z-index: 9999; }
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.chat-input-container:focus-within {
+    box-shadow: 0 -2px 16px rgba(233, 30, 99, 0.2);
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+    .chat-input-container,
+    .app-nav,
+    .chat-header {
+        border-width: 2px;
+    }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+    * {
+        animation-duration: 0.01ms !important;
+        transition-duration: 0.01ms !important;
+    }
+
+    .chat-messages {
+        scroll-behavior: auto;
+    }
+}

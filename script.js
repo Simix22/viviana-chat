@@ -701,11 +701,8 @@ function hideAllScreens() {
 }
 
 function showWelcome() {
-    console.log('📱 Showing Welcome Screen');
-    hideAllScreens();
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    welcomeScreen.style.display = 'flex';
-    welcomeScreen.classList.add('active');
+    console.log('📱 Redirecting to Auth Screen');
+    showAuth();
 }
 
 function showAuth() {
@@ -822,6 +819,10 @@ function updateNavButtons(active) {
         if (active === 'credits') {
             const creditsBtn = document.querySelector('[onclick="showCreditsStore()"]');
             if (creditsBtn) creditsBtn.classList.add('active');
+        }
+        if (active === 'discover') {
+            const discoverBtn = document.querySelector('[onclick="showDiscover()"]');
+            if (discoverBtn) discoverBtn.classList.add('active');
         }
         if (active === 'profile') {
             const profileBtn = document.querySelector('[onclick="showProfile()"]');
