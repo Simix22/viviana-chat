@@ -678,13 +678,36 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('passwordResetRequestForm').addEventListener('submit', handlePasswordResetRequest);
     document.getElementById('passwordResetVerifyForm').addEventListener('submit', handlePasswordResetVerify);
 
-    // Enter key for messages
-    document.getElementById('messageInput').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') sendMessage();
-    });
+    // Enter key for messages + Character counter
+    const messageInput = document.getElementById('messageInput');
+    if (messageInput) {
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
+        });
+
+        // Character counter
+        messageInput.addEventListener('input', (e) => {
+            const charCount = document.getElementById('charCount');
+            if (charCount) {
+                charCount.textContent = e.target.value.length;
+            }
+        });
+    }
+
+    // Update free messages count
+    updateFreeMessagesDisplay();
 
     console.log('✅ App initialization complete');
 });
+
+// Update free messages display
+function updateFreeMessagesDisplay() {
+    const freeMessagesEl = document.getElementById('freeMessagesCount');
+    if (freeMessagesEl && currentUser) {
+        const credits = getCreditsBalance(currentUser.userId);
+        freeMessagesEl.textContent = credits || 0;
+    }
+}
 
 // ========================================
 // NAVIGATION
@@ -1877,18 +1900,88 @@ function createConfetti() {
 function loadProfile() {
     if (!currentUser) return;
 
+    // Form fields
     document.getElementById('profileName').value = currentUser.name;
     document.getElementById('profileEmail').value = currentUser.email;
 
     const bio = localStorage.getItem(`VIVIANA_${currentUser.userId}_BIO`) || '';
     document.getElementById('profileBio').value = bio;
 
+    // Profile display elements (new design)
+    const displayName = document.getElementById('profileDisplayName');
+    const displayEmail = document.getElementById('profileDisplayEmail');
+    if (displayName) displayName.textContent = currentUser.name || 'User';
+    if (displayEmail) displayEmail.textContent = '@' + (currentUser.email ? currentUser.email.split('@')[0] : 'user');
+
+    // Profile picture
     const pic = localStorage.getItem(`VIVIANA_${currentUser.userId}_PROFILE_PIC`);
-    if (pic) {
-        document.getElementById('profilePicture').src = pic;
-    } else {
-        const initial = currentUser.name.charAt(0).toUpperCase();
-        document.getElementById('profilePicture').src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-size="60" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E${initial}%3C/text%3E%3C/svg%3E`;
+    const profilePicEl = document.getElementById('profilePicture');
+    const profileInitialEl = document.getElementById('profileInitial');
+
+    if (pic && profilePicEl) {
+        // If there's a picture, show it
+        if (!profilePicEl.querySelector('img')) {
+            const img = document.createElement('img');
+            img.src = pic;
+            img.alt = 'Profile';
+            profilePicEl.innerHTML = '';
+            profilePicEl.appendChild(img);
+        } else {
+            profilePicEl.querySelector('img').src = pic;
+        }
+    } else if (profileInitialEl) {
+        // Show initial
+        const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
+        profileInitialEl.textContent = initial;
+    }
+
+    // Credits count
+    const credits = getCreditsBalance(currentUser.userId);
+    const creditsEl = document.getElementById('profileCreditsCount');
+    if (creditsEl) creditsEl.textContent = credits || 0;
+
+    // Message count (from localStorage)
+    const messageCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_MESSAGE_COUNT`) || '0');
+    const messagesEl = document.getElementById('profileMessagesCount');
+    if (messagesEl) messagesEl.textContent = messageCount;
+
+    // Streak count
+    const streakCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_STREAK`) || '0');
+    const streakEl = document.getElementById('profileStreakCount');
+    if (streakEl) streakEl.textContent = streakCount;
+
+    // Soulmate Level (from soulmate-rank.js)
+    updateProfileLevel();
+
+    // Dark mode toggle state
+    const savedTheme = localStorage.getItem('VIVIANA_THEME');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    if (darkModeToggle) {
+        darkModeToggle.checked = savedTheme === 'dark';
+    }
+}
+
+function updateProfileLevel() {
+    // Get rank info if the function exists
+    if (typeof getRankInfo === 'function') {
+        const info = getRankInfo();
+
+        const levelIcon = document.getElementById('profileLevelIcon');
+        const levelName = document.getElementById('profileLevelName');
+        const levelProgress = document.getElementById('profileLevelProgress');
+        const levelXP = document.getElementById('profileLevelXP');
+
+        if (levelIcon) levelIcon.textContent = info.levelObj.emoji;
+        if (levelName) levelName.textContent = info.levelObj.name;
+        if (levelProgress) levelProgress.style.width = info.percentToNext + '%';
+
+        if (levelXP) {
+            if (info.level >= 5) {
+                levelXP.textContent = 'Max Level!';
+            } else {
+                levelXP.textContent = `${info.progressInLevel} / ${info.thresholdForLevel} XP`;
+            }
+        }
     }
 }
 
@@ -2747,11 +2840,21 @@ function startChatWithViviana() {
     }, 500);
 }
 
-// Back to Profile Selection
+// Back to Profile Selection (from Quiz)
 function backToProfileSelection() {
     quizState.currentQuestion = 0;
     quizState.answers = [];
     showChatState('profileSelection');
+}
+
+// Back to Contact List (from Chat)
+function backToContactList() {
+    console.log('⬅️ Back to contact list');
+    showChatState('profileSelection');
+    // Update contact list to reflect any changes
+    if (typeof renderProfileList === 'function') {
+        renderProfileList();
+    }
 }
 
 // ========================================
@@ -2838,9 +2941,53 @@ function stopConfetti() {
 const originalShowChat = showChat;
 showChat = function() {
     originalShowChat();
-    
+
     // Initialize quiz state machine
     setTimeout(() => {
         initChatStateMachine();
     }, 100);
 };
+
+// ========================================
+// DARK MODE FUNCTIONALITY
+// ========================================
+
+function initDarkMode() {
+    const savedTheme = localStorage.getItem('VIVIANA_THEME');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (darkModeToggle) darkModeToggle.checked = false;
+    }
+}
+
+function toggleDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const isDark = darkModeToggle?.checked;
+
+    if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('VIVIANA_THEME', 'dark');
+        showToast('🌙 Dark mode enabled');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('VIVIANA_THEME', 'light');
+        showToast('☀️ Light mode enabled');
+    }
+
+    console.log('🎨 Theme changed to:', isDark ? 'dark' : 'light');
+}
+
+// Apply saved theme on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initDarkMode();
+});
+
+// Also initialize immediately if DOM is ready
+if (document.readyState !== 'loading') {
+    initDarkMode();
+}

@@ -147,30 +147,46 @@ function getRankInfo() {
 }
 
 // ──────────────────────────────────────────
-// UI: PROGRESS BAR
+// UI: PROGRESS BAR (supports both old and new IDs)
 // ──────────────────────────────────────────
 
 function updateRankUI(animatePulse) {
     const info = getRankInfo();
-    const fill = document.getElementById('rankProgressFill');
-    const label = document.getElementById('rankLevelLabel');
-    const nextLabel = document.getElementById('rankNextLabel');
 
-    if (!fill || !label || !nextLabel) return;
+    // Support both old and new element IDs
+    const fill = document.getElementById('soulmateProgressFill') || document.getElementById('rankProgressFill');
+    const icon = document.getElementById('soulmateIcon');
+    const levelName = document.getElementById('soulmateLevelName') || document.getElementById('rankLevelLabel');
+    const nextLabel = document.getElementById('soulmateNextLevel') || document.getElementById('rankNextLabel');
 
-    label.textContent = `${info.levelObj.emoji} ${info.levelObj.name}`;
-    fill.style.width = info.percentToNext + '%';
-
-    if (info.level >= RANK_LEVELS.length) {
-        nextLabel.textContent = '— max';
-    } else {
-        nextLabel.textContent = RANK_LEVELS[info.level].name;
+    if (fill) {
+        fill.style.width = info.percentToNext + '%';
+        if (animatePulse) {
+            fill.classList.remove('level-up-pulse');
+            void fill.offsetWidth;
+            fill.classList.add('level-up-pulse');
+        }
     }
 
-    if (animatePulse) {
-        fill.classList.remove('level-up-pulse');
-        void fill.offsetWidth; // force reflow
-        fill.classList.add('level-up-pulse');
+    if (icon) {
+        icon.textContent = info.levelObj.emoji;
+    }
+
+    if (levelName) {
+        // New design: just the name. Old design: emoji + name
+        if (document.getElementById('soulmateIcon')) {
+            levelName.textContent = info.levelObj.name;
+        } else {
+            levelName.textContent = `${info.levelObj.emoji} ${info.levelObj.name}`;
+        }
+    }
+
+    if (nextLabel) {
+        if (info.level >= RANK_LEVELS.length) {
+            nextLabel.textContent = 'Max level reached!';
+        } else {
+            nextLabel.textContent = `Next: ${RANK_LEVELS[info.level].name}`;
+        }
     }
 }
 

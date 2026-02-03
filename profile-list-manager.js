@@ -61,7 +61,7 @@ function getProfileStatus(profileId) {
 // ========================================
 
 /**
- * Render the profile list in profile selection screen
+ * Render the contact list (Fanfix-Style)
  */
 function renderProfileList() {
     const container = document.querySelector('#profileSelection .profile-selection-container');
@@ -70,44 +70,91 @@ function renderProfileList() {
         return;
     }
 
-    // Build HTML
+    // Build HTML - Fanfix Style Messages List
     let html = `
-        <div class="profile-list-header">
-            <h2>Your Chats</h2>
-            <p class="profile-list-subtitle">Choose a profile to start or continue chatting</p>
+        <!-- Messages Header -->
+        <div class="messages-header">
+            <div class="messages-header-left">
+                <button class="messages-header-btn" title="Search">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="11" cy="11" r="8"></circle>
+                        <path d="M21 21l-4.35-4.35"></path>
+                    </svg>
+                </button>
+            </div>
+            <h1>Messages</h1>
+            <div class="messages-header-right">
+                <button class="messages-header-btn notification-badge" title="Notifications">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                    </svg>
+                </button>
+                <button class="messages-header-btn" title="Menu">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <line x1="3" y1="6" x2="21" y2="6"></line>
+                        <line x1="3" y1="12" x2="21" y2="12"></line>
+                        <line x1="3" y1="18" x2="21" y2="18"></line>
+                    </svg>
+                </button>
+            </div>
         </div>
-        <div class="profile-list">
+
+        <!-- Search Bar -->
+        <div class="messages-search">
+            <div class="messages-search-input">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="M21 21l-4.35-4.35"></path>
+                </svg>
+                <input type="text" placeholder="Search messages..." />
+            </div>
+        </div>
+
+        <!-- Filter -->
+        <div class="messages-filter">
+            <span>All messages</span>
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <polyline points="6 9 12 15 18 9"></polyline>
+            </svg>
+        </div>
+
+        <!-- Contact List -->
+        <div class="contact-list">
     `;
 
-    // Render each profile
+    // Render each profile as a contact
     for (const [profileId, profile] of Object.entries(PROFILES)) {
         const status = getProfileStatus(profileId);
 
+        // Get last message preview
+        const lastMessage = status.status === 'unlocked'
+            ? 'Hey! 👋 So happy you\'re here...'
+            : status.statusText;
+
+        // Time display
+        const timeDisplay = status.status === 'unlocked' ? 'Now' : '';
+
+        // Show unread dot for new/quiz profiles
+        const showUnread = status.status === 'quiz-open' || status.status === 'locked';
+
         html += `
-            <div class="profile-list-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0"
-                 onkeypress="if(event.key==='Enter') handleProfileClick('${profileId}')">
-                <div class="profile-list-avatar">
-                    <div class="profile-list-avatar-circle" style="background: ${profile.color};">
+            <div class="contact-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0">
+                <div class="contact-avatar">
+                    <div class="contact-avatar-img" style="background: ${profile.color};">
                         ${profile.avatar}
                     </div>
-                    <div class="profile-list-status-badge ${status.badgeClass}"></div>
+                    ${showUnread ? '<div class="contact-unread-dot"></div>' : ''}
                 </div>
-                <div class="profile-list-info">
-                    <h3 class="profile-list-name">
-                        ${profile.name}
-                        ${status.status === 'unlocked' ? '<span class="profile-list-verified">✓</span>' : ''}
-                    </h3>
-                    <p class="profile-list-tagline">${profile.tagline}</p>
-                    <p class="profile-list-status ${status.statusClass || ''}">
-                        ${status.statusText}
-                    </p>
-                </div>
-                <div class="profile-list-action">
-                    <div class="profile-list-arrow">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
+                <div class="contact-info">
+                    <div class="contact-name">
+                        <h3>${profile.name}</h3>
+                        ${status.status === 'unlocked' ? '<span class="contact-verified">✓</span>' : ''}
                     </div>
+                    <p class="contact-preview">${lastMessage}</p>
+                </div>
+                <div class="contact-meta">
+                    <span class="contact-time">${timeDisplay}</span>
                 </div>
             </div>
         `;
@@ -118,7 +165,7 @@ function renderProfileList() {
     `;
 
     container.innerHTML = html;
-    console.log('✅ Profile list rendered');
+    console.log('✅ Messages list rendered (Fanfix-style)');
 }
 
 /**

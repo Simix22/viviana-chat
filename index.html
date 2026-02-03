@@ -18,6 +18,10 @@
     <link rel="stylesheet" href="audio-messaging.css">
     <link rel="stylesheet" href="discover.css">
     <link rel="stylesheet" href="soulmate-rank.css">
+    <link rel="stylesheet" href="chat-redesign.css">
+    <link rel="stylesheet" href="chat-ui-fanfix.css">
+    <link rel="stylesheet" href="discover-premium.css">
+    <link rel="stylesheet" href="profile-premium.css">
 </head>
 <body>
     <!-- Welcome Screen (hidden, redirects to auth) -->
@@ -325,38 +329,58 @@
             </div>
         </div>
 
-        <!-- Actual Chat (Initially Hidden) -->
+        <!-- Actual Chat (Initially Hidden) - Fanfix-Style -->
         <div id="actualChat" class="chat-state" style="display: none;">
             <!-- Chat Header -->
             <div class="chat-header">
-                <div class="header-profile">
-                    <div class="avatar-small">V</div>
-                    <div class="header-info">
-                        <h3>Viviana <span class="unlock-badge">✓</span></h3>
-                        <span class="status">Online</span>
+                <button class="chat-back-btn" onclick="backToContactList()" title="Back">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M19 12H5M12 19l-7-7 7-7"/>
+                    </svg>
+                </button>
+                <div class="chat-partner" id="chatPartner">
+                    <div class="chat-partner-avatar" id="chatPartnerAvatar" style="background: linear-gradient(135deg, #E91E63, #F06292);">V</div>
+                    <div class="chat-partner-info">
+                        <h3 class="chat-partner-name" id="chatPartnerName">Viviana</h3>
+                        <p class="chat-partner-handle">@viviana <span class="contact-verified">✓</span></p>
                     </div>
+                </div>
+                <!-- Soulmate Level Badge (subtle in header) -->
+                <div class="soulmate-level-badge" id="soulmateLevelBadge">
+                    <span class="level-icon" id="soulmateIcon">🌱</span>
+                    <span id="soulmateLevelName">Curious</span>
+                    <div class="level-progress">
+                        <div class="level-progress-fill" id="soulmateProgressFill" style="width: 0%;"></div>
+                    </div>
+                </div>
+                <div class="chat-header-actions">
+                    <button class="chat-header-btn" title="More">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+                            <circle cx="12" cy="12" r="1.5"></circle>
+                            <circle cx="12" cy="6" r="1.5"></circle>
+                            <circle cx="12" cy="18" r="1.5"></circle>
+                        </svg>
+                    </button>
                 </div>
             </div>
 
-            <!-- Soulmate Rank Progress Bar -->
-            <div class="soulmate-rank-bar">
-                <span class="rank-level-label" id="rankLevelLabel">🌱 Curious</span>
-                <div class="rank-progress-track">
-                    <div class="rank-progress-fill" id="rankProgressFill" style="width: 0%;"></div>
-                </div>
-                <span class="rank-next-label" id="rankNextLabel">Connected</span>
-                <button class="joker-open-btn" onclick="openJokerModal()" title="Joker Shop">🃏</button>
+            <!-- Chat Tabs -->
+            <div class="chat-tabs">
+                <button class="chat-tab active">Chat</button>
+                <button class="chat-tab">Gallery</button>
             </div>
 
             <!-- Open Quizzes List -->
-            <div id="openQuizzesList" class="open-quizzes-list" style="display: none;">
-                <!-- Dynamically populated by profile-quiz-system.js -->
-            </div>
+            <div id="openQuizzesList" class="open-quizzes-list" style="display: none;"></div>
 
             <!-- Chat Messages -->
             <div class="chat-messages" id="chatMessages">
+                <!-- Date Separator -->
+                <div class="message-date-separator">
+                    <span>Today</span>
+                </div>
                 <div class="message received">
-                    <div class="message-avatar">V</div>
+                    <div class="message-avatar" style="background: linear-gradient(135deg, #E91E63, #F06292);">V</div>
                     <div class="message-bubble">
                         <p>Hey! 👋 So happy you're here! How are you doing today?</p>
                         <span class="message-time">Just now</span>
@@ -364,74 +388,20 @@
                 </div>
             </div>
 
-            <!-- Chat Input (3-Column Layout: Left Placeholder / Center Input / Right Actions) -->
-            <div class="chat-input-container">
-                <div class="chat-input-wrapper">
-                    <!-- Left: Placeholder (reserved for future features) -->
-                    <div class="chat-input-left">
-                        <button class="menu-placeholder-btn" disabled title="More options (coming soon)">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <circle cx="12" cy="12" r="1"></circle>
-                                <circle cx="12" cy="5" r="1"></circle>
-                                <circle cx="12" cy="19" r="1"></circle>
-                            </svg>
-                        </button>
-                    </div>
-
-                    <!-- Center: Input Field (main focus, centered) -->
-                    <div class="chat-input-center">
-                        <button class="photo-btn" onclick="triggerPhotoUpload()" title="Send photo">
+            <!-- Chat Input Area - Fanfix Style -->
+            <div class="chat-input-area">
+                <div class="chat-input-row">
+                    <!-- Input Field with actions inside -->
+                    <div class="chat-input-field">
+                        <input type="text" id="messageInput" placeholder="Message Viviana..." maxlength="400" />
+                        <button class="input-action-btn" onclick="triggerPhotoUpload()" title="Photo">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
                                 <circle cx="8.5" cy="8.5" r="1.5"></circle>
                                 <polyline points="21 15 16 10 5 21"></polyline>
                             </svg>
                         </button>
-
-                        <button class="audio-btn" onclick="startAudioRecording()" title="Record voice message">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                <path d="M12 1a3 3 0 0 0-3 3v8a3 3 0 0 0 6 0V4a3 3 0 0 0-3-3z"></path>
-                                <path d="M19 10v2a7 7 0 0 1-14 0v-2"></path>
-                                <line x1="12" y1="19" x2="12" y2="23"></line>
-                                <line x1="8" y1="23" x2="16" y2="23"></line>
-                            </svg>
-                        </button>
-
-                        <input type="text" id="messageInput" placeholder="Type a message..." />
-                    </div>
-
-                    <!-- Recording UI (replaces input during recording) -->
-                    <div id="audioRecordingUI" class="audio-recording-ui">
-                        <div class="recording-indicator">
-                            <div class="recording-pulse"></div>
-                            <span id="recordingTimer" class="recording-timer">0:00</span>
-                        </div>
-                        <div class="recording-waveform">
-                            <div class="recording-bar"></div>
-                            <div class="recording-bar"></div>
-                            <div class="recording-bar"></div>
-                            <div class="recording-bar"></div>
-                            <div class="recording-bar"></div>
-                        </div>
-                        <div class="recording-actions">
-                            <button class="recording-cancel-btn" onclick="cancelAudioRecording()" title="Cancel">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="18" y1="6" x2="6" y2="18"></line>
-                                    <line x1="6" y1="6" x2="18" y2="18"></line>
-                                </svg>
-                            </button>
-                            <button class="recording-send-btn" onclick="stopAudioRecording()" title="Send">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <line x1="22" y1="2" x2="11" y2="13"></line>
-                                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
-                                </svg>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: Send Button -->
-                    <div class="chat-input-right">
-                        <button class="send-btn" onclick="sendMessage()">
+                        <button class="input-action-btn send-btn" onclick="sendMessage()" title="Send">
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <line x1="22" y1="2" x2="11" y2="13"></line>
                                 <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
@@ -439,8 +409,48 @@
                         </button>
                     </div>
 
-                    <!-- Hidden File Input -->
-                    <input type="file" id="photoInput" accept="image/jpeg,image/png,image/webp" style="display: none;" onchange="handlePhotoSelect(event)" />
+                    <!-- Joker Button (right side, like gift icon) -->
+                    <button class="joker-btn" onclick="openJokerModal()" title="Joker Cards">
+                        🃏
+                    </button>
+                </div>
+
+                <!-- Input Footer Info -->
+                <div class="chat-input-footer">
+                    <span class="char-counter"><span id="charCount">0</span>/400</span>
+                    <span class="free-messages">You have <strong id="freeMessagesCount">3</strong> free messages</span>
+                </div>
+
+                <!-- Hidden elements -->
+                <input type="file" id="photoInput" accept="image/*" style="display: none;" onchange="handlePhotoSelect(event)">
+
+                <!-- Audio Recording UI -->
+                <div id="audioRecordingUI" class="audio-recording-ui" style="display: none;">
+                    <div class="recording-indicator">
+                        <div class="recording-pulse"></div>
+                        <span id="recordingTimer" class="recording-timer">0:00</span>
+                    </div>
+                    <div class="recording-waveform">
+                        <div class="recording-bar"></div>
+                        <div class="recording-bar"></div>
+                        <div class="recording-bar"></div>
+                        <div class="recording-bar"></div>
+                        <div class="recording-bar"></div>
+                    </div>
+                    <div class="recording-actions">
+                        <button class="recording-cancel-btn" onclick="cancelAudioRecording()" title="Cancel">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="18" y1="6" x2="6" y2="18"></line>
+                                <line x1="6" y1="6" x2="18" y2="18"></line>
+                            </svg>
+                        </button>
+                        <button class="recording-send-btn" onclick="stopAudioRecording()" title="Send">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <line x1="22" y1="2" x2="11" y2="13"></line>
+                                <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>
@@ -470,9 +480,10 @@
         </div>
     </div>
 
-    <!-- Discover Screen (Tinder-Style) -->
+    <!-- Discover Screen (Tinder-Style Premium) -->
     <div id="discoverScreen" class="screen">
         <div class="discover-header">
+            <span class="discover-header-icon">💕</span>
             <h2>Discover</h2>
         </div>
         <div class="discover-cards-area">
@@ -632,130 +643,243 @@
         </div>
     </div>
 
-    <!-- Profile Screen -->
+    <!-- Profile Screen - Premium Redesign -->
     <div id="profileScreen" class="screen">
-        <div class="profile-header">
-            <button class="back-btn" onclick="showChat()">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M19 12H5M12 19l-7-7 7-7"/>
-                </svg>
-            </button>
-            <h2>My Profile</h2>
+        <!-- Profile Hero Section -->
+        <div class="profile-hero">
+            <div class="profile-hero-bg"></div>
+            <div class="profile-hero-content">
+                <!-- Profile Avatar -->
+                <div class="profile-avatar-section">
+                    <div class="profile-avatar-ring">
+                        <div class="profile-avatar" id="profilePicture">
+                            <span id="profileInitial">U</span>
+                        </div>
+                        <button class="profile-avatar-edit" onclick="uploadProfilePicture()">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
+                                <circle cx="12" cy="13" r="4"></circle>
+                            </svg>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- User Identity -->
+                <div class="profile-identity">
+                    <h1 class="profile-name" id="profileDisplayName">User</h1>
+                    <p class="profile-handle" id="profileDisplayEmail">@user</p>
+                </div>
+
+                <!-- Soulmate Level Badge -->
+                <div class="profile-level-card">
+                    <div class="level-card-icon" id="profileLevelIcon">🌱</div>
+                    <div class="level-card-info">
+                        <span class="level-card-title" id="profileLevelName">Curious</span>
+                        <div class="level-card-progress">
+                            <div class="level-card-progress-fill" id="profileLevelProgress" style="width: 0%;"></div>
+                        </div>
+                        <span class="level-card-xp" id="profileLevelXP">0 / 50 XP</span>
+                    </div>
+                </div>
+            </div>
         </div>
 
-        <div class="profile-container">
-            <!-- Profile Picture Section -->
-            <div class="profile-picture-section">
-                <div class="profile-picture-wrapper">
-                    <div class="profile-picture" id="profilePicture">
-                        <span id="profileInitial">U</span>
+        <!-- Profile Content -->
+        <div class="profile-content">
+            <!-- Stats Cards -->
+            <div class="profile-stats">
+                <div class="stat-card stat-card-primary" onclick="showCreditsStore()">
+                    <div class="stat-card-icon">💎</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileCreditsCount">0</span>
+                        <span class="stat-card-label">Credits</span>
                     </div>
-                    <button class="edit-picture-btn" onclick="uploadProfilePicture()">
+                    <div class="stat-card-action">
+                        <span>Get More</span>
                         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"></path>
-                            <circle cx="12" cy="13" r="4"></circle>
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
-                    </button>
+                    </div>
                 </div>
-                <p class="profile-hint">Tap the camera icon to upload a photo</p>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">💬</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileMessagesCount">0</span>
+                        <span class="stat-card-label">Messages</span>
+                    </div>
+                </div>
+
+                <div class="stat-card">
+                    <div class="stat-card-icon">🔥</div>
+                    <div class="stat-card-info">
+                        <span class="stat-card-value" id="profileStreakCount">0</span>
+                        <span class="stat-card-label">Day Streak</span>
+                    </div>
+                </div>
             </div>
 
-            <!-- Profile Info Form -->
-            <form id="profileForm" class="profile-form">
-                <div class="input-group">
-                    <label>Name</label>
-                    <input type="text" id="profileName" placeholder="Your name" required>
-                </div>
-
-                <div class="input-group">
-                    <label>Email</label>
-                    <input type="email" id="profileEmail" placeholder="Your email" disabled>
-                    <span class="input-hint">Email cannot be changed</span>
-                </div>
-
-                <div class="input-group">
-                    <label>Bio</label>
-                    <textarea id="profileBio" placeholder="Tell Viviana about yourself..." rows="3"></textarea>
-                </div>
-
-                <button type="submit" class="btn-primary">Save Changes</button>
-            </form>
-
-            <!-- Credits Section - Prominent -->
-            <div class="profile-credits-section">
-                <div class="credits-balance">
-                    <div class="credits-amount">
-                        <div class="credits-icon">💎</div>
-                        <div>
-                            <span class="credits-number" id="profileCreditsCount">3</span>
-                            <span class="credits-label">Credits</span>
+            <!-- Edit Profile Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                        <circle cx="12" cy="7" r="4"></circle>
+                    </svg>
+                    Edit Profile
+                </h3>
+                <div class="profile-form-card">
+                    <form id="profileForm" class="profile-form-modern">
+                        <div class="form-field">
+                            <label>Name</label>
+                            <input type="text" id="profileName" placeholder="Your name" required>
                         </div>
-                    </div>
+                        <div class="form-field">
+                            <label>Email</label>
+                            <input type="email" id="profileEmail" placeholder="Your email" disabled>
+                            <span class="field-hint">Email cannot be changed</span>
+                        </div>
+                        <div class="form-field">
+                            <label>Bio</label>
+                            <textarea id="profileBio" placeholder="Tell us about yourself..." rows="3"></textarea>
+                        </div>
+                        <button type="submit" class="btn-save">
+                            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"></path>
+                                <polyline points="17 21 17 13 7 13 7 21"></polyline>
+                                <polyline points="7 3 7 8 15 8"></polyline>
+                            </svg>
+                            Save Changes
+                        </button>
+                    </form>
                 </div>
-                <button class="credits-buy-btn" onclick="showCreditsStore()">
-                    <span class="credits-buy-icon">✨</span>
-                    <span>Get More Credits</span>
-                </button>
             </div>
 
-            <!-- Additional Options -->
-            <div class="profile-options">
-                <h3>Account Settings</h3>
-
-                <button class="option-btn" onclick="showNotificationSettings()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                        </svg>
-                        <span>Notification Settings</span>
-                    </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
+            <!-- Preferences Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <circle cx="12" cy="12" r="3"></circle>
+                        <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
                     </svg>
-                </button>
-
-                <button class="option-btn" onclick="showPrivacySettings()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                            <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                        </svg>
-                        <span>Privacy Settings</span>
+                    Preferences
+                </h3>
+                <div class="settings-card">
+                    <!-- Dark Mode -->
+                    <div class="setting-row">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Dark Mode</span>
+                                <span class="setting-desc">Switch between light and dark theme</span>
+                            </div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <span class="toggle-slider"></span>
+                        </label>
                     </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
 
-                <button class="option-btn" onclick="deleteAccount()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F44336" stroke-width="2">
-                            <polyline points="3 6 5 6 21 6"></polyline>
-                            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
-                            <line x1="10" y1="11" x2="10" y2="17"></line>
-                            <line x1="14" y1="11" x2="14" y2="17"></line>
+                    <!-- Notifications -->
+                    <div class="setting-row" onclick="showNotificationSettings()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Notifications</span>
+                                <span class="setting-desc">Manage push notifications</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
-                        <span style="color: #F44336;">Delete Account</span>
                     </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F44336" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
-                    </svg>
-                </button>
 
-                <button class="option-btn" onclick="logout()">
-                    <div class="option-content">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                            <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
-                            <polyline points="16 17 21 12 16 7"></polyline>
-                            <line x1="21" y1="12" x2="9" y2="12"></line>
+                    <!-- Privacy -->
+                    <div class="setting-row" onclick="showPrivacySettings()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                    <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Privacy</span>
+                                <span class="setting-desc">Control your data and visibility</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
                         </svg>
-                        <span>Logout</span>
                     </div>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <polyline points="9 18 15 12 9 6"></polyline>
+                </div>
+            </div>
+
+            <!-- Account Section -->
+            <div class="profile-section">
+                <h3 class="section-title">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
                     </svg>
-                </button>
+                    Account
+                </h3>
+                <div class="settings-card">
+                    <!-- Logout -->
+                    <div class="setting-row" onclick="logout()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap setting-icon-neutral">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"></path>
+                                    <polyline points="16 17 21 12 16 7"></polyline>
+                                    <line x1="21" y1="12" x2="9" y2="12"></line>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Log Out</span>
+                                <span class="setting-desc">Sign out of your account</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+
+                    <!-- Delete Account -->
+                    <div class="setting-row setting-row-danger" onclick="deleteAccount()">
+                        <div class="setting-row-left">
+                            <div class="setting-icon-wrap setting-icon-danger">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <polyline points="3 6 5 6 21 6"></polyline>
+                                    <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+                                    <line x1="10" y1="11" x2="10" y2="17"></line>
+                                    <line x1="14" y1="11" x2="14" y2="17"></line>
+                                </svg>
+                            </div>
+                            <div class="setting-text">
+                                <span class="setting-label">Delete Account</span>
+                                <span class="setting-desc">Permanently remove your account</span>
+                            </div>
+                        </div>
+                        <svg class="setting-chevron" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                    </div>
+                </div>
+            </div>
+
+            <!-- App Info -->
+            <div class="profile-footer">
+                <p class="app-version">Soulmate v1.0.0</p>
+                <p class="app-tagline">Made with 💕 for connection</p>
             </div>
         </div>
 
