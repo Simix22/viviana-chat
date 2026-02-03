@@ -2871,9 +2871,53 @@ function stopConfetti() {
 const originalShowChat = showChat;
 showChat = function() {
     originalShowChat();
-    
+
     // Initialize quiz state machine
     setTimeout(() => {
         initChatStateMachine();
     }, 100);
 };
+
+// ========================================
+// DARK MODE FUNCTIONALITY
+// ========================================
+
+function initDarkMode() {
+    const savedTheme = localStorage.getItem('VIVIANA_THEME');
+    const darkModeToggle = document.getElementById('darkModeToggle');
+
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        if (darkModeToggle) darkModeToggle.checked = true;
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        if (darkModeToggle) darkModeToggle.checked = false;
+    }
+}
+
+function toggleDarkMode() {
+    const darkModeToggle = document.getElementById('darkModeToggle');
+    const isDark = darkModeToggle?.checked;
+
+    if (isDark) {
+        document.documentElement.setAttribute('data-theme', 'dark');
+        localStorage.setItem('VIVIANA_THEME', 'dark');
+        showToast('🌙 Dark mode enabled');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+        localStorage.setItem('VIVIANA_THEME', 'light');
+        showToast('☀️ Light mode enabled');
+    }
+
+    console.log('🎨 Theme changed to:', isDark ? 'dark' : 'light');
+}
+
+// Apply saved theme on page load
+document.addEventListener('DOMContentLoaded', function() {
+    initDarkMode();
+});
+
+// Also initialize immediately if DOM is ready
+if (document.readyState !== 'loading') {
+    initDarkMode();
+}

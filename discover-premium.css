@@ -1,0 +1,1136 @@
+/* ============================================
+   DISCOVER - PREMIUM DESIGN
+   Dark Mode + Light Mode Support
+   Enhanced Animations + Premium Card Effects
+   ============================================ */
+
+/* ========================================
+   THEME VARIABLES
+   ======================================== */
+
+/* Light Mode (Default) */
+:root {
+    --discover-bg: #f5f5f7;
+    --discover-card-bg: #ffffff;
+    --discover-card-shadow: 0 8px 40px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.08);
+    --discover-card-shadow-hover: 0 16px 60px rgba(0, 0, 0, 0.18), 0 4px 12px rgba(0, 0, 0, 0.1);
+    --discover-header-bg: rgba(255, 255, 255, 0.9);
+    --discover-text-primary: #1a1a1a;
+    --discover-text-secondary: #666666;
+    --discover-text-muted: #999999;
+    --discover-border: rgba(0, 0, 0, 0.08);
+    --discover-tag-bg: rgba(0, 0, 0, 0.05);
+    --discover-tag-border: rgba(0, 0, 0, 0.1);
+    --discover-overlay: linear-gradient(to top, rgba(0, 0, 0, 0.7) 0%, rgba(0, 0, 0, 0) 60%);
+    --discover-action-bg: #ffffff;
+    --discover-glass: rgba(255, 255, 255, 0.7);
+}
+
+/* Dark Mode */
+[data-theme="dark"] {
+    --discover-bg: #0a0a0a;
+    --discover-card-bg: #1a1a1a;
+    --discover-card-shadow: 0 8px 40px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.05);
+    --discover-card-shadow-hover: 0 20px 60px rgba(0, 0, 0, 0.6), 0 0 30px rgba(233, 30, 99, 0.15);
+    --discover-header-bg: rgba(10, 10, 10, 0.95);
+    --discover-text-primary: #ffffff;
+    --discover-text-secondary: #a0a0a0;
+    --discover-text-muted: #666666;
+    --discover-border: rgba(255, 255, 255, 0.08);
+    --discover-tag-bg: rgba(255, 255, 255, 0.08);
+    --discover-tag-border: rgba(255, 255, 255, 0.12);
+    --discover-overlay: linear-gradient(to top, rgba(0, 0, 0, 0.9) 0%, rgba(0, 0, 0, 0.3) 40%, transparent 70%);
+    --discover-action-bg: #1a1a1a;
+    --discover-glass: rgba(30, 30, 30, 0.8);
+}
+
+/* ========================================
+   DISCOVER SCREEN LAYOUT
+   ======================================== */
+
+#discoverScreen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: var(--discover-bg);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+    transition: background 0.3s ease;
+}
+
+#discoverScreen.active {
+    display: flex;
+}
+
+/* ========================================
+   PREMIUM HEADER
+   ======================================== */
+
+.discover-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 60px;
+    background: var(--discover-header-bg);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border-bottom: 1px solid var(--discover-border);
+    z-index: 50;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: all 0.3s ease;
+}
+
+.discover-header h2 {
+    font-size: 20px;
+    font-weight: 700;
+    color: var(--discover-text-primary);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.discover-header-icon {
+    font-size: 22px;
+    animation: heartbeat 2s ease-in-out infinite;
+}
+
+@keyframes heartbeat {
+    0%, 100% { transform: scale(1); }
+    10%, 30% { transform: scale(1.1); }
+    20% { transform: scale(1.05); }
+}
+
+/* ========================================
+   PREMIUM CARD STACK AREA
+   ======================================== */
+
+.discover-cards-area {
+    position: fixed;
+    top: 60px;
+    left: 0;
+    right: 0;
+    bottom: 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    padding: 20px;
+    padding-top: 16px;
+    overflow: hidden;
+}
+
+.discover-card-stack {
+    position: relative;
+    width: 100%;
+    max-width: 380px;
+    height: calc(100% - 120px);
+    max-height: 520px;
+    perspective: 1000px;
+}
+
+/* ========================================
+   PREMIUM PROFILE CARD
+   ======================================== */
+
+.discover-card {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 100%;
+    border-radius: 24px;
+    overflow: hidden;
+    background: var(--discover-card-bg);
+    box-shadow: var(--discover-card-shadow);
+    cursor: grab;
+    user-select: none;
+    -webkit-user-select: none;
+    transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.3s ease,
+                box-shadow 0.3s ease;
+    will-change: transform;
+    transform-style: preserve-3d;
+}
+
+.discover-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    border-radius: 24px;
+    border: 1px solid var(--discover-border);
+    pointer-events: none;
+    z-index: 1;
+}
+
+.discover-card:active {
+    cursor: grabbing;
+}
+
+/* Top card interactive state */
+.discover-card.card-top {
+    z-index: 3;
+    pointer-events: all;
+}
+
+.discover-card.card-top:hover {
+    box-shadow: var(--discover-card-shadow-hover);
+}
+
+/* Stacked cards with enhanced depth */
+.discover-card.card-behind-1 {
+    transform: scale(0.95) translateY(16px);
+    z-index: 2;
+    pointer-events: none;
+    filter: brightness(0.95);
+}
+
+.discover-card.card-behind-2 {
+    transform: scale(0.90) translateY(32px);
+    z-index: 1;
+    pointer-events: none;
+    opacity: 0.6;
+    filter: brightness(0.9);
+}
+
+/* Swipe animations */
+.discover-card.swipe-left {
+    transform: translateX(-140%) rotate(-25deg) !important;
+    opacity: 0 !important;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+.discover-card.swipe-right {
+    transform: translateX(140%) rotate(25deg) !important;
+    opacity: 0 !important;
+    transition: all 0.5s cubic-bezier(0.25, 0.46, 0.45, 0.94) !important;
+}
+
+/* ========================================
+   CARD IMAGE + OVERLAY
+   ======================================== */
+
+.discover-card-image {
+    width: 100%;
+    height: 340px;
+    background-size: cover;
+    background-position: center top;
+    position: relative;
+}
+
+.discover-card-image::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 70%;
+    background: var(--discover-overlay);
+    pointer-events: none;
+}
+
+/* Card Info Overlay */
+.discover-card-info {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 24px 20px;
+    z-index: 2;
+    color: white;
+}
+
+.discover-card-name {
+    font-size: 28px;
+    font-weight: 700;
+    margin: 0 0 4px 0;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
+    letter-spacing: -0.5px;
+}
+
+.discover-card-age {
+    font-size: 20px;
+    font-weight: 500;
+    opacity: 0.9;
+    text-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Online indicator */
+.discover-card-online {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-left: 10px;
+    font-size: 12px;
+    font-weight: 500;
+    color: #4CAF50;
+    background: rgba(0, 0, 0, 0.3);
+    padding: 4px 10px;
+    border-radius: 12px;
+    backdrop-filter: blur(4px);
+}
+
+.discover-card-online::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: #4CAF50;
+    border-radius: 50%;
+    animation: pulse-online 2s infinite;
+}
+
+@keyframes pulse-online {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(1.2); }
+}
+
+/* ========================================
+   CARD DETAILS SECTION
+   ======================================== */
+
+.discover-card-details {
+    padding: 18px 20px;
+    background: var(--discover-card-bg);
+    transition: background 0.3s ease;
+}
+
+.discover-card-tagline {
+    font-size: 15px;
+    color: var(--discover-text-secondary);
+    margin: 0 0 12px 0;
+    line-height: 1.4;
+}
+
+.discover-card-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.discover-tag {
+    background: var(--discover-tag-bg);
+    border: 1px solid var(--discover-tag-border);
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--discover-text-secondary);
+    transition: all 0.2s ease;
+}
+
+.discover-tag:hover {
+    background: rgba(233, 30, 99, 0.1);
+    border-color: rgba(233, 30, 99, 0.3);
+    color: #E91E63;
+}
+
+/* ========================================
+   LIKE / NOPE LABELS (Enhanced)
+   ======================================== */
+
+.card-like-label,
+.card-nope-label {
+    position: absolute;
+    top: 50px;
+    padding: 10px 20px;
+    border-radius: 12px;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 2px;
+    z-index: 10;
+    opacity: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+    pointer-events: none;
+    border: 4px solid;
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+}
+
+.card-like-label {
+    left: 24px;
+    color: #4CAF50;
+    border-color: #4CAF50;
+    transform: rotate(-15deg);
+    background: rgba(76, 175, 80, 0.15);
+    box-shadow: 0 4px 20px rgba(76, 175, 80, 0.3);
+}
+
+.card-nope-label {
+    right: 24px;
+    color: #FF5252;
+    border-color: #FF5252;
+    transform: rotate(15deg);
+    background: rgba(255, 82, 82, 0.15);
+    box-shadow: 0 4px 20px rgba(255, 82, 82, 0.3);
+}
+
+/* ========================================
+   ACTION BUTTONS (Premium Style)
+   ======================================== */
+
+.discover-actions {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 28px;
+    padding: 20px 0;
+    margin-top: auto;
+}
+
+.discover-action-btn {
+    border: none;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    position: relative;
+    overflow: hidden;
+}
+
+.discover-action-btn::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: currentColor;
+    opacity: 0.15;
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.discover-action-btn:hover::before {
+    width: 100%;
+    height: 100%;
+}
+
+/* Skip Button */
+.discover-skip-btn {
+    width: 58px;
+    height: 58px;
+    background: var(--discover-action-bg);
+    color: #FF5252;
+    box-shadow: 0 4px 16px rgba(255, 82, 82, 0.2);
+    border: 2px solid rgba(255, 82, 82, 0.2);
+}
+
+.discover-skip-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 8px 24px rgba(255, 82, 82, 0.35);
+    border-color: rgba(255, 82, 82, 0.4);
+}
+
+.discover-skip-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* Like Button (Bigger) */
+.discover-like-btn {
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #E91E63 0%, #FF4081 100%);
+    color: white;
+    box-shadow: 0 6px 24px rgba(233, 30, 99, 0.4);
+    border: none;
+}
+
+.discover-like-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 10px 32px rgba(233, 30, 99, 0.5);
+}
+
+.discover-like-btn:active {
+    transform: scale(0.95) !important;
+}
+
+/* Super Like Button (Optional) */
+.discover-superlike-btn {
+    width: 50px;
+    height: 50px;
+    background: var(--discover-action-bg);
+    color: #2196F3;
+    box-shadow: 0 4px 16px rgba(33, 150, 243, 0.2);
+    border: 2px solid rgba(33, 150, 243, 0.2);
+}
+
+.discover-superlike-btn:hover {
+    transform: scale(1.12);
+    box-shadow: 0 8px 24px rgba(33, 150, 243, 0.35);
+}
+
+/* ========================================
+   ENHANCED LIKE ANIMATION
+   ======================================== */
+
+.heart-burst {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0);
+    font-size: 100px;
+    z-index: 9999;
+    pointer-events: none;
+    animation: heartBurstEnhanced 0.8s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+}
+
+@keyframes heartBurstEnhanced {
+    0% {
+        transform: translate(-50%, -50%) scale(0) rotate(-10deg);
+        opacity: 1;
+        filter: brightness(1);
+    }
+    40% {
+        transform: translate(-50%, -50%) scale(1.4) rotate(5deg);
+        opacity: 1;
+        filter: brightness(1.3);
+    }
+    100% {
+        transform: translate(-50%, -50%) scale(2) rotate(0deg);
+        opacity: 0;
+        filter: brightness(1);
+    }
+}
+
+/* Heart particles */
+.heart-particle {
+    position: fixed;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+}
+
+@keyframes particleFly {
+    0% {
+        transform: scale(0);
+        opacity: 1;
+    }
+    100% {
+        transform: scale(1) translateY(-100px);
+        opacity: 0;
+    }
+}
+
+@keyframes particleFlyOut {
+    0% {
+        transform: translate(-50%, -50%) scale(0);
+        opacity: 1;
+    }
+    50% {
+        opacity: 1;
+    }
+    100% {
+        transform: translate(calc(-50% + var(--tx)), calc(-50% + var(--ty))) scale(1);
+        opacity: 0;
+    }
+}
+
+/* Like glow effect on card */
+.discover-card.like-glow {
+    box-shadow: 0 0 60px rgba(233, 30, 99, 0.6), var(--discover-card-shadow);
+    animation: likeGlow 0.4s ease-out;
+}
+
+@keyframes likeGlow {
+    0% { box-shadow: 0 0 0 rgba(233, 30, 99, 0); }
+    50% { box-shadow: 0 0 60px rgba(233, 30, 99, 0.8); }
+    100% { box-shadow: 0 0 0 rgba(233, 30, 99, 0); }
+}
+
+/* Nope shake effect */
+.discover-card.nope-shake {
+    animation: nopeShake 0.4s ease-out;
+}
+
+@keyframes nopeShake {
+    0%, 100% { transform: translateX(0) rotate(0); }
+    20% { transform: translateX(-10px) rotate(-2deg); }
+    40% { transform: translateX(10px) rotate(2deg); }
+    60% { transform: translateX(-6px) rotate(-1deg); }
+    80% { transform: translateX(6px) rotate(1deg); }
+}
+
+/* ========================================
+   EMPTY STATE (Premium)
+   ======================================== */
+
+.discover-empty {
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 40px 24px;
+    gap: 16px;
+}
+
+.discover-empty.visible {
+    display: flex;
+}
+
+.discover-empty-icon {
+    font-size: 72px;
+    animation: floatEmoji 3s ease-in-out infinite;
+}
+
+@keyframes floatEmoji {
+    0%, 100% { transform: translateY(0) rotate(0deg); }
+    50% { transform: translateY(-10px) rotate(5deg); }
+}
+
+.discover-empty h3 {
+    font-size: 24px;
+    font-weight: 700;
+    color: var(--discover-text-primary);
+    margin: 0;
+    letter-spacing: -0.3px;
+}
+
+.discover-empty p {
+    font-size: 15px;
+    color: var(--discover-text-secondary);
+    margin: 0;
+    line-height: 1.5;
+}
+
+.discover-refresh-btn {
+    margin-top: 12px;
+    background: linear-gradient(135deg, #E91E63, #FF4081);
+    color: white;
+    border: none;
+    padding: 14px 36px;
+    border-radius: 28px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.35);
+    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.discover-refresh-btn:hover {
+    transform: translateY(-3px) scale(1.02);
+    box-shadow: 0 8px 24px rgba(233, 30, 99, 0.45);
+}
+
+.discover-refresh-btn:active {
+    transform: translateY(0) scale(0.98);
+}
+
+/* ========================================
+   MATCH NOTIFICATION (Premium)
+   ======================================== */
+
+.match-notification {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.9);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10000;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.match-notification.active {
+    opacity: 1;
+    pointer-events: all;
+}
+
+.match-notification-content {
+    text-align: center;
+    animation: matchPop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+@keyframes matchPop {
+    0% { transform: scale(0); opacity: 0; }
+    100% { transform: scale(1); opacity: 1; }
+}
+
+.match-title {
+    font-size: 36px;
+    font-weight: 800;
+    color: white;
+    margin: 0 0 8px 0;
+    background: linear-gradient(135deg, #E91E63, #FF4081);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.match-subtitle {
+    font-size: 16px;
+    color: rgba(255, 255, 255, 0.8);
+    margin: 0 0 32px 0;
+}
+
+.match-avatars {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: -20px;
+    margin-bottom: 32px;
+}
+
+.match-avatar {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 4px solid #E91E63;
+    object-fit: cover;
+}
+
+.match-heart {
+    font-size: 40px;
+    margin: 0 -10px;
+    z-index: 1;
+    animation: matchHeartBeat 0.8s ease-in-out infinite;
+}
+
+@keyframes matchHeartBeat {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.2); }
+}
+
+/* ========================================
+   MOBILE OPTIMIZATIONS
+   ======================================== */
+
+@media (max-width: 600px) {
+    .discover-card-stack {
+        max-height: 460px;
+    }
+
+    .discover-card-image {
+        height: 300px;
+    }
+
+    .discover-card-name {
+        font-size: 24px;
+    }
+
+    .discover-card-age {
+        font-size: 18px;
+    }
+
+    .discover-actions {
+        gap: 20px;
+        padding: 16px 0;
+    }
+
+    .discover-skip-btn {
+        width: 52px;
+        height: 52px;
+    }
+
+    .discover-like-btn {
+        width: 64px;
+        height: 64px;
+    }
+
+    .card-like-label,
+    .card-nope-label {
+        font-size: 24px;
+        padding: 8px 16px;
+    }
+}
+
+/* ========================================
+   ACCESSIBILITY
+   ======================================== */
+
+.discover-action-btn:focus {
+    outline: 2px solid #E91E63;
+    outline-offset: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .discover-card,
+    .heart-burst,
+    .card-like-label,
+    .card-nope-label,
+    .discover-action-btn,
+    .discover-empty-icon,
+    .discover-header-icon {
+        animation: none !important;
+        transition: none !important;
+    }
+}
+
+/* ========================================
+   TRANSITION EFFECTS FOR THEME SWITCH
+   ======================================== */
+
+#discoverScreen,
+#discoverScreen *,
+#profileScreen,
+#profileScreen *,
+#creditsScreen,
+#creditsScreen * {
+    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - PROFILE SCREEN
+   ======================================== */
+
+[data-theme="dark"] #profileScreen {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .profile-header {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .profile-header h2 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .profile-container {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .profile-form .input-group label {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .profile-form input,
+[data-theme="dark"] .profile-form textarea {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .profile-form input::placeholder,
+[data-theme="dark"] .profile-form textarea::placeholder {
+    color: #666666;
+}
+
+[data-theme="dark"] .profile-form input:focus,
+[data-theme="dark"] .profile-form textarea:focus {
+    border-color: #E91E63;
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.15);
+}
+
+[data-theme="dark"] .input-hint {
+    color: #666666;
+}
+
+[data-theme="dark"] .profile-options {
+    background: #141414;
+    border-radius: 16px;
+}
+
+[data-theme="dark"] .profile-options h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .option-btn {
+    background: transparent;
+    border-bottom: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .option-btn:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+[data-theme="dark"] .option-btn svg {
+    stroke: #a0a0a0;
+}
+
+[data-theme="dark"] .option-content span {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .profile-credits-section {
+    background: linear-gradient(135deg, #1a1a1a, #252525);
+    border: 1px solid #2a2a2a;
+}
+
+[data-theme="dark"] .credits-number {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .credits-label {
+    color: #a0a0a0;
+}
+
+/* Dark Mode Toggle Row styling */
+.dark-mode-toggle-row {
+    cursor: default !important;
+}
+
+.dark-mode-toggle-row:hover {
+    background: transparent !important;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - CREDITS SCREEN
+   ======================================== */
+
+[data-theme="dark"] #creditsScreen {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .store-header {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .store-header h2 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .current-balance {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .store-container {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .store-subtitle {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .credit-card {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+}
+
+[data-theme="dark"] .credit-card h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card-description {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .card-price .price {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .card-price .price-per {
+    color: #666666;
+}
+
+[data-theme="dark"] .credit-card.popular {
+    background: linear-gradient(135deg, #1a1a1a, #252525);
+    border: 2px solid #E91E63;
+}
+
+[data-theme="dark"] .store-footer p {
+    color: #a0a0a0;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - APP NAVIGATION
+   ======================================== */
+
+[data-theme="dark"] .app-nav {
+    background: rgba(10, 10, 10, 0.95);
+    backdrop-filter: blur(20px);
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+[data-theme="dark"] .nav-item {
+    color: #666666;
+}
+
+[data-theme="dark"] .nav-item.active {
+    color: #E91E63;
+}
+
+[data-theme="dark"] .nav-item span {
+    color: inherit;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - SETTINGS SCREENS
+   ======================================== */
+
+[data-theme="dark"] #notificationSettingsScreen,
+[data-theme="dark"] #privacySettingsScreen {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .settings-container {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .settings-section {
+    background: #141414;
+    border-radius: 16px;
+}
+
+[data-theme="dark"] .settings-section h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .settings-hint {
+    color: #666666;
+}
+
+[data-theme="dark"] .setting-item {
+    border-bottom: 1px solid #2a2a2a;
+}
+
+[data-theme="dark"] .setting-info strong {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .setting-info p {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .setting-icon {
+    background: rgba(233, 30, 99, 0.15);
+}
+
+[data-theme="dark"] .settings-footer-note {
+    color: #666666;
+}
+
+[data-theme="dark"] .radio-option {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .radio-content p {
+    color: #a0a0a0;
+}
+
+/* Toggle Switch Dark Mode */
+[data-theme="dark"] .toggle-switch .toggle-slider {
+    background: #2a2a2a;
+}
+
+[data-theme="dark"] .toggle-switch input:checked + .toggle-slider {
+    background: #E91E63;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - MODALS / POPUPS
+   ======================================== */
+
+[data-theme="dark"] .popup-content {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+}
+
+[data-theme="dark"] .popup-content h3 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .popup-content p {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .warning-box {
+    background: rgba(244, 67, 54, 0.1);
+    border: 1px solid rgba(244, 67, 54, 0.2);
+}
+
+[data-theme="dark"] .btn-modal-cancel {
+    background: #2a2a2a;
+    color: #ffffff;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - AUTH SCREENS
+   ======================================== */
+
+[data-theme="dark"] #authScreen,
+[data-theme="dark"] #verificationScreen,
+[data-theme="dark"] #passwordResetScreen,
+[data-theme="dark"] #passwordResetVerifyScreen {
+    background: #0a0a0a;
+}
+
+[data-theme="dark"] .auth-container {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+}
+
+[data-theme="dark"] .auth-container h2 {
+    color: #ffffff;
+}
+
+[data-theme="dark"] .auth-subtitle {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .auth-toggle {
+    background: #1a1a1a;
+}
+
+[data-theme="dark"] .toggle-btn {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .toggle-btn.active {
+    background: #E91E63;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .auth-form .input-group label {
+    color: #a0a0a0;
+}
+
+[data-theme="dark"] .auth-form input {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .auth-form input::placeholder {
+    color: #666666;
+}
+
+[data-theme="dark"] .auth-form input:focus {
+    border-color: #E91E63;
+}
+
+[data-theme="dark"] .divider span {
+    background: #141414;
+    color: #666666;
+}
+
+[data-theme="dark"] .btn-google {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+[data-theme="dark"] .btn-google:hover {
+    background: #252525;
+}
+
+/* ========================================
+   GLOBAL DARK MODE - TOAST
+   ======================================== */
+
+[data-theme="dark"] .toast {
+    background: #1a1a1a;
+    color: #ffffff;
+    border: 1px solid #2a2a2a;
+}

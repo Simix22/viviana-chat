@@ -289,9 +289,11 @@ function swipeCard(direction) {
     // Add swipe class
     topCard.classList.add(direction === 'right' ? 'swipe-right' : 'swipe-left');
 
-    // If like (right), show heart burst
+    // Effects based on direction
     if (direction === 'right') {
         showHeartBurst();
+    } else {
+        showNopeEffect();
     }
 
     // After animation, advance to next card
@@ -326,17 +328,64 @@ window.discoverSkip = discoverSkip;
 window.discoverRefresh = discoverRefresh;
 
 // ========================================
-// HEART BURST ANIMATION
+// ENHANCED HEART BURST ANIMATION
 // ========================================
 
 function showHeartBurst() {
+    // Main heart burst
     const burst = document.createElement('div');
     burst.className = 'heart-burst';
     burst.textContent = '❤️';
     document.body.appendChild(burst);
 
-    // Remove after animation
-    setTimeout(() => burst.remove(), 600);
+    // Add glow effect to current card
+    const topCard = document.querySelector('.discover-card.card-top');
+    if (topCard) {
+        topCard.classList.add('like-glow');
+        setTimeout(() => topCard.classList.remove('like-glow'), 400);
+    }
+
+    // Create heart particles
+    createHeartParticles();
+
+    // Remove burst after animation
+    setTimeout(() => burst.remove(), 800);
+}
+
+function createHeartParticles() {
+    const hearts = ['❤️', '💕', '💖', '💗', '💓'];
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    for (let i = 0; i < 12; i++) {
+        const particle = document.createElement('div');
+        particle.className = 'heart-particle';
+        particle.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+        particle.style.fontSize = (16 + Math.random() * 20) + 'px';
+        particle.style.left = centerX + 'px';
+        particle.style.top = centerY + 'px';
+
+        // Random direction
+        const angle = (i / 12) * Math.PI * 2;
+        const distance = 80 + Math.random() * 60;
+        const tx = Math.cos(angle) * distance;
+        const ty = Math.sin(angle) * distance;
+
+        particle.style.setProperty('--tx', tx + 'px');
+        particle.style.setProperty('--ty', ty + 'px');
+        particle.style.animation = `particleFlyOut 0.7s ease-out forwards`;
+
+        document.body.appendChild(particle);
+        setTimeout(() => particle.remove(), 700);
+    }
+}
+
+function showNopeEffect() {
+    const topCard = document.querySelector('.discover-card.card-top');
+    if (topCard) {
+        topCard.classList.add('nope-shake');
+        setTimeout(() => topCard.classList.remove('nope-shake'), 400);
+    }
 }
 
 // ========================================

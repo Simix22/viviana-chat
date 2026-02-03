@@ -20,6 +20,7 @@
     <link rel="stylesheet" href="soulmate-rank.css">
     <link rel="stylesheet" href="chat-redesign.css">
     <link rel="stylesheet" href="chat-ui-fanfix.css">
+    <link rel="stylesheet" href="discover-premium.css">
 </head>
 <body>
     <!-- Welcome Screen (hidden, redirects to auth) -->
@@ -478,9 +479,10 @@
         </div>
     </div>
 
-    <!-- Discover Screen (Tinder-Style) -->
+    <!-- Discover Screen (Tinder-Style Premium) -->
     <div id="discoverScreen" class="screen">
         <div class="discover-header">
+            <span class="discover-header-icon">💕</span>
             <h2>Discover</h2>
         </div>
         <div class="discover-cards-area">
@@ -709,6 +711,20 @@
             <!-- Additional Options -->
             <div class="profile-options">
                 <h3>Account Settings</h3>
+
+                <!-- Dark Mode Toggle -->
+                <div class="option-btn dark-mode-toggle-row">
+                    <div class="option-content">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                        </svg>
+                        <span>Dark Mode</span>
+                    </div>
+                    <label class="toggle-switch">
+                        <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                        <span class="toggle-slider"></span>
+                    </label>
+                </div>
 
                 <button class="option-btn" onclick="showNotificationSettings()">
                     <div class="option-content">
