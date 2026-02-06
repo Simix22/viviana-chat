@@ -4,6 +4,8 @@
 
 let currentUser = null;
 let pendingVerificationEmail = null;
+let verificationCode = null;
+let verificationCodeExpiry = null;
 let resendCooldownUntil = null;
 
 // Password Reset
@@ -50,23 +52,11 @@ try {
         console.log('✅ Firebase initialized successfully');
 
         // Set up auth state observer
-        firebaseAuth.onAuthStateChanged(async (user) => {
+        firebaseAuth.onAuthStateChanged((user) => {
             if (user) {
                 console.log('🔐 Firebase user detected:', user.email);
-                console.log('📧 Email verified in Firebase:', user.emailVerified);
-
-                // Update local database if email was verified
-                if (user.emailVerified) {
-                    const userId = 'user_' + user.uid;
-                    const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-
-                    if (allUsers[userId]) {
-                        console.log('✅ Updating emailVerified status in local database');
-                        allUsers[userId].emailVerified = true;
-                        localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-                        localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
-                    }
-                }
+                // User is signed in with Firebase
+                // The handleGoogleLogin function will handle the rest
             } else {
                 console.log('🔓 No Firebase user signed in');
             }
@@ -638,18 +628,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Check if user is logged in
     const savedUserId = localStorage.getItem('VIVIANA_CURRENT_USER_ID');
-    console.log('🔍 Checking for saved user ID:', savedUserId);
 
     if (savedUserId) {
         const userData = getUserFromDatabase(savedUserId);
-        console.log('🔍 User data from database:', userData);
 
         if (userData) {
             // Check if email is verified
-            console.log('🔍 Email verified status:', userData.emailVerified);
             if (!userData.emailVerified) {
                 console.log('⚠️ Email not verified, redirecting to verification');
-                console.log('⚠️ User data:', JSON.stringify(userData));
                 localStorage.removeItem('VIVIANA_CURRENT_USER_ID');
                 showWelcome();
                 return;
@@ -657,9 +643,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             currentUser = { userId: savedUserId, ...userData };
             console.log('✅ User logged in:', currentUser.email);
-            console.log('✅ Calling showChat() from DOMContentLoaded...');
             showChat();
-            console.log('✅ Calling loadProfile() from DOMContentLoaded...');
             loadProfile();
         } else {
             console.log('⚠️ Saved user ID not found, showing welcome');
@@ -678,36 +662,13 @@ document.addEventListener('DOMContentLoaded', () => {
     document.getElementById('passwordResetRequestForm').addEventListener('submit', handlePasswordResetRequest);
     document.getElementById('passwordResetVerifyForm').addEventListener('submit', handlePasswordResetVerify);
 
-    // Enter key for messages + Character counter
-    const messageInput = document.getElementById('messageInput');
-    if (messageInput) {
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Character counter
-        messageInput.addEventListener('input', (e) => {
-            const charCount = document.getElementById('charCount');
-            if (charCount) {
-                charCount.textContent = e.target.value.length;
-            }
-        });
-    }
-
-    // Update free messages count
-    updateFreeMessagesDisplay();
+    // Enter key for messages
+    document.getElementById('messageInput').addEventListener('keypress', (e) => {
+        if (e.key === 'Enter') sendMessage();
+    });
 
     console.log('✅ App initialization complete');
 });
-
-// Update free messages display
-function updateFreeMessagesDisplay() {
-    const freeMessagesEl = document.getElementById('freeMessagesCount');
-    if (freeMessagesEl && currentUser) {
-        const credits = getCreditsBalance(currentUser.userId);
-        freeMessagesEl.textContent = credits || 0;
-    }
-}
 
 // ========================================
 // NAVIGATION
@@ -724,8 +685,11 @@ function hideAllScreens() {
 }
 
 function showWelcome() {
-    console.log('📱 Redirecting to Auth Screen');
-    showAuth();
+    console.log('📱 Showing Welcome Screen');
+    hideAllScreens();
+    const welcomeScreen = document.getElementById('welcomeScreen');
+    welcomeScreen.style.display = 'flex';
+    welcomeScreen.classList.add('active');
 }
 
 function showAuth() {
@@ -746,15 +710,6 @@ function showVerificationScreenNav() {
 
 function showChat() {
     console.log('💬 Showing Chat Screen');
-
-    if (!currentUser) {
-        console.error('❌ Cannot show chat: currentUser is not set');
-        showWelcome();
-        return;
-    }
-
-    console.log('✅ currentUser verified:', currentUser.email);
-
     hideAllScreens();
     const chatScreen = document.getElementById('chatScreen');
     chatScreen.style.display = 'flex';
@@ -762,8 +717,6 @@ function showChat() {
     updateCreditsDisplay();
     updateNavButtons('chat');
     loadAdminMessages();
-
-    console.log('✅ Chat screen displayed');
 
     // Start auto-refresh for new messages from Viviana
     startMessageRefresh();
@@ -833,23 +786,19 @@ function updateNavButtons(active) {
     const navItems = document.querySelectorAll('.nav-item');
     navItems.forEach(btn => btn.classList.remove('active'));
 
-    // Add active to ALL buttons with the matching onclick (each screen has its own nav)
+    // Add active to the current section
     try {
         if (active === 'chat') {
-            const chatBtns = document.querySelectorAll('[onclick="showChat()"]');
-            chatBtns.forEach(btn => btn.classList.add('active'));
+            const chatBtn = document.querySelector('[onclick="showChat()"]');
+            if (chatBtn) chatBtn.classList.add('active');
         }
         if (active === 'credits') {
-            const creditsBtns = document.querySelectorAll('[onclick="showCreditsStore()"]');
-            creditsBtns.forEach(btn => btn.classList.add('active'));
-        }
-        if (active === 'discover') {
-            const discoverBtns = document.querySelectorAll('[onclick="showDiscover()"]');
-            discoverBtns.forEach(btn => btn.classList.add('active'));
+            const creditsBtn = document.querySelector('[onclick="showCreditsStore()"]');
+            if (creditsBtn) creditsBtn.classList.add('active');
         }
         if (active === 'profile') {
-            const profileBtns = document.querySelectorAll('[onclick="showProfile()"]');
-            profileBtns.forEach(btn => btn.classList.add('active'));
+            const profileBtn = document.querySelector('[onclick="showProfile()"]');
+            if (profileBtn) profileBtn.classList.add('active');
         }
     } catch (error) {
         console.error('Error updating nav buttons:', error);
@@ -876,15 +825,8 @@ function switchToLogin() {
 // AUTHENTICATION
 // ========================================
 
-async function handleLogin(e) {
+function handleLogin(e) {
     e.preventDefault();
-
-    // Check if Firebase is initialized
-    if (!firebaseAuth) {
-        showToast('Firebase Authentication is not configured. Please contact support.', 'error');
-        console.error('Firebase Auth not initialized');
-        return;
-    }
 
     // Rate limiting
     const rateCheck = checkRateLimit('login');
@@ -897,171 +839,65 @@ async function handleLogin(e) {
     const email = document.getElementById('loginEmail').value.trim().toLowerCase();
     const password = document.getElementById('loginPassword').value;
 
-    console.log('🔐 Firebase Login attempt:', { email });
-
     if (!email || !password) {
         showToast('Please fill in all fields', 'error');
         return;
     }
 
-    try {
-        // Sign in with Firebase
-        console.log('🔥 Signing in with Firebase...');
-        const userCredential = await firebaseAuth.signInWithEmailAndPassword(email, password);
-        const firebaseUser = userCredential.user;
+    const user = findUserByEmail(email);
 
-        console.log('✅ Firebase sign-in successful:', firebaseUser.uid);
-        console.log('📧 Email verified:', firebaseUser.emailVerified);
+    if (!user || user.password !== password) {
+        showToast('Invalid email or password', 'error');
+        logSecurityEvent('failed_login', { email });
+        return;
+    }
 
-        // Check if email is verified
-        if (!firebaseUser.emailVerified) {
-            console.log('⚠️ Email not verified');
-            showToast('Please verify your email before logging in', 'error');
+    // CHECK EMAIL VERIFICATION
+    if (!user.emailVerified) {
+        console.log('⚠️ Email not verified for user:', user.email);
+        showToast('Please verify your email before logging in', 'error');
 
-            // Set pending verification
-            pendingVerificationEmail = email;
+        // Set pending verification
+        pendingVerificationEmail = user.email;
+        currentUser = user;
 
-            // Check if user exists in local database
-            const userId = 'user_' + firebaseUser.uid;
-            const userData = getUserFromDatabase(userId);
-
-            if (userData) {
-                currentUser = { userId, ...userData };
-            } else {
-                // Create local user data if not exists
-                currentUser = {
-                    userId: userId,
-                    name: firebaseUser.displayName || email.split('@')[0],
-                    email: email,
-                    firebaseUID: firebaseUser.uid,
-                    emailVerified: false
-                };
-            }
-
-            // Clear form
-            document.getElementById('loginEmail').value = '';
-            document.getElementById('loginPassword').value = '';
-
-            // Sign out from Firebase (don't allow access without verification)
-            await firebaseAuth.signOut();
-
-            // Show verification screen
-            setTimeout(() => {
-                showVerificationScreen();
-            }, 500);
-
-            return;
-        }
-
-        // Email is verified - proceed with login
-
-        // Create or get local user ID
-        const userId = 'user_' + firebaseUser.uid;
-        let userData = getUserFromDatabase(userId);
-
-        if (!userData) {
-            // First time logging in after verification - create local data
-            console.log('🆕 Creating local user data for verified user');
-            saveUserToDatabase(
-                userId,
-                firebaseUser.displayName || email.split('@')[0],
-                email,
-                null,
-                true
-            );
-
-            // Add Firebase UID
-            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-            if (allUsers[userId]) {
-                allUsers[userId].firebaseUID = firebaseUser.uid;
-                allUsers[userId].loginMethod = 'email';
-                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-            }
-
-            // Initialize user data if not exists
-            if (!localStorage.getItem(`VIVIANA_${userId}_MESSAGES`)) {
-                localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
-                localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
-                localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
-                localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
-                localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
-
-                // Initial credits for first login
-                const initialCredits = 3;
-                localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
-
-                addCreditsLedgerEntry(userId, {
-                    type: 'initial_grant',
-                    amount: initialCredits,
-                    balance_before: 0,
-                    balance_after: initialCredits,
-                    description: 'Welcome bonus - First login after verification',
-                    metadata: { first_login: new Date().toISOString() }
-                });
-            }
-
-            userData = getUserFromDatabase(userId);
-        } else {
-            // Update email verified status in local database
-            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-            if (allUsers[userId]) {
-                allUsers[userId].emailVerified = true;
-                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-            }
-            localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
-        }
-
-        // Login successful
-        currentUser = { userId, ...userData };
-        localStorage.setItem('VIVIANA_CURRENT_USER_ID', userId);
-        localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
-
-        console.log('✅ Login successful:', email);
-        logSecurityEvent('login_success', { email: email, userId: userId, method: 'firebase_email' });
-        showToast('Welcome back!', 'success');
+        // Generate new code
+        generateVerificationCode();
 
         // Clear form
         document.getElementById('loginEmail').value = '';
         document.getElementById('loginPassword').value = '';
 
-        // Navigate to chat
+        // Show verification screen
         setTimeout(() => {
-            console.log('🔄 Navigating to chat...');
-            showChat();
-            loadProfile();
-        }, 500);
+            showVerificationScreen();
+        }, 1000);
 
-    } catch (error) {
-        console.error('❌ Firebase Login error:', error);
-
-        // Handle specific Firebase errors
-        if (error.code === 'auth/user-not-found') {
-            showToast('No account found with this email', 'error');
-        } else if (error.code === 'auth/wrong-password') {
-            showToast('Incorrect password', 'error');
-        } else if (error.code === 'auth/invalid-email') {
-            showToast('Invalid email address', 'error');
-        } else if (error.code === 'auth/user-disabled') {
-            showToast('This account has been disabled', 'error');
-        } else if (error.code === 'auth/network-request-failed') {
-            showToast('Network error. Please check your connection.', 'error');
-        } else {
-            showToast('Failed to sign in. Please try again.', 'error');
-        }
-
-        logSecurityEvent('login_failed', { email, reason: error.code, message: error.message });
-    }
-}
-
-async function handleSignup(e) {
-    e.preventDefault();
-
-    // Check if Firebase is initialized
-    if (!firebaseAuth) {
-        showToast('Firebase Authentication is not configured. Please contact support.', 'error');
-        console.error('Firebase Auth not initialized');
         return;
     }
+
+    // Login successful
+    currentUser = user;
+    localStorage.setItem('VIVIANA_CURRENT_USER_ID', user.userId);
+    localStorage.setItem(`VIVIANA_${user.userId}_LAST_LOGIN`, new Date().toISOString());
+
+    console.log('✅ Login successful:', user.email);
+    logSecurityEvent('login_success', { email: user.email, userId: user.userId });
+    showToast('Welcome back!', 'success');
+
+    // Clear form
+    document.getElementById('loginEmail').value = '';
+    document.getElementById('loginPassword').value = '';
+
+    // Navigate to chat after a brief delay
+    setTimeout(() => {
+        console.log('🔄 Navigating to chat...');
+        showChat();
+    }, 500);
+}
+
+function handleSignup(e) {
+    e.preventDefault();
 
     // Rate limiting
     const rateCheck = checkRateLimit('signup');
@@ -1075,7 +911,7 @@ async function handleSignup(e) {
     const email = document.getElementById('signupEmail').value.trim().toLowerCase();
     const password = document.getElementById('signupPassword').value;
 
-    console.log('📝 Firebase Signup attempt:', { name, email });
+    console.log('📝 Signup attempt:', { name, email });
 
     if (!name || !email || !password) {
         showToast('Please fill in all fields', 'error');
@@ -1087,97 +923,81 @@ async function handleSignup(e) {
         return;
     }
 
-    try {
-        // Create user in Firebase
-        console.log('🔥 Creating Firebase user...');
-        const userCredential = await firebaseAuth.createUserWithEmailAndPassword(email, password);
-        const firebaseUser = userCredential.user;
+    // CRITICAL: Check for ANY existing references to this email
+    const searchResult = searchUserReferences(email);
+    if (searchResult.found) {
+        console.error('⚠️ CRITICAL: Email already exists in system!');
+        console.error('User ID:', searchResult.userId);
+        console.error('References:', searchResult.references.length);
 
-        console.log('✅ Firebase user created:', firebaseUser.uid);
+        showToast('Account with this email already exists', 'error');
+        logSecurityEvent('signup_failed', { email, reason: 'email_exists', existingUserId: searchResult.userId });
 
-        // Update display name in Firebase
-        await firebaseUser.updateProfile({
-            displayName: name
-        });
-
-        // Send verification email via Firebase
-        console.log('📧 Sending verification email...');
-        await firebaseUser.sendEmailVerification();
-        console.log('✅ Verification email sent to:', email);
-
-        // Create local user data with Firebase UID
-        const userId = 'user_' + firebaseUser.uid;
-
-        // Save user to local database (emailVerified = false until they verify)
-        saveUserToDatabase(userId, name, email, null, false);
-
-        // Add Firebase UID to user data
-        const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-        if (allUsers[userId]) {
-            allUsers[userId].firebaseUID = firebaseUser.uid;
-            allUsers[userId].loginMethod = 'email';
-            localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-        }
-
-        logSecurityEvent('signup_success', { email, userId, method: 'firebase_email' });
-
-        // Initialize user data
-        localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
-        localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
-        localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
-        localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
-        localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'false');
-        localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
-
-        // Initialize credits with proper ledger entry (signup bonus)
-        const initialCredits = 3;
-        localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
-
-        addCreditsLedgerEntry(userId, {
-            type: 'initial_grant',
-            amount: initialCredits,
-            balance_before: 0,
-            balance_after: initialCredits,
-            description: 'Welcome bonus - New user signup',
-            metadata: { signup_date: new Date().toISOString() }
-        });
-
-        // Store pending user info
-        pendingVerificationEmail = email;
-        currentUser = { userId, name, email, firebaseUID: firebaseUser.uid, createdAt: new Date().toISOString(), emailVerified: false };
-
-        console.log('✅ Account created - verification email sent');
-
-        showToast('Account created! Please check your email to verify.', 'success');
-
-        // Clear form
-        document.getElementById('signupName').value = '';
-        document.getElementById('signupEmail').value = '';
-        document.getElementById('signupPassword').value = '';
-
-        // Navigate to verification screen (updated to show "check email" message)
-        setTimeout(() => {
-            showVerificationScreen();
-        }, 500);
-
-    } catch (error) {
-        console.error('❌ Firebase Signup error:', error);
-
-        // Handle specific Firebase errors
-        if (error.code === 'auth/email-already-in-use') {
-            showToast('An account with this email already exists', 'error');
-        } else if (error.code === 'auth/invalid-email') {
-            showToast('Invalid email address', 'error');
-        } else if (error.code === 'auth/weak-password') {
-            showToast('Password is too weak. Use at least 6 characters.', 'error');
-        } else if (error.code === 'auth/network-request-failed') {
-            showToast('Network error. Please check your connection.', 'error');
-        } else {
-            showToast('Failed to create account. Please try again.', 'error');
-        }
-
-        logSecurityEvent('signup_failed', { email, reason: error.code, message: error.message });
+        // Alert admin that cleanup may be needed
+        console.error('⚠️ Run purgeUserByEmail("' + email + '") to clean up ghost account');
+        return;
     }
+
+    // Double-check with legacy method
+    const existingUser = findUserByEmail(email);
+    if (existingUser) {
+        console.error('⚠️ CRITICAL: Legacy check found existing user!');
+        showToast('Account with this email already exists', 'error');
+        logSecurityEvent('signup_failed', { email, reason: 'email_exists_legacy' });
+        return;
+    }
+
+    // Create new user (NOT VERIFIED YET)
+    const userId = generateUserId();
+
+    console.log('🆕 Creating user with ID:', userId);
+
+    // Save user to VIVIANA_USERS with email_verified = false
+    saveUserToDatabase(userId, name, email, password, false);
+
+    logSecurityEvent('signup_success', { email, userId });
+
+    // Initialize user data
+    localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
+    localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, '');
+    localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
+    localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
+    localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'false');
+    localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
+
+    // Initialize credits with proper ledger entry (signup bonus)
+    const initialCredits = 3;
+    localStorage.setItem(`VIVIANA_${userId}_CREDITS`, initialCredits.toString());
+
+    addCreditsLedgerEntry(userId, {
+        type: 'initial_grant',
+        amount: initialCredits,
+        balance_before: 0,
+        balance_after: initialCredits,
+        description: 'Welcome bonus - New user signup',
+        metadata: { signup_date: new Date().toISOString() }
+    });
+
+    // Store pending user info
+    pendingVerificationEmail = email;
+    currentUser = { userId, name, email, password, createdAt: new Date().toISOString(), emailVerified: false };
+
+    console.log('✅ Account created - verification required');
+
+    showToast('Account created! Please verify your email.', 'success');
+
+    // Clear form
+    document.getElementById('signupName').value = '';
+    document.getElementById('signupEmail').value = '';
+    document.getElementById('signupPassword').value = '';
+
+    // Generate and send verification code
+    generateVerificationCode();
+
+    // Navigate to verification screen
+    setTimeout(() => {
+        showVerificationScreen();
+    }, 500);
 }
 
 async function handleGoogleLogin() {
@@ -1189,224 +1009,99 @@ async function handleGoogleLogin() {
     }
 
     try {
-        // Show loading state
-        const googleButtons = document.querySelectorAll('.btn-google');
-        googleButtons.forEach(btn => {
-            btn.disabled = true;
-            btn.innerHTML = '<span style="opacity: 0.7;">Signing in with Google...</span>';
-        });
+        console.log('🔐 Starting Google Sign-In...');
 
         // Create Google Auth Provider
         const provider = new firebase.auth.GoogleAuthProvider();
 
-        // Optional: Add scopes if needed
-        provider.addScope('profile');
-        provider.addScope('email');
-
         // Sign in with popup
         const result = await firebaseAuth.signInWithPopup(provider);
 
-        // Get user information
-        const user = result.user;
-        const googleEmail = user.email;
-        const googleName = user.displayName;
-        const googlePhotoURL = user.photoURL;
-        const googleUID = user.uid;
+        // Get user information from Google
+        const googleUser = result.user;
+        const email = googleUser.email;
+        const name = googleUser.displayName || email.split('@')[0];
+        const photoURL = googleUser.photoURL;
 
-        console.log('✅ Google Sign-In successful:', {
-            email: googleEmail,
-            name: googleName,
-            uid: googleUID
-        });
+        console.log('✅ Google Sign-In successful:', email);
 
-        // Check if user already exists in our system
-        let existingUser = getUserByEmail(googleEmail);
+        // Check if user exists
+        let user = findUserByEmail(email);
 
-        if (existingUser) {
-            // User exists - log them in
-            console.log('👤 Existing user found, logging in...');
-
-            // CRITICAL: Update user data in database
-            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-            if (allUsers[existingUser.userId]) {
-                // Google login auto-verifies email
-                allUsers[existingUser.userId].emailVerified = true;
-
-                // Update profile photo from Google if available
-                if (googlePhotoURL && !allUsers[existingUser.userId].profilePhoto) {
-                    allUsers[existingUser.userId].profilePhoto = googlePhotoURL;
-                }
-
-                // Mark as Google login method if not already set
-                if (!allUsers[existingUser.userId].loginMethod) {
-                    allUsers[existingUser.userId].loginMethod = 'google';
-                }
-
-                // Store Google UID if not already stored
-                if (!allUsers[existingUser.userId].googleUID) {
-                    allUsers[existingUser.userId].googleUID = googleUID;
-                }
-
-                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-
-                // Update profile pic in separate storage
-                if (googlePhotoURL) {
-                    localStorage.setItem(`VIVIANA_${existingUser.userId}_PROFILE_PIC`, googlePhotoURL);
-                }
-            }
-
-            // Update email verified status in separate storage
-            localStorage.setItem(`VIVIANA_${existingUser.userId}_EMAIL_VERIFIED`, 'true');
-
-            // Update last login
-            localStorage.setItem(`VIVIANA_${existingUser.userId}_LAST_LOGIN`, new Date().toISOString());
-
-            // Get fresh user data with all updates
-            const userData = getUserFromDatabase(existingUser.userId);
-            currentUser = { userId: existingUser.userId, ...userData };
-
-            console.log('✅ Existing user logged in with Google:', currentUser);
+        if (user) {
+            // EXISTING USER - Just log in
+            console.log('👤 Existing user, logging in...');
         } else {
-            // New user - create account
+            // NEW USER - Create account
             console.log('✨ New user, creating account...');
 
-            // Generate userId using standard function
             const userId = generateUserId();
 
-            // Save user to database using standard method (ensures consistent structure)
-            saveUserToDatabase(userId, googleName || googleEmail.split('@')[0], googleEmail, null, true);
+            // Create user with emailVerified = true (Google accounts are verified)
+            saveUserToDatabase(userId, name, email, null, true);
 
-            // Add Google-specific fields to database
-            const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
-            if (allUsers[userId]) {
-                allUsers[userId].loginMethod = 'google';
-                allUsers[userId].googleUID = googleUID;
-                allUsers[userId].profilePhoto = googlePhotoURL || null;
-                localStorage.setItem('VIVIANA_USERS', JSON.stringify(allUsers));
-            }
-
-            // Get the user object with all fields (including Google-specific ones)
-            const userData = getUserFromDatabase(userId);
-            currentUser = { userId, ...userData };
-
-            console.log('✅ New Google user created:', currentUser);
-
-            // Initialize user data (like email signup does)
-            localStorage.setItem(`VIVIANA_${userId}_BIO`, '');
-            localStorage.setItem(`VIVIANA_${userId}_PROFILE_PIC`, googlePhotoURL || '');
-            localStorage.setItem(`VIVIANA_${userId}_MESSAGES`, '[]');
-            localStorage.setItem(`VIVIANA_${userId}_LAST_LOGIN`, new Date().toISOString());
-            localStorage.setItem(`VIVIANA_${userId}_EMAIL_VERIFIED`, 'true');
-            localStorage.setItem(`VIVIANA_${userId}_STATUS`, 'active');
-
-            // Give welcome credits (10 for Google signup)
+            // Give welcome credits
             creditsPurchase(userId, 10, 'Free', 'google_signup_bonus');
 
-            logSecurityEvent('user_registered', {
-                userId: userId,
-                email: googleEmail,
-                method: 'google',
-                verified: true
-            });
+            // Reload user data
+            user = findUserByEmail(email);
+
+            console.log('✅ Account created for:', email);
         }
 
-        // Save current session - CRITICAL: Must set VIVIANA_CURRENT_USER_ID for app restart
-        console.log('💾 Saving session to localStorage...');
-        localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
-        localStorage.setItem('VIVIANA_CURRENT_USER', JSON.stringify(currentUser));
-        console.log('✅ Session saved. User ID:', currentUser.userId);
-        console.log('✅ Email verified:', currentUser.emailVerified);
+        // Set current user and save session
+        currentUser = user;
+        localStorage.setItem('VIVIANA_CURRENT_USER_ID', user.userId);
 
-        try {
-            logSecurityEvent('user_login', {
-                userId: currentUser.userId,
-                email: googleEmail,
-                method: 'google'
-            });
-        } catch (error) {
-            console.error('❌ Error logging security event:', error);
-        }
+        showToast(`Welcome, ${user.name}!`, 'success');
 
-        console.log('🔄 Navigating to chat NOW...');
-
-        // Restore Google button state (in case of success)
-        document.querySelectorAll('.btn-google').forEach(btn => {
-            btn.disabled = false;
-        });
-
-        // Navigate to chat IMMEDIATELY (don't use setTimeout - it can fail)
-        try {
-            console.log('📱 Calling showChat()...');
+        // Navigate to chat
+        setTimeout(() => {
             showChat();
-            console.log('👤 Calling loadProfile()...');
-            loadProfile();
-            console.log('✅ Navigation complete');
-
-            // Show welcome toast AFTER navigation
-            showToast(`Welcome back, ${currentUser.name}!`, 'success');
-        } catch (error) {
-            console.error('❌ Error during navigation:', error);
-            console.error('Error details:', error.message, error.stack);
-            // Try fallback navigation
-            setTimeout(() => {
-                try {
-                    showChat();
-                    loadProfile();
-                } catch (e) {
-                    console.error('❌ Fallback navigation also failed:', e);
-                    // Last resort - reload the page to trigger DOMContentLoaded
-                    console.log('🔄 Reloading page as last resort...');
-                    window.location.reload();
-                }
-            }, 500);
-        }
+        }, 500);
 
     } catch (error) {
         console.error('❌ Google Sign-In error:', error);
 
-        // Restore button state
-        document.querySelectorAll('.btn-google').forEach(btn => {
-            btn.disabled = false;
-            btn.innerHTML = `
-                <svg width="18" height="18" viewBox="0 0 18 18">
-                    <path fill="#4285F4" d="M16.51 8H8.98v3h4.3c-.18 1-.74 1.48-1.6 2.04v2.01h2.6a7.8 7.8 0 0 0 2.38-5.88c0-.57-.05-.66-.15-1.18Z"/>
-                    <path fill="#34A853" d="M8.98 17c2.16 0 3.97-.72 5.3-1.94l-2.6-2a4.8 4.8 0 0 1-7.18-2.54H1.83v2.07A8 8 0 0 0 8.98 17Z"/>
-                    <path fill="#FBBC05" d="M4.5 10.52a4.8 4.8 0 0 1 0-3.04V5.41H1.83a8 8 0 0 0 0 7.18l2.67-2.07Z"/>
-                    <path fill="#EA4335" d="M8.98 4.18c1.17 0 2.23.4 3.06 1.2l2.3-2.3A8 8 0 0 0 1.83 5.4L4.5 7.49a4.77 4.77 0 0 1 4.48-3.3Z"/>
-                </svg>
-                Continue with Google
-            `;
-        });
-
-        // Handle specific errors
         if (error.code === 'auth/popup-closed-by-user') {
             showToast('Sign-in cancelled', 'info');
         } else if (error.code === 'auth/popup-blocked') {
             showToast('Popup blocked. Please allow popups for this site.', 'error');
-        } else if (error.code === 'auth/network-request-failed') {
-            showToast('Network error. Please check your connection.', 'error');
         } else {
             showToast('Failed to sign in with Google. Please try again.', 'error');
         }
     }
 }
 
-// Helper function to get user by email
-function getUserByEmail(email) {
-    const allUsers = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+// ========================================
+// EMAIL VERIFICATION
+// ========================================
 
-    for (let userId in allUsers) {
-        if (allUsers[userId].email.toLowerCase() === email.toLowerCase()) {
-            return { userId, ...allUsers[userId] };
-        }
-    }
+function generateVerificationCode() {
+    // Generate 6-digit code
+    verificationCode = Math.floor(100000 + Math.random() * 900000).toString();
 
-    return null;
+    // Set expiry to 15 minutes from now
+    verificationCodeExpiry = Date.now() + (15 * 60 * 1000);
+
+    console.log('📧 Verification code generated:', verificationCode);
+    console.log('⏰ Expires at:', new Date(verificationCodeExpiry).toLocaleTimeString());
+
+    // In a real app, send this via email API
+    // For demo, we'll log it to console
+    console.log('');
+    console.log('==============================================');
+    console.log('📬 EMAIL VERIFICATION CODE');
+    console.log('==============================================');
+    console.log('To:', pendingVerificationEmail);
+    console.log('Code:', verificationCode);
+    console.log('Expires in: 15 minutes');
+    console.log('==============================================');
+    console.log('');
+
+    // Show in alert for demo purposes
+    alert(`📧 DEMO MODE: Your verification code is:\n\n${verificationCode}\n\n(In production, this would be sent via email)`);
 }
-
-// ========================================
-// EMAIL VERIFICATION (Firebase)
-// ========================================
 
 function showVerificationScreen() {
     console.log('📧 Showing verification screen');
@@ -1416,16 +1111,142 @@ function showVerificationScreen() {
     verificationScreen.style.display = 'flex';
     verificationScreen.classList.add('active');
 
-    // Display email
-    const emailDisplay = document.getElementById('verificationEmail');
-    if (emailDisplay && pendingVerificationEmail) {
-        emailDisplay.textContent = pendingVerificationEmail;
+    // Set email in UI
+    document.getElementById('verificationEmail').textContent = pendingVerificationEmail;
+
+    // Setup code inputs
+    setupCodeInputs();
+
+    // Focus first input
+    document.getElementById('code1').focus();
+}
+
+function setupCodeInputs() {
+    const inputs = document.querySelectorAll('.code-input');
+
+    inputs.forEach((input, index) => {
+        // Auto-focus next input
+        input.addEventListener('input', (e) => {
+            if (e.target.value.length === 1) {
+                input.classList.add('filled');
+                if (index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+            } else {
+                input.classList.remove('filled');
+            }
+
+            // Clear error state
+            inputs.forEach(inp => inp.classList.remove('error'));
+            document.getElementById('verificationError').style.display = 'none';
+        });
+
+        // Handle backspace
+        input.addEventListener('keydown', (e) => {
+            if (e.key === 'Backspace' && !input.value && index > 0) {
+                inputs[index - 1].focus();
+            }
+        });
+
+        // Only allow numbers
+        input.addEventListener('keypress', (e) => {
+            if (!/[0-9]/.test(e.key)) {
+                e.preventDefault();
+            }
+        });
+    });
+
+    // Setup form submission
+    const form = document.getElementById('verificationForm');
+    form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        verifyCode();
+    });
+}
+
+function verifyCode() {
+    // Rate limiting
+    const rateCheck = checkRateLimit('verification');
+    if (!rateCheck.allowed) {
+        showVerificationError(`Too many attempts. Try again in ${rateCheck.waitMinutes} minutes.`);
+        logSecurityEvent('rate_limit_exceeded', { type: 'verification', email: pendingVerificationEmail });
+        return;
+    }
+
+    const inputs = document.querySelectorAll('.code-input');
+    const enteredCode = Array.from(inputs).map(input => input.value).join('');
+
+    console.log('🔍 Verifying code:', enteredCode);
+
+    // Check if code is complete
+    if (enteredCode.length !== 6) {
+        showVerificationError('Please enter all 6 digits');
+        return;
+    }
+
+    // Check if code expired
+    if (Date.now() > verificationCodeExpiry) {
+        showVerificationError('Code has expired. Please request a new one.');
+        inputs.forEach(input => {
+            input.classList.add('error');
+            input.value = '';
+        });
+        inputs[0].focus();
+        return;
+    }
+
+    // Verify code
+    if (enteredCode === verificationCode) {
+        console.log('✅ Code verified successfully!');
+
+        // Mark user as verified
+        const users = JSON.parse(localStorage.getItem('VIVIANA_USERS') || '{}');
+        if (currentUser && users[currentUser.userId]) {
+            users[currentUser.userId].emailVerified = true;
+            localStorage.setItem('VIVIANA_USERS', JSON.stringify(users));
+            localStorage.setItem(`VIVIANA_${currentUser.userId}_EMAIL_VERIFIED`, 'true');
+        }
+
+        currentUser.emailVerified = true;
+        localStorage.setItem('VIVIANA_CURRENT_USER_ID', currentUser.userId);
+
+        logSecurityEvent('email_verified', { email: currentUser.email, userId: currentUser.userId });
+        showToast('Email verified successfully! 🎉', 'success');
+
+        // Clear verification data
+        verificationCode = null;
+        verificationCodeExpiry = null;
+        pendingVerificationEmail = null;
+
+        // Navigate to chat
+        setTimeout(() => {
+            showChat();
+        }, 1000);
+
+    } else {
+        console.log('❌ Invalid code');
+        logSecurityEvent('verification_failed', { email: pendingVerificationEmail, reason: 'invalid_code' });
+        showVerificationError('Invalid code. Please try again.');
+        inputs.forEach(input => {
+            input.classList.add('error');
+            input.value = '';
+        });
+        inputs[0].focus();
     }
 }
 
-async function resendVerificationEmail() {
-    if (!firebaseAuth) {
-        showToast('Firebase is not initialized', 'error');
+function showVerificationError(message) {
+    const errorDiv = document.getElementById('verificationError');
+    errorDiv.textContent = message;
+    errorDiv.style.display = 'block';
+}
+
+function resendVerificationCode() {
+    // Rate limiting
+    const rateCheck = checkRateLimit('verification');
+    if (!rateCheck.allowed) {
+        showToast(`Too many attempts. Try again in ${rateCheck.waitMinutes} minutes.`, 'error');
+        logSecurityEvent('rate_limit_exceeded', { type: 'resend_verification', email: pendingVerificationEmail });
         return;
     }
 
@@ -1436,64 +1257,37 @@ async function resendVerificationEmail() {
         return;
     }
 
-    try {
-        // Get current Firebase user
-        const firebaseUser = firebaseAuth.currentUser;
+    // Generate new code
+    generateVerificationCode();
 
-        if (!firebaseUser) {
-            showToast('Please sign up or log in first', 'error');
-            showAuth();
-            return;
-        }
+    // Set cooldown (60 seconds)
+    resendCooldownUntil = Date.now() + (60 * 1000);
 
-        console.log('📧 Resending verification email to:', firebaseUser.email);
+    // Start cooldown timer
+    startResendCooldown();
 
-        // Send verification email
-        await firebaseUser.sendEmailVerification();
-
-        console.log('✅ Verification email sent');
-        showToast('Verification email sent! Please check your inbox.', 'success');
-
-        // Set cooldown (60 seconds)
-        resendCooldownUntil = Date.now() + (60 * 1000);
-
-        // Start cooldown timer
-        startResendCooldown();
-
-    } catch (error) {
-        console.error('❌ Error resending verification email:', error);
-
-        if (error.code === 'auth/too-many-requests') {
-            showToast('Too many requests. Please try again later.', 'error');
-        } else if (error.code === 'auth/network-request-failed') {
-            showToast('Network error. Please check your connection.', 'error');
-        } else {
-            showToast('Failed to send verification email. Please try again.', 'error');
-        }
-    }
+    showToast('New code sent!', 'success');
 }
 
 function startResendCooldown() {
-    const resendBtn = document.getElementById('resendVerificationBtn');
+    const resendBtn = document.getElementById('resendBtn');
     const timerDiv = document.getElementById('resendTimer');
     const timerSeconds = document.getElementById('timerSeconds');
 
-    if (!resendBtn || !timerDiv || !timerSeconds) return;
-
+    resendBtn.disabled = true;
     resendBtn.style.display = 'none';
     timerDiv.style.display = 'block';
 
-    let remaining = 60;
-    timerSeconds.textContent = remaining;
-
     const interval = setInterval(() => {
-        remaining--;
-        timerSeconds.textContent = remaining;
+        const remaining = Math.ceil((resendCooldownUntil - Date.now()) / 1000);
 
         if (remaining <= 0) {
             clearInterval(interval);
-            resendBtn.style.display = 'block';
+            resendBtn.disabled = false;
+            resendBtn.style.display = 'inline-block';
             timerDiv.style.display = 'none';
+        } else {
+            timerSeconds.textContent = remaining;
         }
     }, 1000);
 }
@@ -1695,11 +1489,6 @@ function addReceivedMessage(text) {
 }
 
 function updateCreditsDisplay() {
-    if (!currentUser || !currentUser.userId) {
-        console.error('❌ Cannot update credits: currentUser not set');
-        return;
-    }
-
     const credits = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_CREDITS`) || '0');
     document.getElementById('creditsCount').textContent = credits;
 }
@@ -1900,88 +1689,18 @@ function createConfetti() {
 function loadProfile() {
     if (!currentUser) return;
 
-    // Form fields
     document.getElementById('profileName').value = currentUser.name;
     document.getElementById('profileEmail').value = currentUser.email;
 
     const bio = localStorage.getItem(`VIVIANA_${currentUser.userId}_BIO`) || '';
     document.getElementById('profileBio').value = bio;
 
-    // Profile display elements (new design)
-    const displayName = document.getElementById('profileDisplayName');
-    const displayEmail = document.getElementById('profileDisplayEmail');
-    if (displayName) displayName.textContent = currentUser.name || 'User';
-    if (displayEmail) displayEmail.textContent = '@' + (currentUser.email ? currentUser.email.split('@')[0] : 'user');
-
-    // Profile picture
     const pic = localStorage.getItem(`VIVIANA_${currentUser.userId}_PROFILE_PIC`);
-    const profilePicEl = document.getElementById('profilePicture');
-    const profileInitialEl = document.getElementById('profileInitial');
-
-    if (pic && profilePicEl) {
-        // If there's a picture, show it
-        if (!profilePicEl.querySelector('img')) {
-            const img = document.createElement('img');
-            img.src = pic;
-            img.alt = 'Profile';
-            profilePicEl.innerHTML = '';
-            profilePicEl.appendChild(img);
-        } else {
-            profilePicEl.querySelector('img').src = pic;
-        }
-    } else if (profileInitialEl) {
-        // Show initial
-        const initial = currentUser.name ? currentUser.name.charAt(0).toUpperCase() : 'U';
-        profileInitialEl.textContent = initial;
-    }
-
-    // Credits count
-    const credits = getCreditsBalance(currentUser.userId);
-    const creditsEl = document.getElementById('profileCreditsCount');
-    if (creditsEl) creditsEl.textContent = credits || 0;
-
-    // Message count (from localStorage)
-    const messageCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_MESSAGE_COUNT`) || '0');
-    const messagesEl = document.getElementById('profileMessagesCount');
-    if (messagesEl) messagesEl.textContent = messageCount;
-
-    // Streak count
-    const streakCount = parseInt(localStorage.getItem(`VIVIANA_${currentUser.userId}_STREAK`) || '0');
-    const streakEl = document.getElementById('profileStreakCount');
-    if (streakEl) streakEl.textContent = streakCount;
-
-    // Soulmate Level (from soulmate-rank.js)
-    updateProfileLevel();
-
-    // Dark mode toggle state
-    const savedTheme = localStorage.getItem('VIVIANA_THEME');
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    if (darkModeToggle) {
-        darkModeToggle.checked = savedTheme === 'dark';
-    }
-}
-
-function updateProfileLevel() {
-    // Get rank info if the function exists
-    if (typeof getRankInfo === 'function') {
-        const info = getRankInfo();
-
-        const levelIcon = document.getElementById('profileLevelIcon');
-        const levelName = document.getElementById('profileLevelName');
-        const levelProgress = document.getElementById('profileLevelProgress');
-        const levelXP = document.getElementById('profileLevelXP');
-
-        if (levelIcon) levelIcon.textContent = info.levelObj.emoji;
-        if (levelName) levelName.textContent = info.levelObj.name;
-        if (levelProgress) levelProgress.style.width = info.percentToNext + '%';
-
-        if (levelXP) {
-            if (info.level >= 5) {
-                levelXP.textContent = 'Max Level!';
-            } else {
-                levelXP.textContent = `${info.progressInLevel} / ${info.thresholdForLevel} XP`;
-            }
-        }
+    if (pic) {
+        document.getElementById('profilePicture').src = pic;
+    } else {
+        const initial = currentUser.name.charAt(0).toUpperCase();
+        document.getElementById('profilePicture').src = `data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="200"%3E%3Crect fill="%23ddd" width="200" height="200"/%3E%3Ctext fill="%23999" font-size="60" x="50%25" y="50%25" text-anchor="middle" dy=".3em"%3E${initial}%3C/text%3E%3C/svg%3E`;
     }
 }
 
@@ -2571,423 +2290,4 @@ function escapeHtml(text) {
     const div = document.createElement('div');
     div.textContent = text;
     return div.innerHTML;
-}
-
-// ========================================
-// QUIZ ONBOARDING FLOW
-// ========================================
-
-// Quiz State
-let quizState = {
-    currentQuestion: 0,
-    answers: [],
-    isUnlocked: false
-};
-
-// Quiz Questions
-const quizQuestions = [
-    {
-        question: "Was ist dir am wichtigsten?",
-        choices: [
-            { text: "🎵 Musik & Entertainment", match: "Viviana liebt Musik!" },
-            { text: "📚 Tiefgründige Gespräche", match: "Viviana liebt Deep Talks!" },
-            { text: "🎮 Gaming & Fun", match: "Viviana ist playful!" },
-            { text: "🌙 Late night vibes", match: "Viviana ist Nachteule!" }
-        ]
-    },
-    {
-        question: "Wie verbringst du am liebsten Zeit?",
-        choices: [
-            { text: "✈️ Reisen & Abenteuer", match: "Same! Viviana liebt Abenteuer" },
-            { text: "🏡 Gemütlich zuhause", match: "Viviana liebt cozy vibes" },
-            { text: "🌆 City Life & Events", match: "Viviana liebt die City!" },
-            { text: "🌲 Natur & Draußen", match: "Viviana liebt die Natur!" }
-        ]
-    },
-    {
-        question: "Was beschreibt deinen Stil?",
-        choices: [
-            { text: "✨ Glam & Elegant", match: "Viviana loves that vibe!" },
-            { text: "🖤 Minimalistisch & Clean", match: "Viviana appreciates minimalism!" },
-            { text: "🎨 Kreativ & Bunt", match: "Viviana ist kreativ!" },
-            { text: "😌 Comfortable & Chill", match: "Viviana loves comfort!" }
-        ]
-    },
-    {
-        question: "Bist du eher...?",
-        choices: [
-            { text: "🎲 Spontan & flexibel", match: "Viviana liebt Spontanität!" },
-            { text: "📅 Strukturiert & geplant", match: "Viviana schätzt das!" },
-            { text: "🌀 Chaotisch kreativ", match: "Viviana finds das cool!" },
-            { text: "⚖️ Ausbalanciert", match: "Perfect match!" }
-        ]
-    },
-    {
-        question: "Dein perfekter Abend?",
-        choices: [
-            { text: "💬 Lange Gespräche", match: "Viviana loves deep talks!" },
-            { text: "🍿 Netflix & Chill", match: "Viviana loves that!" },
-            { text: "🎉 Party & Socializing", match: "Viviana ist social!" },
-            { text: "📖 Lesen & Entspannen", match: "Viviana loves reading!" }
-        ]
-    },
-    {
-        question: "Was macht dich glücklich?",
-        choices: [
-            { text: "😂 Humor & Lachen", match: "Viviana loves to laugh!" },
-            { text: "💕 Romantik & Connection", match: "Perfect match!" },
-            { text: "🎯 Ziele erreichen", match: "Viviana ist driven!" },
-            { text: "🆕 Neue Erfahrungen", match: "Viviana loves that!" }
-        ]
-    }
-];
-
-// Initialize Chat State Machine
-function initChatStateMachine() {
-    console.log('🎮 Initializing Quiz Onboarding');
-    
-    // Check if already unlocked
-    checkUnlockStatus();
-}
-
-// Check Unlock Status (Firestore or localStorage)
-async function checkUnlockStatus() {
-    if (!currentUser) {
-        console.log('⚠️ No user logged in');
-        return;
-    }
-
-    try {
-        // Check Firestore first (if available)
-        if (firebase && firebase.firestore) {
-            const db = firebase.firestore();
-            const userDoc = await db.collection('users').doc(currentUser.userId).get();
-            
-            if (userDoc.exists && userDoc.data().vivianaUnlocked) {
-                console.log('✅ User already unlocked from Firestore');
-                quizState.isUnlocked = true;
-                showChatState('actualChat');
-                return;
-            }
-        }
-    } catch (error) {
-        console.log('📝 Firestore not available, using localStorage');
-    }
-
-    // Fallback: Check localStorage
-    const unlocked = localStorage.getItem(`VIVIANA_${currentUser.userId}_UNLOCKED`);
-    if (unlocked === 'true') {
-        console.log('✅ User already unlocked from localStorage');
-        quizState.isUnlocked = true;
-        showChatState('actualChat');
-    } else {
-        console.log('🔒 User not unlocked, showing profile selection');
-        showChatState('profileSelection');
-    }
-}
-
-// Show Chat State
-function showChatState(stateName) {
-    const states = ['profileSelection', 'quizFlow', 'unlockModal', 'actualChat'];
-    
-    states.forEach(state => {
-        const element = document.getElementById(state);
-        if (element) {
-            if (state === stateName) {
-                element.style.display = 'flex';
-                element.classList.add('fade-in');
-                element.classList.remove('fade-out');
-            } else {
-                element.classList.add('fade-out');
-                element.classList.remove('fade-in');
-                setTimeout(() => {
-                    element.style.display = 'none';
-                }, 300);
-            }
-        }
-    });
-}
-
-// Start Quiz
-function startQuiz() {
-    console.log('🎯 Starting quiz');
-    quizState.currentQuestion = 0;
-    quizState.answers = [];
-    
-    showChatState('quizFlow');
-    renderQuestion();
-}
-
-// Render Current Question
-function renderQuestion() {
-    const question = quizQuestions[quizState.currentQuestion];
-    
-    // Update progress
-    document.getElementById('quizCurrentStep').textContent = quizState.currentQuestion + 1;
-    const progress = ((quizState.currentQuestion + 1) / 6) * 100;
-    document.getElementById('quizProgressFill').style.width = progress + '%';
-    
-    // Update question
-    document.getElementById('quizQuestion').textContent = question.question;
-    
-    // Render choices
-    const choicesContainer = document.getElementById('quizChoices');
-    choicesContainer.innerHTML = '';
-    
-    question.choices.forEach((choice, index) => {
-        const button = document.createElement('button');
-        button.className = 'quiz-choice';
-        button.textContent = choice.text;
-        button.onclick = () => selectChoice(index);
-        choicesContainer.appendChild(button);
-    });
-}
-
-// Select Choice
-function selectChoice(choiceIndex) {
-    const question = quizQuestions[quizState.currentQuestion];
-    const choice = question.choices[choiceIndex];
-    
-    console.log('✅ Choice selected:', choice.text);
-    
-    // Store answer
-    quizState.answers.push({
-        question: question.question,
-        choice: choice.text,
-        match: choice.match
-    });
-    
-    // Show match feedback
-    showMatchFeedback(choice.match);
-    
-    // Move to next question or finish
-    setTimeout(() => {
-        hideMatchFeedback();
-        
-        if (quizState.currentQuestion < quizQuestions.length - 1) {
-            quizState.currentQuestion++;
-            renderQuestion();
-        } else {
-            // Quiz completed!
-            finishQuiz();
-        }
-    }, 1800);
-}
-
-// Show Match Feedback
-function showMatchFeedback(matchText) {
-    const feedback = document.getElementById('matchFeedback');
-    const subtext = document.getElementById('matchSubtext');
-    
-    subtext.textContent = matchText;
-    feedback.style.display = 'flex';
-}
-
-// Hide Match Feedback
-function hideMatchFeedback() {
-    const feedback = document.getElementById('matchFeedback');
-    feedback.style.display = 'none';
-}
-
-// Finish Quiz
-async function finishQuiz() {
-    console.log('🎉 Quiz completed! Unlocking chat...');
-    
-    // Mark as unlocked
-    quizState.isUnlocked = true;
-    
-    // Save to localStorage
-    localStorage.setItem(`VIVIANA_${currentUser.userId}_UNLOCKED`, 'true');
-    
-    // Save to Firestore (if available)
-    try {
-        if (firebase && firebase.firestore) {
-            const db = firebase.firestore();
-            await db.collection('users').doc(currentUser.userId).set({
-                vivianaUnlocked: true,
-                unlockedAt: new Date().toISOString(),
-                quizAnswers: quizState.answers
-            }, { merge: true });
-            
-            console.log('✅ Unlock status saved to Firestore');
-        }
-    } catch (error) {
-        console.log('📝 Firestore not available:', error.message);
-    }
-    
-    // Show unlock modal with confetti
-    showChatState('unlockModal');
-    startConfetti();
-    
-    // Stop confetti after 5 seconds
-    setTimeout(() => {
-        stopConfetti();
-    }, 5000);
-}
-
-// Start Chat with Viviana (after unlock)
-function startChatWithViviana() {
-    console.log('💬 Starting chat with Viviana');
-    stopConfetti();
-    showChatState('actualChat');
-    
-    // Focus input field
-    setTimeout(() => {
-        const input = document.getElementById('messageInput');
-        if (input) {
-            input.focus();
-        }
-    }, 500);
-}
-
-// Back to Profile Selection (from Quiz)
-function backToProfileSelection() {
-    quizState.currentQuestion = 0;
-    quizState.answers = [];
-    showChatState('profileSelection');
-}
-
-// Back to Contact List (from Chat)
-function backToContactList() {
-    console.log('⬅️ Back to contact list');
-    showChatState('profileSelection');
-    // Update contact list to reflect any changes
-    if (typeof renderProfileList === 'function') {
-        renderProfileList();
-    }
-}
-
-// ========================================
-// CONFETTI ANIMATION
-// ========================================
-
-let confettiCanvas = null;
-let confettiCtx = null;
-let confettiParticles = [];
-let confettiAnimationId = null;
-
-function startConfetti() {
-    confettiCanvas = document.getElementById('confettiCanvas');
-    if (!confettiCanvas) return;
-    
-    confettiCtx = confettiCanvas.getContext('2d');
-    confettiCanvas.width = window.innerWidth;
-    confettiCanvas.height = window.innerHeight;
-    
-    // Create particles
-    confettiParticles = [];
-    const colors = ['#e74c3c', '#3498db', '#f39c12', '#2ecc71', '#9b59b6', '#e67e22'];
-    
-    for (let i = 0; i < 150; i++) {
-        confettiParticles.push({
-            x: Math.random() * confettiCanvas.width,
-            y: Math.random() * confettiCanvas.height - confettiCanvas.height,
-            r: Math.random() * 6 + 4,
-            d: Math.random() * 150 + 50,
-            color: colors[Math.floor(Math.random() * colors.length)],
-            tilt: Math.random() * 10 - 10,
-            tiltAngleIncrement: Math.random() * 0.07 + 0.05,
-            tiltAngle: 0
-        });
-    }
-    
-    animateConfetti();
-}
-
-function animateConfetti() {
-    if (!confettiCtx || !confettiCanvas) return;
-    
-    confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    
-    confettiParticles.forEach((p, i) => {
-        confettiCtx.beginPath();
-        confettiCtx.lineWidth = p.r / 2;
-        confettiCtx.strokeStyle = p.color;
-        confettiCtx.moveTo(p.x + p.tilt + p.r, p.y);
-        confettiCtx.lineTo(p.x + p.tilt, p.y + p.tilt + p.r);
-        confettiCtx.stroke();
-        
-        p.tiltAngle += p.tiltAngleIncrement;
-        p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
-        p.tilt = Math.sin(p.tiltAngle - i / 3) * 15;
-        
-        if (p.y > confettiCanvas.height) {
-            confettiParticles[i] = {
-                ...p,
-                x: Math.random() * confettiCanvas.width,
-                y: -20,
-                tilt: Math.random() * 10 - 10
-            };
-        }
-    });
-    
-    confettiAnimationId = requestAnimationFrame(animateConfetti);
-}
-
-function stopConfetti() {
-    if (confettiAnimationId) {
-        cancelAnimationFrame(confettiAnimationId);
-        confettiAnimationId = null;
-    }
-    
-    if (confettiCtx && confettiCanvas) {
-        confettiCtx.clearRect(0, 0, confettiCanvas.width, confettiCanvas.height);
-    }
-    
-    confettiParticles = [];
-}
-
-// Initialize quiz when chat is shown
-const originalShowChat = showChat;
-showChat = function() {
-    originalShowChat();
-
-    // Initialize quiz state machine
-    setTimeout(() => {
-        initChatStateMachine();
-    }, 100);
-};
-
-// ========================================
-// DARK MODE FUNCTIONALITY
-// ========================================
-
-function initDarkMode() {
-    const savedTheme = localStorage.getItem('VIVIANA_THEME');
-    const darkModeToggle = document.getElementById('darkModeToggle');
-
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        if (darkModeToggle) darkModeToggle.checked = true;
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        if (darkModeToggle) darkModeToggle.checked = false;
-    }
-}
-
-function toggleDarkMode() {
-    const darkModeToggle = document.getElementById('darkModeToggle');
-    const isDark = darkModeToggle?.checked;
-
-    if (isDark) {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        localStorage.setItem('VIVIANA_THEME', 'dark');
-        showToast('🌙 Dark mode enabled');
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        localStorage.setItem('VIVIANA_THEME', 'light');
-        showToast('☀️ Light mode enabled');
-    }
-
-    console.log('🎨 Theme changed to:', isDark ? 'dark' : 'light');
-}
-
-// Apply saved theme on page load
-document.addEventListener('DOMContentLoaded', function() {
-    initDarkMode();
-});
-
-// Also initialize immediately if DOM is ready
-if (document.readyState !== 'loading') {
-    initDarkMode();
 }
