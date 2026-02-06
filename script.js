@@ -619,6 +619,16 @@ function cleanupOrphanedData() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Viviana App Starting');
 
+    // Initialize theme from saved preference (default: dark)
+    const savedTheme = localStorage.getItem('VIVIANA_THEME') || 'dark';
+    if (savedTheme === 'dark') {
+        document.documentElement.setAttribute('data-theme', 'dark');
+    } else {
+        document.documentElement.removeAttribute('data-theme');
+    }
+    const darkToggle = document.getElementById('darkModeToggle');
+    if (darkToggle) darkToggle.checked = (savedTheme === 'dark');
+
     // Check data consistency and cleanup orphaned data
     checkDataConsistency();
     cleanupOrphanedData();
@@ -685,11 +695,8 @@ function hideAllScreens() {
 }
 
 function showWelcome() {
-    console.log('📱 Showing Welcome Screen');
-    hideAllScreens();
-    const welcomeScreen = document.getElementById('welcomeScreen');
-    welcomeScreen.style.display = 'flex';
-    welcomeScreen.classList.add('active');
+    console.log('📱 Showing Welcome → redirecting to Auth');
+    showAuth();
 }
 
 function showAuth() {
@@ -751,6 +758,18 @@ function stopMessageRefresh() {
     if (messageRefreshInterval) {
         clearInterval(messageRefreshInterval);
         messageRefreshInterval = null;
+    }
+}
+
+function toggleDarkMode() {
+    const html = document.documentElement;
+    const toggle = document.getElementById('darkModeToggle');
+    if (toggle && toggle.checked) {
+        html.setAttribute('data-theme', 'dark');
+        localStorage.setItem('VIVIANA_THEME', 'dark');
+    } else {
+        html.removeAttribute('data-theme');
+        localStorage.setItem('VIVIANA_THEME', 'light');
     }
 }
 
@@ -1689,6 +1708,12 @@ function createConfetti() {
 function loadProfile() {
     if (!currentUser) return;
 
+    // Sync dark mode toggle with current theme
+    const darkToggle = document.getElementById('darkModeToggle');
+    if (darkToggle) {
+        darkToggle.checked = document.documentElement.getAttribute('data-theme') === 'dark';
+    }
+
     document.getElementById('profileName').value = currentUser.name;
     document.getElementById('profileEmail').value = currentUser.email;
 
@@ -1980,6 +2005,32 @@ function showVerificationPopup() {
 
 function closeVerificationPopup() {
     document.getElementById('verificationPopup').classList.remove('active');
+}
+
+// Aliases for HTML onclick handlers
+function closeVerification() {
+    closeVerificationPopup();
+}
+
+function attemptVerification() {
+    handleVerificationUpload();
+}
+
+function closePurchaseSuccess() {
+    document.getElementById('purchaseSuccessPopup').classList.remove('active');
+    document.getElementById('purchaseSuccessPopup').style.display = 'none';
+}
+
+function backToContactList() {
+    // Hide actual chat, show profile selection (contact list)
+    const actualChat = document.getElementById('actualChat');
+    const profileSelection = document.getElementById('profileSelection');
+    if (actualChat) actualChat.style.display = 'none';
+    if (profileSelection) profileSelection.style.display = 'flex';
+}
+
+function resendVerificationEmail() {
+    resendVerificationCode();
 }
 
 function handleVerificationUpload() {

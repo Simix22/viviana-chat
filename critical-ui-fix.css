@@ -580,6 +580,110 @@ body {
     display: flex !important;
 }
 
+/* ========================================
+   FIX: AUTH SCREEN DARK MODE
+   Since .screen forces #0a0a0a, auth needs matching dark form styles
+   ======================================== */
+
+#authScreen {
+    justify-content: center;
+    align-items: center;
+}
+
+#authScreen .auth-container {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    padding: 32px 24px;
+}
+
+#authScreen .auth-container h2 {
+    color: #ffffff;
+}
+
+#authScreen .auth-subtitle {
+    color: #a0a0a0;
+}
+
+#authScreen .auth-toggle {
+    background: #1a1a1a;
+    border-radius: 12px;
+}
+
+#authScreen .toggle-btn {
+    color: #a0a0a0;
+}
+
+#authScreen .toggle-btn.active {
+    background: #E91E63;
+    color: #ffffff;
+}
+
+#authScreen .auth-form .input-group label {
+    color: #a0a0a0;
+}
+
+#authScreen .auth-form input {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+#authScreen .auth-form input::placeholder {
+    color: #666666;
+}
+
+#authScreen .auth-form input:focus {
+    border-color: #E91E63;
+}
+
+#authScreen .divider span {
+    background: #141414;
+    color: #666666;
+}
+
+#authScreen .btn-google {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
+/* Verification & Reset screens dark styling */
+#verificationScreen .auth-container,
+#passwordResetScreen .auth-container,
+#passwordResetVerifyScreen .auth-container {
+    background: #141414;
+    border: 1px solid #2a2a2a;
+    border-radius: 16px;
+    color: #ffffff;
+}
+
+#verificationScreen h2,
+#passwordResetScreen h2,
+#passwordResetVerifyScreen h2 {
+    color: #ffffff;
+}
+
+#verificationScreen .auth-subtitle,
+#passwordResetScreen .auth-subtitle,
+#passwordResetVerifyScreen .auth-subtitle {
+    color: #a0a0a0;
+}
+
+#verificationScreen,
+#passwordResetScreen,
+#passwordResetVerifyScreen {
+    justify-content: center;
+    align-items: center;
+}
+
+#passwordResetScreen .auth-form input,
+#passwordResetVerifyScreen input {
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    color: #ffffff;
+}
+
 /* Ensure proper stacking */
 #authScreen { z-index: 10; }
 #chatScreen { z-index: 20; }
