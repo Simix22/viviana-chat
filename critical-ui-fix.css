@@ -67,14 +67,13 @@ body {
     background: #0a0a0a;
 }
 
-/* Messages Header - Fixed at top */
+/* Messages Header - Clean */
 #profileSelection .messages-header {
     position: relative !important;
     flex-shrink: 0;
     display: flex;
     align-items: center;
-    justify-content: space-between;
-    padding: 12px 16px;
+    padding: 16px 20px;
     background: #0a0a0a !important;
     border-bottom: 1px solid #1a1a1a;
     min-height: 56px;
@@ -82,82 +81,22 @@ body {
 }
 
 #profileSelection .messages-header h1 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 24px;
+    font-weight: 700;
     color: #ffffff !important;
     margin: 0;
 }
 
-#profileSelection .messages-header-btn {
-    width: 40px;
-    height: 40px;
+/* Online dot for unlocked contacts */
+#profileSelection .contact-online-dot {
+    position: absolute;
+    bottom: 2px;
+    right: 2px;
+    width: 12px;
+    height: 12px;
+    background: #4CAF50;
     border-radius: 50%;
-    border: none;
-    background: transparent;
-    color: #ffffff;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-}
-
-#profileSelection .messages-header-btn svg {
-    stroke: #ffffff;
-}
-
-/* Search Bar - Below header */
-#profileSelection .messages-search {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    background: #0a0a0a !important;
-}
-
-#profileSelection .messages-search-input {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: #1a1a1a !important;
-    border: 1px solid #2a2a2a;
-    border-radius: 12px;
-    padding: 10px 14px;
-}
-
-#profileSelection .messages-search-input svg {
-    stroke: #666666;
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-}
-
-#profileSelection .messages-search-input input {
-    flex: 1;
-    border: none;
-    background: transparent !important;
-    outline: none;
-    font-size: 15px;
-    color: #ffffff !important;
-}
-
-#profileSelection .messages-search-input input::placeholder {
-    color: #666666;
-}
-
-/* Filter Row */
-#profileSelection .messages-filter {
-    flex-shrink: 0;
-    padding: 8px 16px;
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    color: #a0a0a0;
-    font-size: 13px;
-    background: #0a0a0a !important;
-}
-
-#profileSelection .messages-filter svg {
-    width: 14px;
-    height: 14px;
-    stroke: #a0a0a0;
+    border: 2px solid #0a0a0a;
 }
 
 /* Contact List - Scrollable */
@@ -692,7 +631,8 @@ body {
 #creditsScreen { z-index: 25; }
 
 /* ========================================
-   FIX: ACTUAL CHAT VIEW
+   FIX: ACTUAL CHAT VIEW (WhatsApp-Style)
+   Full screen, no nav footer, input sticky bottom
    ======================================== */
 
 #actualChat {
@@ -700,15 +640,256 @@ body {
     top: 0;
     left: 0;
     right: 0;
-    bottom: 65px;
+    bottom: 0; /* Full height - no nav bar space */
     display: none;
     flex-direction: column;
     background: #0a0a0a !important;
-    z-index: 2;
+    z-index: 200; /* Above nav bar */
 }
 
 #actualChat[style*="display: flex"] {
     display: flex !important;
+}
+
+/* Chat Header - dark themed */
+#actualChat .chat-header {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    background: #111111;
+    border-bottom: 1px solid #1a1a1a;
+    min-height: 56px;
+    z-index: 5;
+}
+
+#actualChat .chat-back-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: transparent;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+#actualChat .chat-back-btn:active {
+    background: rgba(255,255,255,0.1);
+}
+
+#actualChat .chat-partner {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1;
+    min-width: 0;
+}
+
+#actualChat .chat-partner-avatar {
+    width: 38px;
+    height: 38px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+}
+
+#actualChat .chat-partner-name {
+    font-size: 16px;
+    font-weight: 600;
+    color: #ffffff;
+    margin: 0;
+}
+
+#actualChat .chat-partner-handle {
+    font-size: 12px;
+    color: #888;
+    margin: 0;
+}
+
+/* Hide soulmate badge and header actions in chat to keep it clean */
+#actualChat .soulmate-level-badge {
+    display: none;
+}
+
+#actualChat .chat-header-actions {
+    display: none;
+}
+
+/* Hide chat tabs */
+#actualChat .chat-tabs {
+    display: none;
+}
+
+/* Chat Messages area */
+#actualChat .chat-messages {
+    flex: 1;
+    overflow-y: auto;
+    overflow-x: hidden;
+    -webkit-overflow-scrolling: touch;
+    padding: 16px;
+    padding-bottom: 8px;
+    background: #0a0a0a;
+}
+
+/* Message bubbles dark theme */
+#actualChat .message {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 12px;
+    max-width: 85%;
+}
+
+#actualChat .message.received {
+    align-self: flex-start;
+}
+
+#actualChat .message.sent {
+    align-self: flex-end;
+    flex-direction: row-reverse;
+}
+
+#actualChat .message-bubble {
+    background: #1a1a2e;
+    border-radius: 16px;
+    padding: 10px 14px;
+    color: #ffffff;
+    font-size: 15px;
+    line-height: 1.4;
+    max-width: 100%;
+    word-wrap: break-word;
+}
+
+#actualChat .message.sent .message-bubble {
+    background: #E91E63;
+    color: #ffffff;
+}
+
+#actualChat .message-avatar {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: white;
+    flex-shrink: 0;
+}
+
+#actualChat .message-time {
+    font-size: 11px;
+    color: rgba(255,255,255,0.5);
+    display: block;
+    margin-top: 4px;
+}
+
+#actualChat .message-date-separator {
+    text-align: center;
+    margin: 16px 0;
+    color: #666;
+    font-size: 12px;
+}
+
+#actualChat .message-date-separator span {
+    background: #0a0a0a;
+    padding: 0 12px;
+}
+
+/* Chat Input - sticky at bottom */
+#actualChat .chat-input-area {
+    flex-shrink: 0;
+    padding: 8px 12px;
+    padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+    background: #111111;
+    border-top: 1px solid #1a1a1a;
+}
+
+#actualChat .chat-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+#actualChat .chat-input-field {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: #1a1a1a;
+    border: 1px solid #2a2a2a;
+    border-radius: 24px;
+    padding: 8px 12px;
+    gap: 8px;
+}
+
+#actualChat .chat-input-field input {
+    flex: 1;
+    border: none;
+    background: transparent;
+    outline: none;
+    font-size: 15px;
+    color: #ffffff;
+    min-width: 0;
+}
+
+#actualChat .chat-input-field input::placeholder {
+    color: #666;
+}
+
+#actualChat .input-action-btn {
+    width: 32px;
+    height: 32px;
+    border: none;
+    background: transparent;
+    color: #888;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    border-radius: 50%;
+}
+
+#actualChat .input-action-btn.send-btn {
+    color: #E91E63;
+}
+
+#actualChat .joker-btn {
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: #1a1a1a;
+    border-radius: 50%;
+    font-size: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+/* Chat input footer info */
+#actualChat .chat-input-footer {
+    display: flex;
+    justify-content: space-between;
+    padding: 4px 8px 0;
+    font-size: 11px;
+    color: #555;
+}
+
+/* Hide open quizzes list in chat */
+#actualChat #openQuizzesList {
+    display: none !important;
 }
 
 /* ========================================
@@ -723,7 +904,7 @@ body {
     bottom: 0;
     display: none;
     background: rgba(0, 0, 0, 0.95) !important;
-    z-index: 50;
+    z-index: 300;
 }
 
 #quizFlow.active,

@@ -262,11 +262,19 @@ if (_originalShowChatState) {
                 return;
             }
 
-            // Check if user is unlocked
+            // Check if user is unlocked (multiple sources)
             const unlocked = localStorage.getItem(`VIVIANA_${currentUser.userId}_UNLOCKED`);
             const savedProgress = loadQuizProgress();
+            // Also check profile quiz system progress
+            const profileProgress = typeof loadProfileQuizProgress === 'function'
+                ? loadProfileQuizProgress('viviana')
+                : null;
 
-            if (unlocked !== 'true' && (!savedProgress || !savedProgress.isUnlocked)) {
+            const isUnlocked = unlocked === 'true'
+                || (savedProgress && savedProgress.isUnlocked)
+                || (profileProgress && profileProgress.isUnlocked);
+
+            if (!isUnlocked) {
                 console.log('🔒 User not unlocked, showing profile selection');
                 _originalShowChatState('profileSelection');
                 return;

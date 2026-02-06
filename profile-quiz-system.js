@@ -448,10 +448,11 @@ window.backToProfileSelection = function() {
         });
     }
 
-    // Close quiz
+    // Close quiz - both class and display
     const quizFlow = document.getElementById('quizFlow');
     if (quizFlow) {
         quizFlow.classList.remove('active');
+        quizFlow.style.display = 'none';
     }
     document.body.classList.remove('quiz-open');
 
@@ -461,6 +462,11 @@ window.backToProfileSelection = function() {
     // Show profile selection
     if (typeof showChatState === 'function') {
         showChatState('profileSelection');
+    }
+
+    // Update contact list
+    if (typeof renderProfileList === 'function') {
+        renderProfileList();
     }
 };
 

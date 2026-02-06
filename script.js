@@ -14,6 +14,40 @@ let passwordResetCode = null;
 let passwordResetCodeExpiry = null;
 let passwordResetCooldownUntil = null;
 
+// Quiz State (must be global before quiz-polish.js / quiz-modal-fix.js load)
+let quizQuestions = [];
+let quizState = {
+    currentQuestion: 0,
+    answers: [],
+    isUnlocked: false,
+    isAnimating: false
+};
+let confettiAnimationId = null;
+
+function stopConfetti() {
+    if (confettiAnimationId) {
+        cancelAnimationFrame(confettiAnimationId);
+        confettiAnimationId = null;
+    }
+    const canvas = document.getElementById('confettiCanvas');
+    if (canvas) {
+        const ctx = canvas.getContext('2d');
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+    }
+}
+
+// startChatWithViviana (called from HTML unlock button)
+function startChatWithViviana() {
+    stopConfetti();
+    showChatState('actualChat');
+    setTimeout(() => {
+        const chatMessages = document.getElementById('chatMessages');
+        if (chatMessages) chatMessages.scrollTop = chatMessages.scrollHeight;
+        const messageInput = document.getElementById('messageInput');
+        if (messageInput) messageInput.focus();
+    }, 300);
+}
+
 // Payment Processing
 const PAYMENT_WEBHOOKS = []; // In production: registered webhook URLs
 
@@ -2027,6 +2061,11 @@ function backToContactList() {
     const profileSelection = document.getElementById('profileSelection');
     if (actualChat) actualChat.style.display = 'none';
     if (profileSelection) profileSelection.style.display = 'flex';
+    // Show nav bar again
+    const nav = document.querySelector('#chatScreen > .app-nav');
+    if (nav) nav.style.display = 'flex';
+    // Re-render contact list to update last messages
+    if (typeof renderProfileList === 'function') renderProfileList();
 }
 
 function resendVerificationEmail() {
