@@ -2,6 +2,7 @@
    CRITICAL UI FIX
    Fixes layout issues in Chat-List & Discover
    + Mobile Responsive Layout (Safe Areas, dvh, Scaling)
+   + Theme-Aware (uses CSS variables for Dark/Light)
    ============================================ */
 
 /* ========================================
@@ -9,15 +10,15 @@
    ======================================== */
 
 html {
-    background: #0a0a0a;
+    background: var(--app-bg);
     height: 100%;
     height: 100dvh;
     overflow: hidden;
 }
 
 body {
-    background: #0a0a0a !important;
-    color: #ffffff;
+    background: var(--app-bg) !important;
+    color: var(--app-text);
     height: 100%;
     height: 100dvh;
     overflow: hidden;
@@ -38,9 +39,9 @@ body {
     --nav-height: calc(56px + env(safe-area-inset-bottom, 0px));
 }
 
-/* Ensure all screens have dark background + proper viewport fill */
+/* Ensure all screens have proper background + viewport fill */
 .screen {
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     position: fixed !important;
     top: 0;
     left: 0;
@@ -68,7 +69,7 @@ body {
     height: 100dvh;
     display: none;
     flex-direction: column;
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     overflow: hidden;
 }
 
@@ -89,7 +90,7 @@ body {
     bottom: var(--nav-height); /* Leave space for nav + safe area */
     display: flex;
     flex-direction: column;
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     overflow: hidden;
     z-index: 1;
 }
@@ -99,7 +100,7 @@ body {
     flex-direction: column;
     height: 100%;
     overflow: hidden;
-    background: #0a0a0a;
+    background: var(--app-bg);
 }
 
 /* Messages Header - Clean + Safe Area Top */
@@ -110,8 +111,8 @@ body {
     align-items: center;
     padding: 16px 20px;
     padding-top: calc(16px + env(safe-area-inset-top, 0px));
-    background: #0a0a0a !important;
-    border-bottom: 1px solid #1a1a1a;
+    background: var(--app-bg) !important;
+    border-bottom: 1px solid var(--app-border-subtle);
     min-height: calc(56px + env(safe-area-inset-top, 0px));
     z-index: 5;
 }
@@ -119,7 +120,7 @@ body {
 #profileSelection .messages-header h1 {
     font-size: 24px;
     font-weight: 700;
-    color: #ffffff !important;
+    color: var(--app-text) !important;
     margin: 0;
 }
 
@@ -132,7 +133,7 @@ body {
     height: 12px;
     background: #4CAF50;
     border-radius: 50%;
-    border: 2px solid #0a0a0a;
+    border: 2px solid var(--app-bg);
 }
 
 /* Contact List - Scrollable */
@@ -141,7 +142,7 @@ body {
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     padding-bottom: 20px;
 }
 
@@ -152,14 +153,14 @@ body {
     gap: 14px;
     padding: 14px 16px;
     background: transparent;
-    border-bottom: 1px solid #1a1a1a;
+    border-bottom: 1px solid var(--app-border-subtle);
     cursor: pointer;
     transition: background 0.15s ease;
 }
 
 #profileSelection .contact-item:hover,
 #profileSelection .contact-item:active {
-    background: #141414;
+    background: var(--app-surface);
 }
 
 /* Contact Avatar */
@@ -188,7 +189,7 @@ body {
     height: 14px;
     background: #7C4DFF;
     border-radius: 50%;
-    border: 2px solid #0a0a0a;
+    border: 2px solid var(--app-bg);
 }
 
 /* Contact Info */
@@ -207,7 +208,7 @@ body {
 #profileSelection .contact-name h3 {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff !important;
+    color: var(--app-text) !important;
     margin: 0;
 }
 
@@ -218,7 +219,7 @@ body {
 
 #profileSelection .contact-preview {
     font-size: 14px;
-    color: #888888 !important;
+    color: var(--app-text-secondary) !important;
     margin: 0;
     overflow: hidden;
     text-overflow: ellipsis;
@@ -233,7 +234,7 @@ body {
 
 #profileSelection .contact-time {
     font-size: 12px;
-    color: #666666;
+    color: var(--app-text-muted);
 }
 
 /* ========================================
@@ -250,7 +251,7 @@ body {
     height: 100dvh;
     display: none;
     flex-direction: column;
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     overflow: hidden;
 }
 
@@ -270,20 +271,20 @@ body {
     align-items: center;
     justify-content: center;
     gap: 10px;
-    background: #0a0a0a !important;
-    border-bottom: 1px solid #1a1a1a;
+    background: var(--app-bg) !important;
+    border-bottom: 1px solid var(--app-border-subtle);
     z-index: 10;
 }
 
 #discoverScreen .discover-header h2 {
     font-size: 20px;
     font-weight: 600;
-    color: #ffffff !important;
+    color: var(--app-text) !important;
     margin: 0;
     padding: 12px 0;
 }
 
-/* Cards Area - Takes remaining space, leaves room for nav */
+/* Cards Area - Takes remaining space, proper padding for nav */
 #discoverScreen .discover-cards-area {
     flex: 1;
     display: flex;
@@ -293,7 +294,8 @@ body {
     padding: 12px 16px 0;
     overflow: hidden;
     position: relative;
-    margin-bottom: var(--nav-height);
+    /* Leave space for nav - use padding instead of margin for better layout */
+    padding-bottom: calc(16px + var(--nav-height));
 }
 
 /* Card Stack - responsive height */
@@ -301,7 +303,8 @@ body {
     position: relative;
     width: 100%;
     max-width: 360px;
-    height: calc(100% - 90px);
+    /* Account for action buttons below */
+    height: calc(100% - 100px);
     max-height: none; /* Remove fixed max-height, let flex handle it */
 }
 
@@ -314,7 +317,7 @@ body {
     height: 100%;
     border-radius: 20px;
     overflow: hidden;
-    background: #1a1a1a !important;
+    background: var(--app-surface-2) !important;
     box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
@@ -398,12 +401,12 @@ body {
 /* Card Details */
 #discoverScreen .discover-card-details {
     padding: 14px 16px;
-    background: #1a1a1a !important;
+    background: var(--app-surface-2) !important;
 }
 
 #discoverScreen .discover-card-tagline {
     font-size: 14px;
-    color: #a0a0a0 !important;
+    color: var(--app-text-secondary) !important;
     margin: 0 0 10px 0;
 }
 
@@ -414,22 +417,25 @@ body {
 }
 
 #discoverScreen .discover-tag {
-    background: #252525 !important;
-    border: 1px solid #333333;
+    background: var(--app-surface) !important;
+    border: 1px solid var(--app-border);
     border-radius: 16px;
     padding: 5px 12px;
     font-size: 12px;
-    color: #cccccc !important;
+    color: var(--app-text-secondary) !important;
 }
 
-/* Action Buttons */
+/* Action Buttons - always visible above nav */
 #discoverScreen .discover-actions {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 24px;
-    padding: 16px 0;
+    padding: 12px 0;
     margin-top: auto;
+    flex-shrink: 0;
+    position: relative;
+    z-index: 5;
 }
 
 #discoverScreen .discover-action-btn {
@@ -445,12 +451,12 @@ body {
 #discoverScreen .discover-skip-btn {
     width: 56px;
     height: 56px;
-    background: #1a1a1a;
-    border: 2px solid #333333;
+    background: var(--app-surface-2);
+    border: 2px solid var(--app-border);
 }
 
 #discoverScreen .discover-skip-btn svg {
-    stroke: #888888;
+    stroke: var(--app-text-secondary);
 }
 
 #discoverScreen .discover-like-btn {
@@ -480,13 +486,13 @@ body {
 }
 
 #discoverScreen .discover-empty h3 {
-    color: #ffffff !important;
+    color: var(--app-text) !important;
     font-size: 20px;
     margin: 0;
 }
 
 #discoverScreen .discover-empty p {
-    color: #888888 !important;
+    color: var(--app-text-secondary) !important;
     font-size: 14px;
     margin: 0;
 }
@@ -504,8 +510,8 @@ body {
     display: flex;
     align-items: flex-start;
     justify-content: space-around;
-    background: #0a0a0a !important;
-    border-top: 1px solid #1a1a1a;
+    background: var(--app-bg) !important;
+    border-top: 1px solid var(--app-border-subtle);
     z-index: 100;
     padding-top: 4px;
     padding-bottom: env(safe-area-inset-bottom, 0px);
@@ -522,7 +528,7 @@ body {
     background: transparent;
     border: none;
     cursor: pointer;
-    color: #666666;
+    color: var(--app-text-muted);
     transition: color 0.2s ease;
 }
 
@@ -536,15 +542,15 @@ body {
 }
 
 .nav-item.active {
-    color: #E91E63 !important;
+    color: var(--app-nav-active) !important;
 }
 
 .nav-item.active svg {
-    stroke: #E91E63;
+    stroke: var(--app-nav-active);
 }
 
 .nav-item.active span {
-    color: #E91E63;
+    color: var(--app-nav-active);
 }
 
 /* ========================================
@@ -564,8 +570,7 @@ body {
 }
 
 /* ========================================
-   FIX: AUTH SCREEN DARK MODE
-   Since .screen forces #0a0a0a, auth needs matching dark form styles
+   FIX: AUTH SCREEN - Theme Aware
    ======================================== */
 
 #authScreen {
@@ -574,27 +579,27 @@ body {
 }
 
 #authScreen .auth-container {
-    background: #141414;
-    border: 1px solid #2a2a2a;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
     border-radius: 16px;
     padding: 32px 24px;
 }
 
 #authScreen .auth-container h2 {
-    color: #ffffff;
+    color: var(--app-text);
 }
 
 #authScreen .auth-subtitle {
-    color: #a0a0a0;
+    color: var(--app-text-secondary);
 }
 
 #authScreen .auth-toggle {
-    background: #1a1a1a;
+    background: var(--app-surface-2);
     border-radius: 12px;
 }
 
 #authScreen .toggle-btn {
-    color: #a0a0a0;
+    color: var(--app-text-secondary);
 }
 
 #authScreen .toggle-btn.active {
@@ -603,17 +608,17 @@ body {
 }
 
 #authScreen .auth-form .input-group label {
-    color: #a0a0a0;
+    color: var(--app-text-secondary);
 }
 
 #authScreen .auth-form input {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    color: #ffffff;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
 }
 
 #authScreen .auth-form input::placeholder {
-    color: #666666;
+    color: var(--app-text-muted);
 }
 
 #authScreen .auth-form input:focus {
@@ -621,36 +626,36 @@ body {
 }
 
 #authScreen .divider span {
-    background: #141414;
-    color: #666666;
+    background: var(--app-surface);
+    color: var(--app-text-muted);
 }
 
 #authScreen .btn-google {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    color: #ffffff;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
 }
 
-/* Verification & Reset screens dark styling */
+/* Verification & Reset screens styling */
 #verificationScreen .auth-container,
 #passwordResetScreen .auth-container,
 #passwordResetVerifyScreen .auth-container {
-    background: #141414;
-    border: 1px solid #2a2a2a;
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
     border-radius: 16px;
-    color: #ffffff;
+    color: var(--app-text);
 }
 
 #verificationScreen h2,
 #passwordResetScreen h2,
 #passwordResetVerifyScreen h2 {
-    color: #ffffff;
+    color: var(--app-text);
 }
 
 #verificationScreen .auth-subtitle,
 #passwordResetScreen .auth-subtitle,
 #passwordResetVerifyScreen .auth-subtitle {
-    color: #a0a0a0;
+    color: var(--app-text-secondary);
 }
 
 #verificationScreen,
@@ -662,9 +667,9 @@ body {
 
 #passwordResetScreen .auth-form input,
 #passwordResetVerifyScreen input {
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
-    color: #ffffff;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
 }
 
 /* Ensure proper stacking */
@@ -687,7 +692,7 @@ body {
     bottom: 0; /* Full height - no nav bar space */
     display: none;
     flex-direction: column;
-    background: #0a0a0a !important;
+    background: var(--app-bg) !important;
     z-index: 200; /* Above nav bar */
 }
 
@@ -695,7 +700,7 @@ body {
     display: flex !important;
 }
 
-/* Chat Header - dark themed + Safe Area */
+/* Chat Header - themed + Safe Area */
 #actualChat .chat-header {
     flex-shrink: 0;
     display: flex;
@@ -703,8 +708,8 @@ body {
     gap: 12px;
     padding: 10px 12px;
     padding-top: calc(10px + env(safe-area-inset-top, 0px));
-    background: #111111;
-    border-bottom: 1px solid #1a1a1a;
+    background: var(--app-surface-3);
+    border-bottom: 1px solid var(--app-border-subtle);
     min-height: calc(56px + env(safe-area-inset-top, 0px));
     z-index: 5;
 }
@@ -715,7 +720,7 @@ body {
     border-radius: 50%;
     border: none;
     background: transparent;
-    color: #ffffff;
+    color: var(--app-text);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -724,7 +729,7 @@ body {
 }
 
 #actualChat .chat-back-btn:active {
-    background: rgba(255,255,255,0.1);
+    background: rgba(128,128,128,0.15);
 }
 
 #actualChat .chat-partner {
@@ -751,13 +756,13 @@ body {
 #actualChat .chat-partner-name {
     font-size: 16px;
     font-weight: 600;
-    color: #ffffff;
+    color: var(--app-text);
     margin: 0;
 }
 
 #actualChat .chat-partner-handle {
     font-size: 12px;
-    color: #888;
+    color: var(--app-text-secondary);
     margin: 0;
 }
 
@@ -783,10 +788,10 @@ body {
     -webkit-overflow-scrolling: touch;
     padding: 16px;
     padding-bottom: 8px;
-    background: #0a0a0a;
+    background: var(--app-bg);
 }
 
-/* Message bubbles dark theme */
+/* Message bubbles themed */
 #actualChat .message {
     display: flex;
     gap: 8px;
@@ -804,10 +809,10 @@ body {
 }
 
 #actualChat .message-bubble {
-    background: #1a1a2e;
+    background: var(--app-msg-received);
     border-radius: 16px;
     padding: 10px 14px;
-    color: #ffffff;
+    color: var(--app-text);
     font-size: 15px;
     line-height: 1.4;
     max-width: 100%;
@@ -834,7 +839,7 @@ body {
 
 #actualChat .message-time {
     font-size: 11px;
-    color: rgba(255,255,255,0.5);
+    color: var(--app-text-muted);
     display: block;
     margin-top: 4px;
 }
@@ -842,12 +847,12 @@ body {
 #actualChat .message-date-separator {
     text-align: center;
     margin: 16px 0;
-    color: #666;
+    color: var(--app-text-muted);
     font-size: 12px;
 }
 
 #actualChat .message-date-separator span {
-    background: #0a0a0a;
+    background: var(--app-bg);
     padding: 0 12px;
 }
 
@@ -856,8 +861,8 @@ body {
     flex-shrink: 0;
     padding: 8px 12px;
     padding-bottom: calc(8px + env(safe-area-inset-bottom, 0px));
-    background: #111111;
-    border-top: 1px solid #1a1a1a;
+    background: var(--app-surface-3);
+    border-top: 1px solid var(--app-border-subtle);
 }
 
 #actualChat .chat-input-row {
@@ -870,8 +875,8 @@ body {
     flex: 1;
     display: flex;
     align-items: center;
-    background: #1a1a1a;
-    border: 1px solid #2a2a2a;
+    background: var(--app-surface-2);
+    border: 1px solid var(--app-border);
     border-radius: 24px;
     padding: 8px 12px;
     gap: 8px;
@@ -883,12 +888,12 @@ body {
     background: transparent;
     outline: none;
     font-size: 15px;
-    color: #ffffff;
+    color: var(--app-text);
     min-width: 0;
 }
 
 #actualChat .chat-input-field input::placeholder {
-    color: #666;
+    color: var(--app-text-muted);
 }
 
 #actualChat .input-action-btn {
@@ -896,7 +901,7 @@ body {
     height: 32px;
     border: none;
     background: transparent;
-    color: #888;
+    color: var(--app-text-secondary);
     display: flex;
     align-items: center;
     justify-content: center;
@@ -913,7 +918,7 @@ body {
     width: 40px;
     height: 40px;
     border: none;
-    background: #1a1a1a;
+    background: var(--app-surface-2);
     border-radius: 50%;
     font-size: 20px;
     display: flex;
@@ -929,7 +934,7 @@ body {
     justify-content: space-between;
     padding: 4px 8px 0;
     font-size: 11px;
-    color: #555;
+    color: var(--app-text-faded);
 }
 
 /* Hide open quizzes list in chat */
@@ -938,7 +943,7 @@ body {
 }
 
 /* ========================================
-   FIX: QUIZ FLOW
+   FIX: QUIZ FLOW - Fullscreen Overlay Modal
    ======================================== */
 
 #quizFlow {
@@ -948,8 +953,10 @@ body {
     right: 0;
     bottom: 0;
     display: none;
-    background: rgba(0, 0, 0, 0.95) !important;
+    flex-direction: column;
+    background: var(--app-bg) !important;
     z-index: 300;
+    overflow: hidden;
 }
 
 #quizFlow.active,
@@ -957,8 +964,32 @@ body {
     display: flex !important;
 }
 
+/* Quiz close button (top-right) */
+.quiz-close-btn {
+    position: absolute;
+    top: calc(12px + env(safe-area-inset-top, 0px));
+    right: 16px;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: none;
+    background: var(--app-surface-2);
+    color: var(--app-text-secondary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    z-index: 20;
+    transition: background 0.2s ease;
+}
+
+.quiz-close-btn:hover,
+.quiz-close-btn:active {
+    background: var(--app-border);
+}
+
 /* ========================================
-   SCROLLBAR STYLING (Dark Theme)
+   SCROLLBAR STYLING (Theme-Aware)
    ======================================== */
 
 ::-webkit-scrollbar {
@@ -970,12 +1001,12 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-    background: #333333;
+    background: var(--app-scrollbar);
     border-radius: 2px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-    background: #444444;
+    background: var(--app-scrollbar-hover);
 }
 
 /* ========================================
@@ -995,7 +1026,7 @@ body {
     display: none;
     flex-direction: column;
     overflow: hidden !important; /* Don't scroll the whole screen */
-    background: #0a0a0a !important;
+    background: var(--profile-bg, var(--app-bg)) !important;
 }
 
 #profileScreen.active,
@@ -1218,4 +1249,100 @@ body.quiz-open {
     position: fixed !important;
     width: 100%;
     height: 100%;
+}
+
+/* ========================================
+   POPUP/MODAL OVERLAYS - Theme Aware
+   ======================================== */
+
+.popup-overlay .popup-content {
+    background: var(--app-surface);
+    color: var(--app-text);
+    border: 1px solid var(--app-border);
+}
+
+.popup-overlay .popup-content h3 {
+    color: var(--app-text);
+}
+
+.popup-overlay .popup-content p {
+    color: var(--app-text-secondary);
+}
+
+/* Credits store theme */
+#creditsScreen .store-header {
+    background: var(--app-bg);
+    color: var(--app-text);
+}
+
+#creditsScreen .store-header h2 {
+    color: var(--app-text);
+}
+
+#creditsScreen .store-container {
+    color: var(--app-text);
+}
+
+#creditsScreen .credit-card {
+    background: var(--app-surface);
+    border: 1px solid var(--app-border);
+    color: var(--app-text);
+}
+
+#creditsScreen .credit-card h3 {
+    color: var(--app-text);
+}
+
+#creditsScreen .card-description {
+    color: var(--app-text-secondary);
+}
+
+#creditsScreen .store-footer {
+    color: var(--app-text-secondary);
+}
+
+/* Notification/Privacy settings theme */
+.settings-container {
+    color: var(--app-text);
+}
+
+.settings-container h3 {
+    color: var(--app-text);
+}
+
+.settings-container .settings-hint {
+    color: var(--app-text-secondary);
+}
+
+.settings-container .setting-item {
+    border-bottom: 1px solid var(--app-border-subtle);
+}
+
+.settings-container .setting-item strong {
+    color: var(--app-text);
+}
+
+.settings-container .setting-item p {
+    color: var(--app-text-secondary);
+}
+
+.settings-container .radio-option {
+    color: var(--app-text);
+}
+
+.settings-container .settings-footer-note {
+    color: var(--app-text-muted);
+}
+
+.profile-header {
+    background: var(--app-bg);
+    color: var(--app-text);
+}
+
+.profile-header h2 {
+    color: var(--app-text);
+}
+
+.profile-header .back-btn {
+    color: var(--app-text);
 }

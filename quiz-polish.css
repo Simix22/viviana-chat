@@ -25,11 +25,23 @@
     --quiz-transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+/* Dark Mode Quiz Variables */
+[data-theme="dark"] {
+    --quiz-bg: #0a0a0a;
+    --quiz-card-bg: #1a1a1a;
+    --quiz-text-primary: #ffffff;
+    --quiz-text-secondary: #a0a0a0;
+    --quiz-border: #2a2a2a;
+    --quiz-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
+    --quiz-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+    --quiz-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.8);
+}
+
 /* ========================================
    QUIZ FLOW CONTAINER
    ======================================== */
 #quizFlow {
-    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    background: var(--quiz-bg);
     position: relative;
     overflow: hidden;
 }
@@ -298,7 +310,7 @@
     color: white;
     box-shadow: var(--quiz-shadow-lg);
     position: relative;
-    border: 3px solid white;
+    border: 3px solid var(--quiz-card-bg);
 }
 
 .avatar-medium::after {
@@ -375,7 +387,7 @@
 
 .quiz-choice:hover {
     border-color: var(--quiz-primary);
-    background: linear-gradient(135deg, rgba(233, 30, 99, 0.05) 0%, rgba(255, 255, 255, 1) 100%);
+    background: linear-gradient(135deg, rgba(233, 30, 99, 0.08) 0%, var(--quiz-card-bg) 100%);
     transform: translateY(-4px) scale(1.02);
     box-shadow: var(--quiz-shadow-lg);
 }
@@ -436,7 +448,7 @@
 }
 
 .match-content {
-    background: white;
+    background: var(--quiz-card-bg);
     border-radius: var(--quiz-radius-lg);
     padding: 48px 40px;
     text-align: center;
@@ -527,7 +539,7 @@
 }
 
 .unlock-card {
-    background: white;
+    background: var(--quiz-card-bg);
     border-radius: 32px;
     padding: 60px 40px;
     text-align: center;
@@ -904,8 +916,8 @@
    ======================================== */
 
 .quiz-error {
-    background: #FFF3F3;
-    border: 2px solid #EF5350;
+    background: var(--quiz-card-bg);
+    border: 2px solid var(--error-color, #EF5350);
     border-radius: var(--quiz-radius);
     padding: 16px;
     margin: 20px;
