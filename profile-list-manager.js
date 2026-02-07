@@ -70,73 +70,41 @@ function renderProfileList() {
         return;
     }
 
-    // Build HTML - Fanfix Style Messages List
+    // Build HTML - Clean Dark Messages List
     let html = `
-        <!-- Messages Header -->
+        <!-- Messages Header - Clean -->
         <div class="messages-header">
-            <div class="messages-header-left">
-                <button class="messages-header-btn" title="Search">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="11" cy="11" r="8"></circle>
-                        <path d="M21 21l-4.35-4.35"></path>
-                    </svg>
-                </button>
-            </div>
-            <h1>Messages</h1>
-            <div class="messages-header-right">
-                <button class="messages-header-btn notification-badge" title="Notifications">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                </button>
-                <button class="messages-header-btn" title="Menu">
-                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <line x1="3" y1="6" x2="21" y2="6"></line>
-                        <line x1="3" y1="12" x2="21" y2="12"></line>
-                        <line x1="3" y1="18" x2="21" y2="18"></line>
-                    </svg>
-                </button>
-            </div>
-        </div>
-
-        <!-- Search Bar -->
-        <div class="messages-search">
-            <div class="messages-search-input">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <circle cx="11" cy="11" r="8"></circle>
-                    <path d="M21 21l-4.35-4.35"></path>
-                </svg>
-                <input type="text" placeholder="Search messages..." />
-            </div>
-        </div>
-
-        <!-- Filter -->
-        <div class="messages-filter">
-            <span>All messages</span>
-            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <polyline points="6 9 12 15 18 9"></polyline>
-            </svg>
+            <h1>Chats</h1>
         </div>
 
         <!-- Contact List -->
         <div class="contact-list">
     `;
 
-    // Render each profile as a contact
+    // Render each profile as a contact card
     for (const [profileId, profile] of Object.entries(PROFILES)) {
         const status = getProfileStatus(profileId);
 
         // Get last message preview
-        const lastMessage = status.status === 'unlocked'
-            ? 'Hey! 👋 So happy you\'re here...'
-            : status.statusText;
+        let lastMessage, timeDisplay;
+        if (status.status === 'unlocked') {
+            // Load actual last message if available
+            const msgs = currentUser ? JSON.parse(localStorage.getItem(`VIVIANA_${currentUser.userId}_MESSAGES`) || '[]') : [];
+            const lastMsg = msgs.length > 0 ? msgs[msgs.length - 1] : null;
+            lastMessage = lastMsg ? lastMsg.text.substring(0, 40) + (lastMsg.text.length > 40 ? '...' : '') : 'Hey! 👋 So happy you\'re here...';
+            timeDisplay = lastMsg ? new Date(lastMsg.timestamp).toLocaleTimeString([], {hour: '2-digit', minute: '2-digit'}) : 'Now';
+        } else if (status.status === 'quiz-open') {
+            lastMessage = '🎮 ' + status.statusText;
+            timeDisplay = '';
+        } else {
+            lastMessage = '🔒 Tap to start quiz';
+            timeDisplay = '';
+        }
 
-        // Time display
-        const timeDisplay = status.status === 'unlocked' ? 'Now' : '';
-
-        // Show unread dot for new/quiz profiles
-        const showUnread = status.status === 'quiz-open' || status.status === 'locked';
+        // Online indicator for unlocked profiles
+        const onlineIndicator = status.status === 'unlocked'
+            ? '<div class="contact-online-dot"></div>'
+            : '';
 
         html += `
             <div class="contact-item" onclick="handleProfileClick('${profileId}')" role="button" tabindex="0">
@@ -144,7 +112,7 @@ function renderProfileList() {
                     <div class="contact-avatar-img" style="background: ${profile.color};">
                         ${profile.avatar}
                     </div>
-                    ${showUnread ? '<div class="contact-unread-dot"></div>' : ''}
+                    ${onlineIndicator}
                 </div>
                 <div class="contact-info">
                     <div class="contact-name">
@@ -184,9 +152,19 @@ function handleProfileClick(profileId) {
     console.log(`🎯 Profile clicked: ${profile.name} (status: ${status.status})`);
 
     if (status.status === 'unlocked') {
-        // Quiz completed - go to chat
+        // Quiz completed - go directly to chat (bypass unlock check)
         console.log('✅ Quiz completed, opening chat');
-        showChatState('actualChat');
+        const states = ['profileSelection', 'quizFlow', 'unlockModal'];
+        states.forEach(s => {
+            const el = document.getElementById(s);
+            if (el) el.style.display = 'none';
+        });
+        const actualChat = document.getElementById('actualChat');
+        if (actualChat) actualChat.style.display = 'flex';
+        // Hide nav bar when in chat
+        const nav = document.querySelector('#chatScreen > .app-nav');
+        if (nav) nav.style.display = 'none';
+        console.log('📍 Chat opened for: ' + profile.name);
     } else {
         // Locked or quiz in progress - open quiz
         console.log('🎮 Opening quiz');
@@ -277,13 +255,15 @@ function showChatState(state) {
     states.forEach(s => {
         const element = document.getElementById(s);
         if (element) {
-            if (s === state) {
-                element.style.display = (s === 'profileSelection') ? 'flex' : 'flex';
-            } else {
-                element.style.display = 'none';
-            }
+            element.style.display = (s === state) ? 'flex' : 'none';
         }
     });
+
+    // Hide nav bar when in actual chat, show it otherwise
+    const nav = document.querySelector('#chatScreen > .app-nav');
+    if (nav) {
+        nav.style.display = (state === 'actualChat') ? 'none' : 'flex';
+    }
 
     console.log(`📍 Chat state changed to: ${state}`);
 }
