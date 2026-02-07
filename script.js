@@ -655,13 +655,28 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Initialize theme from saved preference (default: dark)
     const savedTheme = localStorage.getItem('VIVIANA_THEME') || 'dark';
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (savedTheme === 'dark') {
         document.documentElement.setAttribute('data-theme', 'dark');
+        if (themeColorMeta) themeColorMeta.content = '#0a0a0a';
     } else {
         document.documentElement.removeAttribute('data-theme');
+        if (themeColorMeta) themeColorMeta.content = '#FFFFFF';
     }
     const darkToggle = document.getElementById('darkModeToggle');
     if (darkToggle) darkToggle.checked = (savedTheme === 'dark');
+
+    // ESC key to close quiz overlay
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+            const quizFlow = document.getElementById('quizFlow');
+            if (quizFlow && quizFlow.style.display === 'flex') {
+                if (typeof backToProfileSelection === 'function') {
+                    backToProfileSelection();
+                }
+            }
+        }
+    });
 
     // Check data consistency and cleanup orphaned data
     checkDataConsistency();
@@ -798,12 +813,15 @@ function stopMessageRefresh() {
 function toggleDarkMode() {
     const html = document.documentElement;
     const toggle = document.getElementById('darkModeToggle');
+    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
     if (toggle && toggle.checked) {
         html.setAttribute('data-theme', 'dark');
         localStorage.setItem('VIVIANA_THEME', 'dark');
+        if (themeColorMeta) themeColorMeta.content = '#0a0a0a';
     } else {
         html.removeAttribute('data-theme');
         localStorage.setItem('VIVIANA_THEME', 'light');
+        if (themeColorMeta) themeColorMeta.content = '#FFFFFF';
     }
 }
 

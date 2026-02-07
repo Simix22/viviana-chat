@@ -54,6 +54,22 @@
     --transition-fast: 0.2s ease;
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
+
+    /* App Surface Colors (Light Mode) */
+    --app-bg: #FFFFFF;
+    --app-surface: #F5F5F5;
+    --app-surface-2: #FAFAFA;
+    --app-surface-3: #F0F0F0;
+    --app-border: #E0E0E0;
+    --app-border-subtle: #EEEEEE;
+    --app-text: #1a1a1a;
+    --app-text-secondary: #757575;
+    --app-text-muted: #999999;
+    --app-text-faded: #BBBBBB;
+    --app-msg-received: #F0F0F5;
+    --app-scrollbar: #CCCCCC;
+    --app-scrollbar-hover: #BBBBBB;
+    --app-nav-active: #E91E63;
 }
 
 /* ============================================
@@ -91,6 +107,22 @@
 
     /* Avatar Gradient */
     --avatar-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+
+    /* App Surface Colors (Dark Mode) */
+    --app-bg: #0a0a0a;
+    --app-surface: #141414;
+    --app-surface-2: #1a1a1a;
+    --app-surface-3: #111111;
+    --app-border: #2a2a2a;
+    --app-border-subtle: #1a1a1a;
+    --app-text: #ffffff;
+    --app-text-secondary: #a0a0a0;
+    --app-text-muted: #666666;
+    --app-text-faded: #555555;
+    --app-msg-received: #1a1a2e;
+    --app-scrollbar: #333333;
+    --app-scrollbar-hover: #444444;
+    --app-nav-active: #E91E63;
 }
 
 /* ============================================
