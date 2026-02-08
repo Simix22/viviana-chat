@@ -691,9 +691,10 @@ body {
     right: 0;
     bottom: 0; /* Full height - no nav bar space */
     display: none;
-    flex-direction: column;
+    flex-direction: column !important;
     background: var(--app-bg) !important;
     z-index: 200; /* Above nav bar */
+    overflow: hidden !important;
 }
 
 #actualChat[style*="display: flex"] {
@@ -712,6 +713,13 @@ body {
     border-bottom: 1px solid var(--app-border-subtle);
     min-height: calc(56px + env(safe-area-inset-top, 0px));
     z-index: 5;
+    /* Override position:fixed from chat-rebuild.css */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
+    height: auto !important;
 }
 
 #actualChat .chat-back-btn {
@@ -780,15 +788,22 @@ body {
     display: none;
 }
 
-/* Chat Messages area */
+/* Chat Messages area - CRITICAL: Reset position:fixed from chat-rebuild.css */
 #actualChat .chat-messages {
-    flex: 1;
+    flex: 1 1 0% !important;
+    min-height: 0 !important;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     padding: 16px;
     padding-bottom: 8px;
     background: var(--app-bg);
+    /* Reset position:fixed from chat-rebuild.css so messages stay in flex flow */
+    position: relative !important;
+    top: auto !important;
+    left: auto !important;
+    right: auto !important;
+    bottom: auto !important;
 }
 
 /* Message bubbles themed */
