@@ -47,12 +47,15 @@ body {
     left: 0;
     right: 0;
     bottom: 0;
-    width: 100%;
+    width: 100% !important;
+    max-width: none !important; /* Override style.css 480px desktop constraint on mobile */
     height: 100%;
     height: 100dvh;
     min-height: 0 !important; /* Override style.css min-height: 100vh */
     flex-direction: column;
     overflow: hidden;
+    margin: 0 !important; /* Override style.css margin: 0 auto */
+    box-shadow: none !important;
 }
 
 /* ========================================
@@ -118,10 +121,11 @@ body {
 }
 
 #profileSelection .messages-header h1 {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     color: var(--app-text) !important;
     margin: 0;
+    letter-spacing: -0.5px;
 }
 
 /* Online dot for unlocked contacts */
@@ -136,26 +140,27 @@ body {
     border: 2px solid var(--app-bg);
 }
 
-/* Contact List - Scrollable */
+/* Contact List - Scrollable with generous bottom space */
 #profileSelection .contact-list {
     flex: 1;
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     background: var(--app-bg) !important;
-    padding-bottom: 20px;
+    padding-bottom: 24px; /* Extra space so last item isn't cut off */
 }
 
-/* Contact Item */
+/* Contact Item - Large touch targets for mobile */
 #profileSelection .contact-item {
     display: flex;
     align-items: center;
-    gap: 14px;
-    padding: 14px 16px;
+    gap: 16px;
+    padding: 16px 20px;
     background: transparent;
     border-bottom: 1px solid var(--app-border-subtle);
     cursor: pointer;
     transition: background 0.15s ease;
+    min-height: 76px; /* Ensure generous tap target */
 }
 
 #profileSelection .contact-item:hover,
@@ -163,22 +168,23 @@ body {
     background: var(--app-surface);
 }
 
-/* Contact Avatar */
+/* Contact Avatar - Larger for mobile */
 #profileSelection .contact-avatar {
     position: relative;
     flex-shrink: 0;
 }
 
 #profileSelection .contact-avatar-img {
-    width: 52px;
-    height: 52px;
+    width: 56px;
+    height: 56px;
     border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 22px;
+    font-size: 24px;
     font-weight: 600;
     color: white;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
 }
 
 #profileSelection .contact-unread-dot {
@@ -206,24 +212,26 @@ body {
 }
 
 #profileSelection .contact-name h3 {
-    font-size: 16px;
+    font-size: 17px;
     font-weight: 600;
     color: var(--app-text) !important;
     margin: 0;
+    letter-spacing: -0.2px;
 }
 
 #profileSelection .contact-verified {
     color: #4CAF50;
-    font-size: 14px;
+    font-size: 15px;
 }
 
 #profileSelection .contact-preview {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--app-text-secondary) !important;
-    margin: 0;
+    margin: 2px 0 0;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+    line-height: 1.4;
 }
 
 /* Contact Meta */
@@ -233,12 +241,13 @@ body {
 }
 
 #profileSelection .contact-time {
-    font-size: 12px;
+    font-size: 13px;
     color: var(--app-text-muted);
 }
 
 /* ========================================
    FIX: DISCOVER SCREEN LAYOUT
+   Premium Swipe UI — Tinder/Bumble-style
    ======================================== */
 
 #discoverScreen {
@@ -260,67 +269,71 @@ body {
     display: flex !important;
 }
 
-/* Discover Header + Safe Area */
+/* Discover Header — minimal, modern */
 #discoverScreen .discover-header {
     position: relative;
     flex-shrink: 0;
     height: auto !important;
-    min-height: 56px;
+    min-height: 52px;
     padding-top: env(safe-area-inset-top, 0px);
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 10px;
-    background: var(--app-bg) !important;
-    border-bottom: 1px solid var(--app-border-subtle);
+    gap: 8px;
+    background: transparent !important;
+    border-bottom: none;
     z-index: 10;
 }
 
 #discoverScreen .discover-header h2 {
-    font-size: 20px;
-    font-weight: 600;
+    font-size: 22px;
+    font-weight: 700;
     color: var(--app-text) !important;
     margin: 0;
-    padding: 12px 0;
+    padding: 10px 0;
+    letter-spacing: -0.3px;
 }
 
-/* Cards Area - Takes remaining space, proper padding for nav */
+#discoverScreen .discover-header-icon {
+    font-size: 20px;
+}
+
+/* Cards Area — full-width, tight spacing */
 #discoverScreen .discover-cards-area {
     flex: 1;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: flex-start;
-    padding: 12px 16px 0;
+    padding: 8px 12px 0;
     overflow: hidden;
     position: relative;
-    /* Leave space for nav - use padding instead of margin for better layout */
-    padding-bottom: calc(16px + var(--nav-height));
+    padding-bottom: calc(12px + var(--nav-height));
 }
 
-/* Card Stack - responsive height */
+/* Card Stack — bigger cards, use more screen */
 #discoverScreen .discover-card-stack {
     position: relative;
     width: 100%;
-    max-width: 360px;
-    /* Account for action buttons below */
-    height: calc(100% - 100px);
-    max-height: none; /* Remove fixed max-height, let flex handle it */
+    max-width: 400px;
+    height: calc(100% - 90px); /* More space for card */
+    max-height: none;
 }
 
-/* Fix Card Stacking - Hide cards behind properly */
+/* Cards — premium feel with stronger shadows */
 #discoverScreen .discover-card {
     position: absolute;
     top: 0;
     left: 0;
     right: 0;
     height: 100%;
-    border-radius: 20px;
+    border-radius: 24px;
     overflow: hidden;
     background: var(--app-surface-2) !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18), 0 2px 8px rgba(0, 0, 0, 0.08);
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
+    transition: transform 0.35s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.3s ease;
 }
 
 #discoverScreen .discover-card.card-top {
@@ -329,11 +342,12 @@ body {
     opacity: 1;
 }
 
-/* Behind cards: only show top portion, hide details */
+/* Behind cards — smooth depth effect */
 #discoverScreen .discover-card.card-behind-1 {
     z-index: 2;
-    transform: scale(0.95) translateY(12px);
+    transform: scale(0.96) translateY(10px);
     pointer-events: none;
+    opacity: 0.7;
 }
 
 #discoverScreen .discover-card.card-behind-1 .discover-card-details,
@@ -343,8 +357,9 @@ body {
 
 #discoverScreen .discover-card.card-behind-2 {
     z-index: 1;
-    transform: scale(0.90) translateY(24px);
+    transform: scale(0.92) translateY(20px);
     pointer-events: none;
+    opacity: 0.4;
 }
 
 #discoverScreen .discover-card.card-behind-2 .discover-card-details,
@@ -353,61 +368,71 @@ body {
     visibility: hidden;
 }
 
-/* Card Image - Responsive */
+/* Card Image — dominant, 65% height */
 #discoverScreen .discover-card-image {
     width: 100%;
-    height: 60% !important; /* Override hardcoded 320px/340px from other CSS */
+    height: 65% !important;
     max-height: none !important;
     background-size: cover;
-    background-position: center;
+    background-position: center top;
     position: relative;
 }
 
+/* Gradient overlay — smooth cinematic look */
 #discoverScreen .discover-card-image::after {
     content: '';
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    height: 60%;
-    background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);
+    height: 70%;
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.85) 0%,
+        rgba(0, 0, 0, 0.4) 40%,
+        transparent 100%
+    );
     pointer-events: none;
 }
 
-/* Card Info Overlay */
+/* Card Info Overlay — bolder, cleaner */
 #discoverScreen .discover-card-info {
     position: absolute;
     bottom: 0;
     left: 0;
     right: 0;
-    padding: 16px;
+    padding: 20px;
     z-index: 2;
     color: white;
 }
 
 #discoverScreen .discover-card-name {
-    font-size: 24px;
-    font-weight: 700;
+    font-size: 28px;
+    font-weight: 800;
     margin: 0;
     color: #ffffff;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    letter-spacing: -0.5px;
 }
 
 #discoverScreen .discover-card-age {
-    font-size: 18px;
+    font-size: 20px;
     font-weight: 500;
     color: rgba(255, 255, 255, 0.9);
 }
 
-/* Card Details */
+/* Card Details — themed surface */
 #discoverScreen .discover-card-details {
-    padding: 14px 16px;
+    padding: 16px 20px;
     background: var(--app-surface-2) !important;
+    flex: 1;
 }
 
 #discoverScreen .discover-card-tagline {
-    font-size: 14px;
+    font-size: 15px;
     color: var(--app-text-secondary) !important;
-    margin: 0 0 10px 0;
+    margin: 0 0 12px 0;
+    line-height: 1.4;
 }
 
 #discoverScreen .discover-card-tags {
@@ -419,19 +444,21 @@ body {
 #discoverScreen .discover-tag {
     background: var(--app-surface) !important;
     border: 1px solid var(--app-border);
-    border-radius: 16px;
-    padding: 5px 12px;
-    font-size: 12px;
+    border-radius: 20px;
+    padding: 6px 14px;
+    font-size: 13px;
+    font-weight: 500;
     color: var(--app-text-secondary) !important;
+    transition: all 0.2s ease;
 }
 
-/* Action Buttons - always visible above nav */
+/* Action Buttons — larger, more prominent */
 #discoverScreen .discover-actions {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 24px;
-    padding: 12px 0;
+    gap: 28px;
+    padding: 14px 0 4px;
     margin-top: auto;
     flex-shrink: 0;
     position: relative;
@@ -445,44 +472,70 @@ body {
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    transition: transform 0.2s ease;
+    transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease;
 }
 
+/* Skip Button — refined */
 #discoverScreen .discover-skip-btn {
-    width: 56px;
-    height: 56px;
+    width: 60px;
+    height: 60px;
     background: var(--app-surface-2);
-    border: 2px solid var(--app-border);
+    border: 2px solid var(--app-border) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 #discoverScreen .discover-skip-btn svg {
     stroke: var(--app-text-secondary);
+    width: 26px;
+    height: 26px;
 }
 
+#discoverScreen .discover-skip-btn:active {
+    transform: scale(0.88);
+    background: var(--app-surface);
+}
+
+/* Like Button — vibrant, glowing */
 #discoverScreen .discover-like-btn {
-    width: 68px;
-    height: 68px;
-    background: linear-gradient(135deg, #E91E63, #FF4081);
-    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.4);
+    width: 72px;
+    height: 72px;
+    background: linear-gradient(135deg, #E91E63 0%, #FF4081 50%, #FF80AB 100%);
+    box-shadow: 0 6px 24px rgba(233, 30, 99, 0.45), 0 2px 8px rgba(233, 30, 99, 0.2);
+}
+
+#discoverScreen .discover-like-btn svg {
+    width: 30px;
+    height: 30px;
+    fill: white;
+}
+
+#discoverScreen .discover-like-btn:active {
+    transform: scale(0.88);
+    box-shadow: 0 3px 12px rgba(233, 30, 99, 0.3);
 }
 
 #discoverScreen .discover-action-btn:active {
-    transform: scale(0.92);
+    transform: scale(0.88);
 }
 
-/* Empty State */
+/* Empty State — centered, beautiful */
 #discoverScreen .discover-empty {
     display: none;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 40px 20px;
-    gap: 12px;
+    padding: 40px 24px;
+    gap: 16px;
 }
 
 #discoverScreen .discover-empty.visible {
     display: flex;
+}
+
+#discoverScreen .discover-empty-icon {
+    font-size: 48px;
+    margin-bottom: 4px;
 }
 
 #discoverScreen .discover-empty h3 {
@@ -493,8 +546,79 @@ body {
 
 #discoverScreen .discover-empty p {
     color: var(--app-text-secondary) !important;
-    font-size: 14px;
+    font-size: 15px;
     margin: 0;
+    line-height: 1.5;
+}
+
+/* Refresh Button in empty state */
+#discoverScreen .discover-refresh-btn {
+    margin-top: 8px;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 24px;
+    background: linear-gradient(135deg, #E91E63, #FF4081);
+    color: white;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.3);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+#discoverScreen .discover-refresh-btn:active {
+    transform: scale(0.95);
+}
+
+/* ========================================
+   DISCOVER: DARK MODE ENHANCEMENTS
+   ======================================== */
+
+[data-theme="dark"] #discoverScreen .discover-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] #discoverScreen .discover-card-image::after {
+    background: linear-gradient(
+        to top,
+        rgba(0, 0, 0, 0.95) 0%,
+        rgba(0, 0, 0, 0.5) 40%,
+        transparent 100%
+    );
+}
+
+[data-theme="dark"] #discoverScreen .discover-skip-btn {
+    background: var(--app-surface-2);
+    border-color: var(--app-border) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+}
+
+[data-theme="dark"] #discoverScreen .discover-like-btn {
+    box-shadow: 0 6px 24px rgba(233, 30, 99, 0.5), 0 0 40px rgba(233, 30, 99, 0.15);
+}
+
+[data-theme="dark"] #discoverScreen .discover-tag {
+    background: rgba(255, 255, 255, 0.08) !important;
+    border-color: rgba(255, 255, 255, 0.12);
+    color: var(--app-text-secondary) !important;
+}
+
+[data-theme="dark"] #discoverScreen .discover-card-details {
+    background: var(--app-surface-2) !important;
+    border-top: 1px solid var(--app-border);
+}
+
+/* ========================================
+   DISCOVER: LIGHT MODE REFINEMENTS
+   ======================================== */
+
+:root #discoverScreen .discover-card {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12), 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+:root #discoverScreen .discover-tag {
+    background: #f5f5f7 !important;
+    border-color: #e8e8ed;
 }
 
 /* ========================================
@@ -507,6 +631,8 @@ body {
     left: 0;
     right: 0;
     height: var(--nav-height);
+    max-width: none !important; /* Override style.css 480px */
+    transform: none !important; /* Override style.css translateX(-50%) */
     display: flex;
     align-items: flex-start;
     justify-content: space-around;
@@ -1120,7 +1246,7 @@ body {
     overflow-y: auto;
     -webkit-overflow-scrolling: touch;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: var(--nav-height);
+    padding-bottom: calc(24px + var(--nav-height)); /* Extra space above nav */
 }
 
 #creditsScreen.active,
@@ -1167,24 +1293,28 @@ body {
         font-size: 20px;
     }
 
-    /* Discover card adjustments */
+    /* Discover card adjustments for small phones */
     #discoverScreen .discover-card-stack {
-        height: calc(100% - 80px);
+        height: calc(100% - 76px);
+    }
+
+    #discoverScreen .discover-card-name {
+        font-size: 24px !important;
     }
 
     #discoverScreen .discover-actions {
-        padding: 8px 0;
-        gap: 16px;
+        padding: 8px 0 2px;
+        gap: 20px;
     }
 
     #discoverScreen .discover-skip-btn {
-        width: 48px;
-        height: 48px;
+        width: 52px;
+        height: 52px;
     }
 
     #discoverScreen .discover-like-btn {
-        width: 56px;
-        height: 56px;
+        width: 62px;
+        height: 62px;
     }
 }
 
