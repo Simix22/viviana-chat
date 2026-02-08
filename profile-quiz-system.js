@@ -236,7 +236,7 @@ function openProfileQuiz(profileId) {
     }
 
     // Override quiz questions with this profile's questions
-    window.quizQuestions = profile.quizQuestions;
+    quizQuestions = profile.quizQuestions;
 
     // Hide other chat states before showing quiz
     const otherStates = ['profileSelection', 'actualChat', 'unlockModal'];
