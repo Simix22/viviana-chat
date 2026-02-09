@@ -1309,15 +1309,33 @@ body {
     height: 100dvh;
     display: none;
     flex-direction: column;
-    overflow-y: auto;
-    -webkit-overflow-scrolling: touch;
+    overflow: hidden !important;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: calc(24px + var(--nav-height)); /* Extra space above nav */
+    padding-bottom: 0 !important;
 }
 
 #creditsScreen.active,
 #creditsScreen[style*="display: flex"] {
     display: flex !important;
+}
+
+#creditsScreen .store-header {
+    flex-shrink: 0;
+    position: relative !important;
+    z-index: 2;
+}
+
+#creditsScreen .store-container {
+    flex: 1 !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 24px !important;
+    min-height: 0 !important;
+}
+
+#creditsScreen .app-nav {
+    flex-shrink: 0;
+    position: relative !important;
 }
 
 /* Quiz safe areas handled in quiz-container/header/content above */
@@ -1457,6 +1475,238 @@ body.quiz-open {
 
 #creditsScreen .store-footer {
     color: var(--app-text-secondary);
+}
+
+#creditsScreen .store-footer p {
+    color: var(--app-text-secondary);
+}
+
+#creditsScreen .store-subtitle {
+    color: var(--app-text-secondary);
+}
+
+#creditsScreen .price {
+    color: var(--app-text);
+}
+
+#creditsScreen .price-per {
+    color: var(--app-text-secondary);
+}
+
+#creditsScreen .current-balance {
+    color: var(--app-text);
+}
+
+#creditsScreen .back-btn {
+    color: var(--app-text);
+}
+
+#creditsScreen .card-badge {
+    background: var(--app-surface);
+    color: var(--app-text-secondary);
+}
+
+#creditsScreen .store-footer {
+    border-top-color: var(--app-border);
+}
+
+#creditsScreen .card-icon svg {
+    stroke: var(--primary-color, #E91E63);
+}
+
+/* Dark mode overrides for credits store - specificity boost */
+[data-theme="dark"] #creditsScreen {
+    background: var(--app-bg, #0a0a0a) !important;
+}
+
+[data-theme="dark"] #creditsScreen .store-header {
+    background: var(--app-bg, #0a0a0a) !important;
+    border-bottom-color: var(--app-border, #2a2a2a) !important;
+}
+
+[data-theme="dark"] #creditsScreen .credit-card.popular {
+    background: linear-gradient(135deg, #1a1218, #251520) !important;
+    border-color: #E91E63 !important;
+}
+
+[data-theme="dark"] #creditsScreen .btn-purchase {
+    background: #E91E63;
+    color: #ffffff;
+}
+
+/* ========================================
+   JOKER SHOP - DARK MODE
+   ======================================== */
+
+[data-theme="dark"] #jokerModal {
+    background: rgba(0, 0, 0, 0.75);
+}
+
+[data-theme="dark"] .joker-modal-panel {
+    background: var(--app-bg, #0a0a0a) !important;
+}
+
+[data-theme="dark"] .joker-modal-header {
+    background: var(--app-bg, #0a0a0a) !important;
+    border-bottom-color: var(--app-border, #2a2a2a) !important;
+}
+
+[data-theme="dark"] .joker-modal-header h3 {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .joker-modal-header .header-sub {
+    color: #999 !important;
+}
+
+[data-theme="dark"] .joker-modal-close {
+    background: #1a1a1a !important;
+    color: #ccc !important;
+}
+
+[data-theme="dark"] .joker-modal-close:hover {
+    background: #252525 !important;
+}
+
+[data-theme="dark"] .joker-card {
+    background: var(--app-surface, #141414) !important;
+    border-color: var(--app-border, #2a2a2a) !important;
+}
+
+[data-theme="dark"] .joker-card.available:hover {
+    border-color: #9c7cff !important;
+    box-shadow: 0 4px 16px rgba(124, 77, 255, 0.2) !important;
+}
+
+[data-theme="dark"] .joker-card.locked {
+    background: #0e0e0e !important;
+}
+
+[data-theme="dark"] .joker-card.locked::before {
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        rgba(255, 255, 255, 0.02) 8px,
+        rgba(255, 255, 255, 0.02) 16px
+    ) !important;
+}
+
+[data-theme="dark"] .joker-card-title {
+    color: #ffffff !important;
+}
+
+[data-theme="dark"] .joker-card.locked .joker-card-title {
+    color: #666 !important;
+}
+
+[data-theme="dark"] .joker-card-desc {
+    color: #999 !important;
+}
+
+[data-theme="dark"] .joker-card.locked .joker-card-desc {
+    color: #555 !important;
+}
+
+[data-theme="dark"] .joker-card.available .joker-card-icon {
+    background: linear-gradient(135deg, #2a1f4e, #3a2060) !important;
+}
+
+[data-theme="dark"] .joker-card.locked .joker-card-icon {
+    background: #1a1a1a !important;
+}
+
+[data-theme="dark"] .joker-card.available .joker-rank-badge {
+    background: #2a1f4e !important;
+    color: #b39dff !important;
+}
+
+[data-theme="dark"] .joker-card.locked .joker-rank-badge {
+    background: #1a1a1a !important;
+    color: #666 !important;
+}
+
+[data-theme="dark"] .joker-price {
+    color: #FF4081 !important;
+}
+
+[data-theme="dark"] .joker-lock-info {
+    color: #555 !important;
+}
+
+[data-theme="dark"] .joker-use-btn:disabled {
+    background: #2a2a2a !important;
+    color: #555 !important;
+}
+
+/* Special joker card dark mode */
+[data-theme="dark"] .joker-card.special-locked {
+    border-color: #5a4200 !important;
+    background: linear-gradient(135deg, #1a1500, #201a00) !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked::before {
+    background: repeating-linear-gradient(
+        45deg,
+        transparent,
+        transparent 8px,
+        rgba(255, 160, 0, 0.04) 8px,
+        rgba(255, 160, 0, 0.04) 16px
+    ) !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked .joker-card-icon {
+    background: linear-gradient(135deg, #3a2800, #4a3200) !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked .joker-card-title {
+    color: #ffab40 !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked .joker-rank-badge {
+    background: #3a2800 !important;
+    color: #ffab40 !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked .joker-card-desc {
+    color: #996830 !important;
+}
+
+[data-theme="dark"] .joker-card.special-locked .joker-lock-info {
+    color: #b87800 !important;
+}
+
+/* Joker chat bubbles dark mode */
+[data-theme="dark"] .joker-bubble {
+    background: linear-gradient(135deg, #1a1530, #1e1835) !important;
+    border-color: #2a2040 !important;
+}
+
+[data-theme="dark"] .joker-msg-title {
+    color: #b39dff !important;
+}
+
+[data-theme="dark"] .joker-msg-text {
+    color: #9c8fcc !important;
+}
+
+[data-theme="dark"] .joker-msg-time {
+    color: #6a5a9e !important;
+}
+
+/* Soulmate rank bar dark mode */
+[data-theme="dark"] .soulmate-rank-bar {
+    background: rgba(10, 10, 10, 0.95) !important;
+    border-bottom-color: var(--app-border, #2a2a2a) !important;
+}
+
+[data-theme="dark"] .rank-level-label,
+[data-theme="dark"] .rank-next-label {
+    color: #ccc !important;
+}
+
+[data-theme="dark"] .rank-progress-track {
+    background: #1a1a1a !important;
 }
 
 /* Notification/Privacy settings theme */
