@@ -1769,6 +1769,12 @@ function loadProfile() {
     document.getElementById('profileName').value = currentUser.name;
     document.getElementById('profileEmail').value = currentUser.email;
 
+    // Update hero display name and initial
+    const heroName = document.getElementById('profileDisplayName');
+    if (heroName) heroName.textContent = currentUser.name;
+    const heroInitial = document.getElementById('profileInitial');
+    if (heroInitial) heroInitial.textContent = currentUser.name.charAt(0).toUpperCase();
+
     const bio = localStorage.getItem(`VIVIANA_${currentUser.userId}_BIO`) || '';
     document.getElementById('profileBio').value = bio;
 
