@@ -83,6 +83,7 @@ body {
 
 /* ========================================
    FIX: PROFILE SELECTION (Messages List)
+   Must fill the entire screen above the nav bar
    ======================================== */
 
 #profileSelection {
@@ -102,6 +103,7 @@ body {
     display: flex;
     flex-direction: column;
     height: 100%;
+    min-height: 0; /* Allow flex children to shrink */
     overflow: hidden;
     background: var(--app-bg);
 }
@@ -140,14 +142,15 @@ body {
     border: 2px solid var(--app-bg);
 }
 
-/* Contact List - Scrollable with generous bottom space */
+/* Contact List - Scrollable, fills all remaining space */
 #profileSelection .contact-list {
     flex: 1;
+    min-height: 0; /* Critical: allows flex item to shrink and scroll */
     overflow-y: auto;
     overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
     background: var(--app-bg) !important;
-    padding-bottom: 24px; /* Extra space so last item isn't cut off */
+    padding-bottom: 16px;
 }
 
 /* Contact Item - Large touch targets for mobile */
@@ -1088,23 +1091,27 @@ body {
 }
 
 /* ========================================
-   FIX: QUIZ FLOW - Fullscreen Overlay Modal
+   FIX: QUIZ FLOW - True Fullscreen Overlay
+   Uses position:fixed to cover entire viewport
+   including the nav bar underneath
    ======================================== */
 
 #quizFlow {
-    position: absolute !important;
+    position: fixed !important;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
     display: none;
     flex-direction: column;
     background: var(--app-bg) !important;
-    z-index: 300;
+    z-index: 9000; /* Above everything including nav bar */
     overflow: hidden;
 }
 
-#quizFlow.active,
 #quizFlow[style*="display: flex"] {
     display: flex !important;
 }
@@ -1131,6 +1138,50 @@ body {
 .quiz-close-btn:hover,
 .quiz-close-btn:active {
     background: var(--app-border);
+}
+
+/* Quiz container - fills entire quiz overlay */
+#quizFlow .quiz-container {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+}
+
+/* Quiz header - fixed at top with safe area */
+#quizFlow .quiz-header {
+    flex-shrink: 0;
+    padding-top: calc(20px + env(safe-area-inset-top, 0px));
+    position: relative;
+    z-index: 10;
+}
+
+/* Quiz content - scrollable, fills remaining space */
+#quizFlow .quiz-content {
+    flex: 1;
+    min-height: 0;
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: calc(24px + env(safe-area-inset-bottom, 0px));
+}
+
+/* Unlock modal - also truly fullscreen */
+.unlock-modal {
+    position: fixed !important;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    width: 100%;
+    height: 100%;
+    height: 100dvh;
+    z-index: 9001; /* Above quiz */
+}
+
+.unlock-modal-content {
+    height: 100%;
+    padding-bottom: env(safe-area-inset-bottom, 0px);
 }
 
 /* ========================================
@@ -1251,13 +1302,7 @@ body {
     display: flex !important;
 }
 
-/* --- QUIZ FLOW - Full viewport + safe areas --- */
-#quizFlow {
-    height: 100%;
-    height: 100dvh;
-    padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
-}
+/* Quiz safe areas handled in quiz-container/header/content above */
 
 /* --- DISCOVER SCREEN - Proper bottom for nav --- */
 #discoverScreen > .app-nav {
