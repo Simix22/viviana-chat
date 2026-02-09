@@ -1,0 +1,538 @@
+/* ============================================
+   VIVIANA CHAT - VIVID REDESIGN
+   Warmer, more emotional, alive UI
+   Especially targeting Light Mode flatness
+   ============================================ */
+
+/* ========================================
+   LIGHT MODE - WARM & ALIVE
+   Replace clinical whites with warm tones
+   ======================================== */
+
+:root {
+    /* Warmer background palette - blush undertones instead of pure white */
+    --app-bg: #FFF8F9;
+    --app-surface: #FFF0F2;
+    --app-surface-2: #FFFBFC;
+    --app-surface-3: #FFF3F5;
+    --app-border: #F0DFE2;
+    --app-border-subtle: #F8EBED;
+    --app-text: #2D1F24;
+    --app-text-secondary: #7A5A62;
+    --app-text-muted: #B89AA2;
+    --app-text-faded: #D4BCC2;
+    --app-msg-received: #FFF0F3;
+    --app-nav-active: #E91E63;
+    --app-scrollbar: #E0C8CD;
+    --app-scrollbar-hover: #D4B0B8;
+
+    /* Richer shadows with pink warmth */
+    --shadow-soft: 0 2px 12px rgba(233, 30, 99, 0.06);
+    --shadow-glow: 0 0 24px rgba(233, 30, 99, 0.12);
+
+    /* Warmer chat variables */
+    --bg-primary: #FFF8F9;
+    --bg-secondary: #FFF0F2;
+    --bg-tertiary: #FFE8EC;
+    --bg-input: #FFF5F7;
+    --bg-bubble-received: linear-gradient(135deg, #FFF0F3 0%, #FFE8EE 100%);
+    --bg-bubble-sent: linear-gradient(135deg, #E91E63 0%, #D81558 50%, #C2185B 100%);
+    --text-primary: #2D1F24;
+    --text-secondary: #7A5A62;
+    --text-muted: #B89AA2;
+    --border-color: #F0DFE2;
+    --border-light: #F8EBED;
+    --accent-light: rgba(233, 30, 99, 0.08);
+    --accent-glow: rgba(233, 30, 99, 0.15);
+}
+
+/* Dark mode - deeper, richer, more atmospheric */
+[data-theme="dark"] {
+    --app-bg: #0D0A0F;
+    --app-surface: #161218;
+    --app-surface-2: #1C1620;
+    --app-surface-3: #130F16;
+    --app-border: #2E2433;
+    --app-border-subtle: #1E1824;
+    --app-msg-received: #1C1428;
+    --app-scrollbar: #3A2E42;
+    --app-scrollbar-hover: #4A3E52;
+    --bg-primary: #0D0A0F;
+    --bg-secondary: #161218;
+    --bg-tertiary: #1C1620;
+    --bg-input: #201A26;
+    --bg-bubble-received: linear-gradient(135deg, #1C1428 0%, #201830 100%);
+    --border-color: #2E2433;
+    --border-light: #382C40;
+}
+
+/* ========================================
+   APP BACKGROUND - SUBTLE TEXTURE
+   ======================================== */
+
+body {
+    background: var(--app-bg) !important;
+}
+
+/* Subtle warm grain overlay on main screens */
+#chatScreen::before,
+#profileSelection::before {
+    content: '';
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(233, 30, 99, 0.03) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(156, 39, 176, 0.02) 0%, transparent 50%);
+    pointer-events: none;
+    z-index: 0;
+}
+
+[data-theme="dark"] #chatScreen::before,
+[data-theme="dark"] #profileSelection::before {
+    background:
+        radial-gradient(ellipse at 20% 0%, rgba(233, 30, 99, 0.05) 0%, transparent 50%),
+        radial-gradient(ellipse at 80% 100%, rgba(124, 77, 255, 0.04) 0%, transparent 50%);
+}
+
+/* ========================================
+   NAV BAR - MORE PRESENCE
+   ======================================== */
+
+.app-nav {
+    background: rgba(255, 248, 249, 0.92) !important;
+    backdrop-filter: blur(20px) saturate(180%);
+    -webkit-backdrop-filter: blur(20px) saturate(180%);
+    border-top: 1px solid rgba(233, 30, 99, 0.08) !important;
+    box-shadow: 0 -4px 24px rgba(233, 30, 99, 0.04) !important;
+}
+
+[data-theme="dark"] .app-nav {
+    background: rgba(13, 10, 15, 0.92) !important;
+    border-top: 1px solid rgba(233, 30, 99, 0.1) !important;
+    box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.3) !important;
+}
+
+.nav-item.active {
+    color: #E91E63 !important;
+}
+
+.nav-item.active svg {
+    filter: drop-shadow(0 0 6px rgba(233, 30, 99, 0.3));
+}
+
+/* ========================================
+   CONTACT LIST - WARMTH & DEPTH
+   ======================================== */
+
+/* Messages header - warm gradient line */
+#profileSelection .messages-header {
+    background: var(--app-bg) !important;
+    border-bottom: none !important;
+    box-shadow: 0 1px 0 rgba(233, 30, 99, 0.06);
+}
+
+#profileSelection .messages-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 20px;
+    right: 20px;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.15), transparent);
+}
+
+#profileSelection .messages-header h1 {
+    background: linear-gradient(135deg, #2D1F24 0%, #E91E63 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800 !important;
+    letter-spacing: -0.5px;
+}
+
+[data-theme="dark"] #profileSelection .messages-header h1 {
+    background: linear-gradient(135deg, #ffffff 0%, #FF80AB 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Contact items - subtle hover glow */
+#profileSelection .contact-item {
+    border-bottom: 1px solid rgba(233, 30, 99, 0.04) !important;
+    transition: all 0.2s ease !important;
+    position: relative;
+}
+
+#profileSelection .contact-item:active {
+    background: rgba(233, 30, 99, 0.04) !important;
+}
+
+/* Avatar ring glow for unlocked contacts */
+#profileSelection .contact-avatar-img {
+    box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08), 0 0 0 2px rgba(233, 30, 99, 0.08);
+}
+
+/* Contact name - slightly bolder */
+#profileSelection .contact-name h3 {
+    font-weight: 700 !important;
+    color: var(--app-text) !important;
+}
+
+/* Unread dot - glow */
+#profileSelection .contact-unread-dot {
+    box-shadow: 0 0 8px rgba(124, 77, 255, 0.4);
+}
+
+/* ========================================
+   CHAT VIEW - EMOTIONAL DEPTH
+   The heart of the redesign
+   ======================================== */
+
+/* Chat header - warm, present */
+#actualChat .chat-header {
+    background: rgba(255, 248, 249, 0.95) !important;
+    backdrop-filter: blur(16px) saturate(150%);
+    -webkit-backdrop-filter: blur(16px) saturate(150%);
+    border-bottom: none !important;
+    box-shadow: 0 2px 16px rgba(233, 30, 99, 0.04);
+}
+
+[data-theme="dark"] #actualChat .chat-header {
+    background: rgba(13, 10, 15, 0.95) !important;
+    box-shadow: 0 2px 16px rgba(0, 0, 0, 0.2);
+}
+
+#actualChat .chat-header::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.1), transparent);
+}
+
+/* Chat partner name - warm */
+#actualChat .chat-partner-name {
+    font-weight: 700 !important;
+    color: var(--app-text) !important;
+}
+
+/* Chat partner avatar - subtle pink ring */
+#actualChat .chat-partner-avatar {
+    box-shadow: 0 0 0 2px rgba(233, 30, 99, 0.15), 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Chat messages area - warm background with subtle gradient */
+#actualChat .chat-messages {
+    background: var(--app-bg) !important;
+    position: relative;
+}
+
+/* Received message bubbles - warm, soft, inviting */
+#actualChat .message.received .message-bubble {
+    background: linear-gradient(135deg, #FFF0F3 0%, #FFE8EE 100%) !important;
+    color: var(--app-text) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06);
+    box-shadow: 0 2px 8px rgba(233, 30, 99, 0.04);
+    border-bottom-left-radius: 6px;
+}
+
+[data-theme="dark"] #actualChat .message.received .message-bubble {
+    background: linear-gradient(135deg, #1C1428 0%, #201830 100%) !important;
+    border: 1px solid rgba(233, 30, 99, 0.08);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+}
+
+/* Sent message bubbles - rich, vibrant gradient with depth */
+#actualChat .message.sent .message-bubble {
+    background: linear-gradient(135deg, #E91E63 0%, #D81558 40%, #C2185B 100%) !important;
+    color: #ffffff !important;
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.25), 0 1px 4px rgba(0, 0, 0, 0.1);
+    border-bottom-right-radius: 6px;
+}
+
+/* Message bubble text */
+#actualChat .message-bubble p {
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+/* Message time stamp */
+#actualChat .message-time {
+    font-size: 11px;
+    opacity: 0.6;
+}
+
+/* Chat input area - elevated, warm */
+#actualChat .chat-input-area {
+    background: rgba(255, 248, 249, 0.95) !important;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-top: none !important;
+    box-shadow: 0 -4px 20px rgba(233, 30, 99, 0.04);
+}
+
+[data-theme="dark"] #actualChat .chat-input-area {
+    background: rgba(13, 10, 15, 0.95) !important;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+}
+
+#actualChat .chat-input-area::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, rgba(233, 30, 99, 0.1), transparent);
+}
+
+/* Input field - warm, soft focus */
+#actualChat .chat-input-field {
+    background: var(--app-surface) !important;
+    border: 1px solid rgba(233, 30, 99, 0.08) !important;
+    border-radius: 24px !important;
+    transition: all 0.2s ease;
+}
+
+#actualChat .chat-input-field:focus-within {
+    border-color: rgba(233, 30, 99, 0.2) !important;
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.06), 0 2px 8px rgba(233, 30, 99, 0.06);
+}
+
+/* Send button - glow on hover */
+#actualChat .input-action-btn.send-btn {
+    color: #E91E63;
+    transition: all 0.2s ease;
+}
+
+/* Joker button - vibrant, alive */
+#actualChat .joker-btn {
+    background: rgba(233, 30, 99, 0.06) !important;
+    border: 2px solid rgba(233, 30, 99, 0.2) !important;
+    transition: all 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+#actualChat .joker-btn:active {
+    transform: scale(0.9);
+    background: rgba(233, 30, 99, 0.12) !important;
+    box-shadow: 0 0 16px rgba(233, 30, 99, 0.15);
+}
+
+/* ========================================
+   DISCOVER SCREEN - VIBRANT
+   ======================================== */
+
+#discoverScreen {
+    background: var(--app-bg) !important;
+}
+
+/* Discover header - gradient text */
+#discoverScreen .discover-header h2 {
+    background: linear-gradient(135deg, var(--app-text) 0%, #E91E63 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    font-weight: 800 !important;
+}
+
+[data-theme="dark"] #discoverScreen .discover-header h2 {
+    background: linear-gradient(135deg, #ffffff 0%, #FF80AB 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+/* Cards - richer shadows */
+#discoverScreen .discover-card {
+    box-shadow:
+        0 8px 32px rgba(233, 30, 99, 0.08),
+        0 4px 16px rgba(0, 0, 0, 0.06) !important;
+    border: 1px solid rgba(233, 30, 99, 0.04);
+}
+
+[data-theme="dark"] #discoverScreen .discover-card {
+    box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        0 4px 16px rgba(233, 30, 99, 0.08) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06);
+}
+
+/* Like button - more alive with pulse glow */
+#discoverScreen .discover-like-btn {
+    background: linear-gradient(135deg, #E91E63 0%, #FF4081 50%, #F06292 100%) !important;
+    box-shadow:
+        0 6px 24px rgba(233, 30, 99, 0.35),
+        0 0 40px rgba(233, 30, 99, 0.1) !important;
+}
+
+#discoverScreen .discover-like-btn:active {
+    box-shadow:
+        0 3px 12px rgba(233, 30, 99, 0.2),
+        0 0 20px rgba(233, 30, 99, 0.05) !important;
+}
+
+/* Skip button - subtle warm border */
+#discoverScreen .discover-skip-btn {
+    background: var(--app-surface-2) !important;
+    border: 2px solid rgba(233, 30, 99, 0.08) !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04) !important;
+}
+
+/* Tags - warmer */
+#discoverScreen .discover-tag {
+    background: rgba(233, 30, 99, 0.04) !important;
+    border-color: rgba(233, 30, 99, 0.08) !important;
+    color: var(--app-text-secondary) !important;
+}
+
+/* ========================================
+   PROFILE SCREEN - HERO GLOW
+   ======================================== */
+
+/* Hero gradient - richer, deeper */
+.profile-hero-bg {
+    background: linear-gradient(135deg, #E91E63 0%, #D81558 30%, #AD1457 60%, #880E4F 100%) !important;
+}
+
+[data-theme="dark"] .profile-hero-bg {
+    background: linear-gradient(135deg, #C2185B 0%, #AD1457 30%, #880E4F 60%, #6A0E3B 100%) !important;
+}
+
+/* Profile avatar - glow ring */
+.profile-avatar-ring {
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 0 40px rgba(233, 30, 99, 0.15) !important;
+}
+
+/* Credits button - more prominent */
+.profile-buy-credits-btn {
+    background: rgba(255, 255, 255, 0.97) !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12), 0 0 24px rgba(233, 30, 99, 0.08) !important;
+}
+
+.profile-buy-credits-btn:active {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+}
+
+/* Stat cards - warm shadows */
+.stat-card {
+    box-shadow: 0 2px 12px rgba(233, 30, 99, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    background: var(--app-surface-2) !important;
+}
+
+.stat-card-primary {
+    background: linear-gradient(135deg, #E91E63 0%, #D81558 50%, #C2185B 100%) !important;
+    box-shadow: 0 4px 20px rgba(233, 30, 99, 0.25), 0 2px 8px rgba(0, 0, 0, 0.06) !important;
+}
+
+/* Settings card - warm */
+.settings-card {
+    box-shadow: 0 2px 12px rgba(233, 30, 99, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    background: var(--app-surface-2) !important;
+}
+
+.profile-form-card {
+    box-shadow: 0 2px 12px rgba(233, 30, 99, 0.04), 0 1px 4px rgba(0, 0, 0, 0.04) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    background: var(--app-surface-2) !important;
+}
+
+/* Form inputs - warm focus */
+.form-field input:focus,
+.form-field textarea:focus {
+    border-color: #E91E63 !important;
+    box-shadow: 0 0 0 3px rgba(233, 30, 99, 0.08) !important;
+}
+
+/* Save button - richer gradient */
+.btn-save {
+    background: linear-gradient(135deg, #E91E63 0%, #D81558 50%, #C2185B 100%) !important;
+    box-shadow: 0 4px 16px rgba(233, 30, 99, 0.3) !important;
+}
+
+/* ========================================
+   CREDITS SCREEN - WARM
+   ======================================== */
+
+#creditsScreen {
+    background: var(--app-bg) !important;
+}
+
+#creditsScreen .credit-card {
+    background: var(--app-surface-2) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    box-shadow: 0 2px 12px rgba(233, 30, 99, 0.04) !important;
+    transition: all 0.2s ease;
+}
+
+/* ========================================
+   AUTH SCREENS - WARM
+   ======================================== */
+
+#authScreen {
+    background: var(--app-bg) !important;
+}
+
+#authScreen .auth-container {
+    background: var(--app-surface-2) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    box-shadow: 0 8px 32px rgba(233, 30, 99, 0.06) !important;
+}
+
+/* ========================================
+   POPUP/MODAL - WARM
+   ======================================== */
+
+.popup-overlay .popup-content {
+    background: var(--app-surface-2) !important;
+    border: 1px solid rgba(233, 30, 99, 0.06) !important;
+    box-shadow: 0 16px 48px rgba(0, 0, 0, 0.12), 0 0 40px rgba(233, 30, 99, 0.04) !important;
+}
+
+/* ========================================
+   TOGGLE SWITCH - ALIVE
+   ======================================== */
+
+.toggle-switch input:checked + .toggle-slider {
+    background: linear-gradient(135deg, #E91E63, #FF4081) !important;
+    box-shadow: 0 0 12px rgba(233, 30, 99, 0.25);
+}
+
+/* ========================================
+   SCROLLBAR - WARM
+   ======================================== */
+
+::-webkit-scrollbar-thumb {
+    background: rgba(233, 30, 99, 0.12) !important;
+    border-radius: 4px !important;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: rgba(233, 30, 99, 0.2) !important;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+    background: rgba(233, 30, 99, 0.15) !important;
+}
+
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+    background: rgba(233, 30, 99, 0.25) !important;
+}
+
+/* ========================================
+   ACCESSIBILITY - Respect motion prefs
+   ======================================== */
+
+@media (prefers-reduced-motion: reduce) {
+    #chatScreen::before,
+    #profileSelection::before {
+        display: none;
+    }
+}
