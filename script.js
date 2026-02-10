@@ -653,18 +653,11 @@ function cleanupOrphanedData() {
 document.addEventListener('DOMContentLoaded', () => {
     console.log('🚀 Viviana App Starting');
 
-    // Initialize theme from saved preference (default: dark)
-    const savedTheme = localStorage.getItem('VIVIANA_THEME') || 'dark';
+    // Force dark mode - light mode is disabled
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('VIVIANA_THEME', 'dark');
     const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (savedTheme === 'dark') {
-        document.documentElement.setAttribute('data-theme', 'dark');
-        if (themeColorMeta) themeColorMeta.content = '#0a0a0a';
-    } else {
-        document.documentElement.removeAttribute('data-theme');
-        if (themeColorMeta) themeColorMeta.content = '#FFFFFF';
-    }
-    const darkToggle = document.getElementById('darkModeToggle');
-    if (darkToggle) darkToggle.checked = (savedTheme === 'dark');
+    if (themeColorMeta) themeColorMeta.content = '#0c0b12';
 
     // ESC key to close quiz overlay
     document.addEventListener('keydown', (e) => {
@@ -811,18 +804,9 @@ function stopMessageRefresh() {
 }
 
 function toggleDarkMode() {
-    const html = document.documentElement;
-    const toggle = document.getElementById('darkModeToggle');
-    const themeColorMeta = document.querySelector('meta[name="theme-color"]');
-    if (toggle && toggle.checked) {
-        html.setAttribute('data-theme', 'dark');
-        localStorage.setItem('VIVIANA_THEME', 'dark');
-        if (themeColorMeta) themeColorMeta.content = '#0a0a0a';
-    } else {
-        html.removeAttribute('data-theme');
-        localStorage.setItem('VIVIANA_THEME', 'light');
-        if (themeColorMeta) themeColorMeta.content = '#FFFFFF';
-    }
+    // Light mode disabled - always enforce dark mode
+    document.documentElement.setAttribute('data-theme', 'dark');
+    localStorage.setItem('VIVIANA_THEME', 'dark');
 }
 
 function showCreditsStore() {

@@ -73,56 +73,58 @@
 }
 
 /* ============================================
-   THEME 1: DARK MODE
+   THEME 1: DARK MODE — "Midnight Velvet"
+   Premium dark design with subtle violet warmth,
+   refined hierarchy, and emotional depth
    ============================================ */
 [data-theme="dark"] {
-    /* Primary Colors */
-    --primary-color: #FF4081;
-    --primary-dark: #F50057;
+    /* Primary Colors — Refined rose accent */
+    --primary-color: #F43B7E;
+    --primary-dark: #D42A6A;
     --primary-light: #FF80AB;
-    --secondary-color: #7C4DFF;
+    --secondary-color: #8B5CF6;
 
-    /* Background Colors */
-    --bg-gradient: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
-    --bg-primary: #1a1a2e;
-    --bg-secondary: #0f0f1e;
-    --bg-tertiary: #16213e;
+    /* Background Colors — Deep indigo-black with warmth */
+    --bg-gradient: linear-gradient(135deg, #14122A 0%, #1A1530 50%, #0F0E1A 100%);
+    --bg-primary: #0c0b12;
+    --bg-secondary: #100f18;
+    --bg-tertiary: #151420;
 
-    /* Text Colors */
-    --text-primary: #FFFFFF;
-    --text-secondary: #B0B0B0;
-    --text-tertiary: #808080;
+    /* Text Colors — Warm neutrals for readability */
+    --text-primary: #EEEAF5;
+    --text-secondary: #9E9BB2;
+    --text-tertiary: #6B677F;
 
     /* UI Elements */
-    --border-color: #2a2a3e;
-    --success-color: #66BB6A;
-    --error-color: #EF5350;
-    --warning-color: #FFA726;
-    --info-color: #42A5F5;
+    --border-color: #282640;
+    --success-color: #34D399;
+    --error-color: #F87171;
+    --warning-color: #FBBF24;
+    --info-color: #60A5FA;
 
-    /* Shadows */
-    --shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
-    --shadow-lg: 0 4px 16px rgba(0, 0, 0, 0.6);
-    --shadow-xl: 0 8px 32px rgba(0, 0, 0, 0.8);
+    /* Shadows — Colored, atmospheric depth */
+    --shadow: 0 2px 10px rgba(10, 8, 24, 0.5), 0 1px 3px rgba(0, 0, 0, 0.2);
+    --shadow-lg: 0 8px 24px rgba(10, 8, 24, 0.6), 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-xl: 0 16px 48px rgba(10, 8, 24, 0.7), 0 4px 16px rgba(0, 0, 0, 0.4);
 
-    /* Avatar Gradient */
-    --avatar-gradient: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    /* Avatar Gradient — Richer */
+    --avatar-gradient: linear-gradient(135deg, #8B5CF6 0%, #EC4899 100%);
 
-    /* App Surface Colors (Dark Mode) */
-    --app-bg: #0a0a0a;
-    --app-surface: #141414;
-    --app-surface-2: #1a1a1a;
-    --app-surface-3: #111111;
-    --app-border: #2a2a2a;
-    --app-border-subtle: #1a1a1a;
-    --app-text: #ffffff;
-    --app-text-secondary: #a0a0a0;
-    --app-text-muted: #666666;
-    --app-text-faded: #555555;
-    --app-msg-received: #1a1a2e;
-    --app-scrollbar: #333333;
-    --app-scrollbar-hover: #444444;
-    --app-nav-active: #E91E63;
+    /* App Surface Colors — Layered depth with violet undertone */
+    --app-bg: #0c0b12;
+    --app-surface: #13121e;
+    --app-surface-2: #1a1928;
+    --app-surface-3: #100f1a;
+    --app-border: #2a2840;
+    --app-border-subtle: #1e1d2e;
+    --app-text: #EEEAF5;
+    --app-text-secondary: #9E9BB2;
+    --app-text-muted: #6B677F;
+    --app-text-faded: #4A4760;
+    --app-msg-received: #18162a;
+    --app-scrollbar: #2E2C44;
+    --app-scrollbar-hover: #3E3C56;
+    --app-nav-active: #F43B7E;
 }
 
 /* ============================================
@@ -328,5 +330,5 @@ body {
 [data-theme="dark"] .shadow,
 [data-theme="dark"] .card,
 [data-theme="dark"] .message-bubble {
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.6);
+    box-shadow: 0 2px 12px rgba(10, 8, 24, 0.5);
 }

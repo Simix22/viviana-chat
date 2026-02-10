@@ -25,16 +25,16 @@
     --quiz-transition-fast: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
-/* Dark Mode Quiz Variables */
+/* Dark Mode Quiz Variables — Midnight Velvet */
 [data-theme="dark"] {
-    --quiz-bg: #0a0a0a;
-    --quiz-card-bg: #1a1a1a;
-    --quiz-text-primary: #ffffff;
-    --quiz-text-secondary: #a0a0a0;
-    --quiz-border: #2a2a2a;
-    --quiz-shadow: 0 2px 12px rgba(0, 0, 0, 0.4);
-    --quiz-shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
-    --quiz-shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.8);
+    --quiz-bg: #0c0b12;
+    --quiz-card-bg: #1a1928;
+    --quiz-text-primary: #EEEAF5;
+    --quiz-text-secondary: #9E9BB2;
+    --quiz-border: #2a2840;
+    --quiz-shadow: 0 2px 12px rgba(10, 8, 24, 0.5);
+    --quiz-shadow-lg: 0 8px 32px rgba(10, 8, 24, 0.6);
+    --quiz-shadow-xl: 0 16px 48px rgba(10, 8, 24, 0.8);
 }
 
 /* ========================================

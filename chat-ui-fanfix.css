@@ -65,27 +65,27 @@
    ======================================== */
 
 [data-theme="dark"] {
-    /* Dark backgrounds */
-    --bg-primary: #0a0a0a;
-    --bg-secondary: #141414;
-    --bg-tertiary: #1a1a1a;
-    --bg-input: #252525;
-    --bg-bubble-received: #1e1e1e;
-    --bg-bubble-sent: linear-gradient(135deg, #E91E63 0%, #C2185B 100%);
+    /* Dark backgrounds — Midnight Velvet */
+    --bg-primary: #0c0b12;
+    --bg-secondary: #13121e;
+    --bg-tertiary: #1a1928;
+    --bg-input: #1e1d2e;
+    --bg-bubble-received: #18162a;
+    --bg-bubble-sent: linear-gradient(135deg, #F43B7E 0%, #D42A6A 100%);
 
     /* Text colors */
-    --text-primary: #ffffff;
-    --text-secondary: #a0a0a0;
-    --text-muted: #666666;
-    --text-accent: #E91E63;
+    --text-primary: #EEEAF5;
+    --text-secondary: #9E9BB2;
+    --text-muted: #6B677F;
+    --text-accent: #F43B7E;
 
     /* Borders */
-    --border-color: #2a2a2a;
-    --border-light: #333333;
+    --border-color: #2a2840;
+    --border-light: #34324e;
 
     /* Shadows */
-    --shadow-soft: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-glow: 0 0 20px rgba(233, 30, 99, 0.2);
+    --shadow-soft: 0 2px 10px rgba(10, 8, 24, 0.4);
+    --shadow-glow: 0 0 24px rgba(244, 59, 126, 0.18);
 }
 
 /* ========================================

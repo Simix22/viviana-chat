@@ -25,19 +25,19 @@
 }
 
 [data-theme="dark"] {
-    /* Profile Dark Theme */
-    --profile-bg: #0a0a0a;
-    --profile-hero-gradient: linear-gradient(135deg, #E91E63 0%, #C2185B 50%, #880E4F 100%);
-    --profile-card-bg: #1a1a1a;
-    --profile-card-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
-    --profile-card-border: rgba(255, 255, 255, 0.06);
-    --profile-text-primary: #ffffff;
-    --profile-text-secondary: #a0a0a0;
-    --profile-text-muted: #666666;
-    --profile-input-bg: #252525;
-    --profile-input-border: #333333;
-    --profile-section-title: #ffffff;
-    --profile-divider: #2a2a2a;
+    /* Profile Dark Theme — Midnight Velvet */
+    --profile-bg: #0c0b12;
+    --profile-hero-gradient: linear-gradient(135deg, #F43B7E 0%, #D42A6A 35%, #8B2255 70%, #2A1530 100%);
+    --profile-card-bg: #1a1928;
+    --profile-card-shadow: 0 2px 16px rgba(10, 8, 24, 0.45);
+    --profile-card-border: rgba(139, 92, 246, 0.08);
+    --profile-text-primary: #EEEAF5;
+    --profile-text-secondary: #9E9BB2;
+    --profile-text-muted: #6B677F;
+    --profile-input-bg: #1e1d2e;
+    --profile-input-border: #2a2840;
+    --profile-section-title: #EEEAF5;
+    --profile-divider: #2a2840;
 }
 
 /* ========================================

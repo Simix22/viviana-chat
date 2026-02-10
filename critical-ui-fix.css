@@ -600,14 +600,14 @@ body {
    ======================================== */
 
 [data-theme="dark"] #discoverScreen .discover-card {
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 2px 8px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 8px 36px rgba(10, 8, 24, 0.6), 0 2px 8px rgba(10, 8, 24, 0.3);
 }
 
 [data-theme="dark"] #discoverScreen .discover-card-image::after {
     background: linear-gradient(
         to top,
-        rgba(0, 0, 0, 0.95) 0%,
-        rgba(0, 0, 0, 0.5) 40%,
+        rgba(12, 11, 18, 0.95) 0%,
+        rgba(12, 11, 18, 0.5) 40%,
         transparent 100%
     );
 }
@@ -615,16 +615,16 @@ body {
 [data-theme="dark"] #discoverScreen .discover-skip-btn {
     background: var(--app-surface-2);
     border-color: var(--app-border) !important;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 4px 16px rgba(10, 8, 24, 0.4);
 }
 
 [data-theme="dark"] #discoverScreen .discover-like-btn {
-    box-shadow: 0 6px 24px rgba(233, 30, 99, 0.5), 0 0 40px rgba(233, 30, 99, 0.15);
+    box-shadow: 0 6px 28px rgba(244, 59, 126, 0.4), 0 0 40px rgba(244, 59, 126, 0.12);
 }
 
 [data-theme="dark"] #discoverScreen .discover-tag {
-    background: rgba(255, 255, 255, 0.08) !important;
-    border-color: rgba(255, 255, 255, 0.12);
+    background: rgba(139, 92, 246, 0.08) !important;
+    border-color: rgba(139, 92, 246, 0.14);
     color: var(--app-text-secondary) !important;
 }
 
@@ -1516,21 +1516,21 @@ body.quiz-open {
 
 /* Dark mode overrides for credits store - specificity boost */
 [data-theme="dark"] #creditsScreen {
-    background: var(--app-bg, #0a0a0a) !important;
+    background: var(--app-bg, #0c0b12) !important;
 }
 
 [data-theme="dark"] #creditsScreen .store-header {
-    background: var(--app-bg, #0a0a0a) !important;
-    border-bottom-color: var(--app-border, #2a2a2a) !important;
+    background: var(--app-bg, #0c0b12) !important;
+    border-bottom-color: var(--app-border, #2a2840) !important;
 }
 
 [data-theme="dark"] #creditsScreen .credit-card.popular {
-    background: linear-gradient(135deg, #1a1218, #251520) !important;
-    border-color: #E91E63 !important;
+    background: linear-gradient(135deg, #1e1c34, #261e38) !important;
+    border-color: #F43B7E !important;
 }
 
 [data-theme="dark"] #creditsScreen .btn-purchase {
-    background: #E91E63;
+    background: linear-gradient(135deg, #F43B7E, #D42A6A);
     color: #ffffff;
 }
 
@@ -1539,47 +1539,47 @@ body.quiz-open {
    ======================================== */
 
 [data-theme="dark"] #jokerModal {
-    background: rgba(0, 0, 0, 0.75);
+    background: rgba(12, 11, 18, 0.8);
 }
 
 [data-theme="dark"] .joker-modal-panel {
-    background: var(--app-bg, #0a0a0a) !important;
+    background: var(--app-bg, #0c0b12) !important;
 }
 
 [data-theme="dark"] .joker-modal-header {
-    background: var(--app-bg, #0a0a0a) !important;
-    border-bottom-color: var(--app-border, #2a2a2a) !important;
+    background: var(--app-bg, #0c0b12) !important;
+    border-bottom-color: var(--app-border, #2a2840) !important;
 }
 
 [data-theme="dark"] .joker-modal-header h3 {
-    color: #ffffff !important;
+    color: #EEEAF5 !important;
 }
 
 [data-theme="dark"] .joker-modal-header .header-sub {
-    color: #999 !important;
+    color: #9E9BB2 !important;
 }
 
 [data-theme="dark"] .joker-modal-close {
-    background: #1a1a1a !important;
-    color: #ccc !important;
+    background: #1a1928 !important;
+    color: #9E9BB2 !important;
 }
 
 [data-theme="dark"] .joker-modal-close:hover {
-    background: #252525 !important;
+    background: #201f34 !important;
 }
 
 [data-theme="dark"] .joker-card {
-    background: var(--app-surface, #141414) !important;
-    border-color: var(--app-border, #2a2a2a) !important;
+    background: var(--app-surface, #13121e) !important;
+    border-color: var(--app-border, #2a2840) !important;
 }
 
 [data-theme="dark"] .joker-card.available:hover {
-    border-color: #9c7cff !important;
-    box-shadow: 0 4px 16px rgba(124, 77, 255, 0.2) !important;
+    border-color: #8B5CF6 !important;
+    box-shadow: 0 4px 20px rgba(139, 92, 246, 0.2) !important;
 }
 
 [data-theme="dark"] .joker-card.locked {
-    background: #0e0e0e !important;
+    background: #100f1a !important;
 }
 
 [data-theme="dark"] .joker-card.locked::before {
@@ -1587,62 +1587,62 @@ body.quiz-open {
         45deg,
         transparent,
         transparent 8px,
-        rgba(255, 255, 255, 0.02) 8px,
-        rgba(255, 255, 255, 0.02) 16px
+        rgba(139, 92, 246, 0.02) 8px,
+        rgba(139, 92, 246, 0.02) 16px
     ) !important;
 }
 
 [data-theme="dark"] .joker-card-title {
-    color: #ffffff !important;
+    color: #EEEAF5 !important;
 }
 
 [data-theme="dark"] .joker-card.locked .joker-card-title {
-    color: #666 !important;
+    color: #6B677F !important;
 }
 
 [data-theme="dark"] .joker-card-desc {
-    color: #999 !important;
+    color: #9E9BB2 !important;
 }
 
 [data-theme="dark"] .joker-card.locked .joker-card-desc {
-    color: #555 !important;
+    color: #4A4760 !important;
 }
 
 [data-theme="dark"] .joker-card.available .joker-card-icon {
-    background: linear-gradient(135deg, #2a1f4e, #3a2060) !important;
+    background: linear-gradient(135deg, #2a2548, #382860) !important;
 }
 
 [data-theme="dark"] .joker-card.locked .joker-card-icon {
-    background: #1a1a1a !important;
+    background: #1a1928 !important;
 }
 
 [data-theme="dark"] .joker-card.available .joker-rank-badge {
-    background: #2a1f4e !important;
-    color: #b39dff !important;
+    background: #2a2548 !important;
+    color: #A78BFA !important;
 }
 
 [data-theme="dark"] .joker-card.locked .joker-rank-badge {
-    background: #1a1a1a !important;
-    color: #666 !important;
+    background: #1a1928 !important;
+    color: #6B677F !important;
 }
 
 [data-theme="dark"] .joker-price {
-    color: #FF4081 !important;
+    color: #F43B7E !important;
 }
 
 [data-theme="dark"] .joker-lock-info {
-    color: #555 !important;
+    color: #4A4760 !important;
 }
 
 [data-theme="dark"] .joker-use-btn:disabled {
-    background: #2a2a2a !important;
-    color: #555 !important;
+    background: #2a2840 !important;
+    color: #4A4760 !important;
 }
 
 /* Special joker card dark mode */
 [data-theme="dark"] .joker-card.special-locked {
     border-color: #5a4200 !important;
-    background: linear-gradient(135deg, #1a1500, #201a00) !important;
+    background: linear-gradient(135deg, #1a1608, #201c0a) !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked::before {
@@ -1650,63 +1650,63 @@ body.quiz-open {
         45deg,
         transparent,
         transparent 8px,
-        rgba(255, 160, 0, 0.04) 8px,
-        rgba(255, 160, 0, 0.04) 16px
+        rgba(251, 191, 36, 0.03) 8px,
+        rgba(251, 191, 36, 0.03) 16px
     ) !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked .joker-card-icon {
-    background: linear-gradient(135deg, #3a2800, #4a3200) !important;
+    background: linear-gradient(135deg, #382c0a, #483610) !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked .joker-card-title {
-    color: #ffab40 !important;
+    color: #FBBF24 !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked .joker-rank-badge {
-    background: #3a2800 !important;
-    color: #ffab40 !important;
+    background: #382c0a !important;
+    color: #FBBF24 !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked .joker-card-desc {
-    color: #996830 !important;
+    color: #9E8840 !important;
 }
 
 [data-theme="dark"] .joker-card.special-locked .joker-lock-info {
-    color: #b87800 !important;
+    color: #C8A020 !important;
 }
 
 /* Joker chat bubbles dark mode */
 [data-theme="dark"] .joker-bubble {
-    background: linear-gradient(135deg, #1a1530, #1e1835) !important;
-    border-color: #2a2040 !important;
+    background: linear-gradient(135deg, #1a1830, #1e1c38) !important;
+    border-color: #2a2848 !important;
 }
 
 [data-theme="dark"] .joker-msg-title {
-    color: #b39dff !important;
+    color: #A78BFA !important;
 }
 
 [data-theme="dark"] .joker-msg-text {
-    color: #9c8fcc !important;
+    color: #9E9BB2 !important;
 }
 
 [data-theme="dark"] .joker-msg-time {
-    color: #6a5a9e !important;
+    color: #6B677F !important;
 }
 
 /* Soulmate rank bar dark mode */
 [data-theme="dark"] .soulmate-rank-bar {
-    background: rgba(10, 10, 10, 0.95) !important;
-    border-bottom-color: var(--app-border, #2a2a2a) !important;
+    background: rgba(12, 11, 18, 0.96) !important;
+    border-bottom-color: var(--app-border, #2a2840) !important;
 }
 
 [data-theme="dark"] .rank-level-label,
 [data-theme="dark"] .rank-next-label {
-    color: #ccc !important;
+    color: #9E9BB2 !important;
 }
 
 [data-theme="dark"] .rank-progress-track {
-    background: #1a1a1a !important;
+    background: #1a1928 !important;
 }
 
 /* Notification/Privacy settings theme */
@@ -1865,8 +1865,9 @@ body.quiz-open {
 }
 
 [data-theme="dark"] .profile-buy-credits-btn {
-    background: rgba(233, 30, 99, 0.9);
+    background: linear-gradient(135deg, rgba(244, 59, 126, 0.9), rgba(212, 42, 106, 0.9));
     color: #ffffff;
+    box-shadow: 0 4px 20px rgba(244, 59, 126, 0.3);
 }
 
 [data-theme="dark"] .profile-buy-credits-btn svg {
